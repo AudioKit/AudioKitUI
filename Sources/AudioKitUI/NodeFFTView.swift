@@ -4,15 +4,9 @@ import AudioKit
 import Accelerate
 import SwiftUI
 
-#if os(macOS)
-public typealias ViewRepresentable = NSViewRepresentable
-#else
-public typealias ViewRepresentable = UIViewRepresentable
-#endif
-
 public struct NodeFFTView: ViewRepresentable {
     var node: Tappable
-    let bufferSampleCount = 1024
+    let bufferSampleCount = 128
 
     let foregroundColorAddress = 0
     let backgroundColorAddress = 1

@@ -5,11 +5,6 @@ import Foundation
 import CAudioKit
 import CoreGraphics
 
-extension Notification.Name {
-    static let IAAConnected = Notification.Name(rawValue: "IAAConnected")
-    static let IAADisconnected = Notification.Name(rawValue: "IAADisconnected")
-}
-
 /// Plot the output from any node in an signal processing graph
 ///
 /// By default this plots the output of engine.output

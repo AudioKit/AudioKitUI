@@ -6,7 +6,7 @@ import SwiftUI
 
 public struct NodeOutputView: ViewRepresentable {
     var node: Tappable
-    let bufferSampleCount = 512
+    let bufferSampleCount = 128
 
     public init(_ tappableNode: Tappable) {
         node = tappableNode
@@ -20,8 +20,9 @@ public struct NodeOutputView: ViewRepresentable {
     var plot: FloatPlot {
         node.installTap()
         return FloatPlot(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024), fragment: metalFragment.stringValue) {
-            let data = node.getTapData(sampleCount: 512)
-            if data.count == 2, data[0].count == 512 {
+            let data = node.getTapData(sampleCount: bufferSampleCount)
+            print(data[0].count)
+            if data.count == 2, data[0].count == bufferSampleCount {
                 return data[0]
             } else {
                 return []
