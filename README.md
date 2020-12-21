@@ -10,3 +10,6 @@ We use SwiftUI so you need to target iOS13+ and macOS 10.15+.
 
 To add AudioKitUI to your Xcode project, select File -> Swift Packages -> Add Package Depedancy. Enter `https://github.com/AudioKit/AudioKitUI` for the URL. Currently, AudioKitUI depends on using the AudioKit `v5-develop` branch, but that will change soon.
 
+## Examples
+
+Just like AudioKit, the example project for AudioKitUI is the [AudioKit Cookbook](https://github.com/AudioKit/).
