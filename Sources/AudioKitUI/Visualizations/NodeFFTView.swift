@@ -2,21 +2,22 @@
 
 import AudioKit
 import Accelerate
+import AVFoundation
 import SwiftUI
 
 public struct NodeFFTView: ViewRepresentable {
-    var node: Tappable
+    var nodeTap: FFTTap
     let bufferSampleCount = 128
 
     let foregroundColorAddress = 0
     let backgroundColorAddress = 1
 
-    public init(node tappableNode: Tappable) {
-        node = tappableNode
+    public init(_ node: Node) {
+        nodeTap = FFTTap(node, bufferSize: UInt32(bufferSampleCount)) { _ in }
     }
 
     internal var plot: FloatPlot {
-        node.installTap()
+        nodeTap.start()
 
         let isFFT = false
         let isCentered = false
@@ -34,57 +35,7 @@ public struct NodeFFTView: ViewRepresentable {
         """
 
         let plot = FloatPlot(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024), fragment: metalFragmentOrig) {
-            let data = node.getTapData(sampleCount: bufferSampleCount)
-
-            if data.count < 2 || data[0].count < bufferSampleCount {
-                return []
-            }
-
-            let signal = data[0]
-
-            // The length of the input
-            let length = vDSP_Length(signal.count)
-            // The power of two of two times the length of the input.
-            // Do not forget this factor 2.
-            let log2n = vDSP_Length(ceil(log2(Float(length * 2))))
-            // Create the instance of the FFT class which allow computing FFT of complex vector with length
-            // up to `length`.
-            let fftSetup = vDSP.FFT(log2n: log2n, radix: .radix2, ofType: DSPSplitComplex.self)!
-
-            // Input / Output arrays
-
-            var forwardInputReal = [Float](signal) // Copy the signal here
-            var forwardInputImag = [Float](repeating: 0, count: Int(length))
-            var forwardOutputReal = [Float](repeating: 0, count: Int(length))
-            var forwardOutputImag = [Float](repeating: 0, count: Int(length))
-
-            var magnitudes = [Float](repeating: 0, count: Int(length))
-            var normalizedMagnitudes = [Float](repeating: 0.0, count: Int(length))
-            forwardInputReal.withUnsafeMutableBufferPointer { forwardInputRealPtr in
-                forwardInputImag.withUnsafeMutableBufferPointer { forwardInputImagPtr in
-                    forwardOutputReal.withUnsafeMutableBufferPointer { forwardOutputRealPtr in
-                        forwardOutputImag.withUnsafeMutableBufferPointer { forwardOutputImagPtr in
-                            // Input
-                            let forwardInput = DSPSplitComplex(realp: forwardInputRealPtr.baseAddress!, imagp: forwardInputImagPtr.baseAddress!)
-                            // Output
-                            var forwardOutput = DSPSplitComplex(realp: forwardOutputRealPtr.baseAddress!, imagp: forwardOutputImagPtr.baseAddress!)
-
-                            fftSetup.forward(input: forwardInput, output: &forwardOutput)
-                            vDSP.absolute(forwardOutput, result: &magnitudes)
-                            vDSP_vsmul(&magnitudes,
-                                       1,
-                                       [1.0 / (magnitudes.max() ?? 1.0)],
-                                       &normalizedMagnitudes,
-                                       1,
-                                       length)
-                        }
-                    }
-                }
-            }
-
-            normalizedMagnitudes = normalizedMagnitudes.dropLast(bufferSampleCount / 2)
-
-            return normalizedMagnitudes
+            return nodeTap.fftData
         }
 
         plot.setParameter(address: 0, value: 1)

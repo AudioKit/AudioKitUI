@@ -6,49 +6,38 @@ import AVFoundation
 import SwiftUI
 
 public class RollingViewData {
-    let bufferSampleCount = 1024
+    let bufferSampleCount = 128
     var history = [Float](repeating: 0.0, count: 1024)
-    var framesToRMS = 256
+    var framesToRMS = 128
 
-    func calculate(_ nodeTap: NodeTap) -> [Float] {
+    func calculate(_ nodeTap: RawDataTap) -> [Float] {
         var framesToTransform = [Float]()
 
-        if let buf = nodeTap.dataBuffer {
-            let data = Array(UnsafeBufferPointer(start: buf.floatChannelData![0],
-                                                 count: Int(nodeTap.bufferSize)))
+        let signal = nodeTap.data
 
-            if data.count < 2 || data.count < framesToRMS {
-                return []
+        for j in 0 ..< bufferSampleCount / framesToRMS {
+            for i in 0 ..< framesToRMS {
+                framesToTransform.append(signal[i + j * framesToRMS])
             }
 
-            let signal = data
-
-            for j in 0 ..< bufferSampleCount / framesToRMS {
-                for i in 0 ..< framesToRMS {
-                    framesToTransform.append(signal[i + j * framesToRMS])
-                }
-
-                var rms: Float = 0.0
-                vDSP_rmsqv(signal, 1, &rms, vDSP_Length(framesToRMS))
-                history.reverse()
-                _ = history.popLast()
-                history.reverse()
-                history.append(rms)
-            }
-            return history
-
-        } else {
-            return []
+            var rms: Float = 0.0
+            vDSP_rmsqv(signal, 1, &rms, vDSP_Length(framesToRMS))
+            history.reverse()
+            _ = history.popLast()
+            history.reverse()
+            history.append(rms)
         }
+        return history
+
     }
 }
 
 public struct NodeRollingView: ViewRepresentable {
-    var nodeTap: NodeTap
+    var nodeTap: RawDataTap
     var rollingData = RollingViewData()
 
     public init(_ node: Node) {
-        nodeTap = NodeTap(node)
+        nodeTap = RawDataTap(node, bufferSize: 128) { _ in }
     }
 
     let metalFragment = FragmentBuilder(foregroundColor: CrossPlatformColor(red: 0.5, green: 1, blue: 0.5, alpha: 1).cgColor,
