@@ -41,7 +41,7 @@ public struct NodeRollingView: ViewRepresentable {
     }
 
     let metalFragment = FragmentBuilder(foregroundColor: CrossPlatformColor(red: 0.5, green: 1, blue: 0.5, alpha: 1).cgColor,
-                                        backgroundColor: CrossPlatformColor(red: 0, green: 0, blue: 0, alpha: 1).cgColor,
+                                        backgroundColor: CrossPlatformColor(red: 0, green: 0, blue: 0, alpha: 0).cgColor,
                                         isCentered: true,
                                         isFilled: true)
     var plot: FloatPlot {

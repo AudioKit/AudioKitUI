@@ -74,8 +74,15 @@ public class FloatPlot: MTKView, MTKViewDelegate {
         let pipelineStateDescriptor = MTLRenderPipelineDescriptor()
         pipelineStateDescriptor.vertexFunction = vertexProgram
         pipelineStateDescriptor.fragmentFunction = fragmentProgram
-        pipelineStateDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
         pipelineStateDescriptor.sampleCount = 1
+
+        let colorAttachment = pipelineStateDescriptor.colorAttachments[0]!
+        colorAttachment.pixelFormat = .bgra8Unorm
+        colorAttachment.isBlendingEnabled = true
+        colorAttachment.sourceRGBBlendFactor = .sourceAlpha
+        colorAttachment.sourceAlphaBlendFactor = .sourceAlpha
+        colorAttachment.destinationRGBBlendFactor = .oneMinusSourceAlpha
+        colorAttachment.destinationAlphaBlendFactor = .oneMinusSourceAlpha
 
         pipelineState = try! device!.makeRenderPipelineState(descriptor: pipelineStateDescriptor)
 
@@ -85,6 +92,9 @@ public class FloatPlot: MTKView, MTKViewDelegate {
                                                   options: .storageModeShared)
 
         super.init(frame: frameRect, device: device)
+
+        self.clearColor = .init(red: 0.0, green: 0.0, blue: 0.0, alpha: 0)
+        self.backgroundColor = .clear
 
         delegate = self
     }
