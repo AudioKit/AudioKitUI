@@ -6,18 +6,13 @@ import AVFoundation
 import SwiftUI
 
 public struct NodeOutputView: ViewRepresentable {
-    var nodeTap: RawDataTap
-    var metalFragment: FragmentBuilder
-    let bufferSampleCount: UInt32 = 1024
+    private var nodeTap: RawDataTap
+    private var metalFragment: FragmentBuilder
 
-    public init(_ node: Node, color: CrossPlatformColor = CrossPlatformColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1)) {
+    public init(_ node: Node, color: Color = .gray, bufferSize: Int = 1024) {
 
-        metalFragment = FragmentBuilder(foregroundColor: color.cgColor,
-                                        backgroundColor: CrossPlatformColor(red: 0, green: 0, blue: 0, alpha: 0).cgColor,
-                                        isCentered: true,
-                                        isFilled: false)
-
-        nodeTap = RawDataTap(node, bufferSize: bufferSampleCount)
+        metalFragment = FragmentBuilder(foregroundColor: color.cg, isCentered: true, isFilled: false)
+        nodeTap = RawDataTap(node, bufferSize: UInt32(bufferSize))
     }
 
     var plot: FloatPlot {

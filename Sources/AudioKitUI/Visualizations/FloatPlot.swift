@@ -58,7 +58,7 @@ public class FloatPlot: MTKView, MTKViewDelegate {
 
         let defaultFragment = """
         float sample = waveform.sample(s, in.t.x).x;
-        float y = -2*(in.t.y - .5);
+        float y = (in.t.y - .5);
         float d = fabs(y - sample);
         float alpha = fabs(1/(50 * d));
         return alpha;

@@ -9,3 +9,9 @@ public typealias ViewRepresentable = NSViewRepresentable
 #else
 public typealias ViewRepresentable = UIViewRepresentable
 #endif
+
+public extension Color {
+    var cg: CGColor {
+        return CrossPlatformColor(self).cgColor
+    }
+}

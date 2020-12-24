@@ -36,16 +36,11 @@ public struct NodeRollingView: ViewRepresentable {
     var nodeTap: RawDataTap
     var metalFragment: FragmentBuilder
     var rollingData = RollingViewData()
-    let bufferSampleCount: UInt32 = 1024
 
-    public init(_ node: Node, color: CrossPlatformColor = CrossPlatformColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1)) {
+    public init(_ node: Node, color: Color = .gray, bufferSize: Int = 1024) {
 
-        metalFragment = FragmentBuilder(foregroundColor: color.cgColor,
-                                        backgroundColor: CrossPlatformColor(red: 0, green: 0, blue: 0, alpha: 0).cgColor,
-                                        isCentered: true,
-                                        isFilled: false)
-
-        nodeTap = RawDataTap(node, bufferSize: bufferSampleCount)
+        metalFragment = FragmentBuilder(foregroundColor: color.cg, isCentered: false, isFilled: false)
+        nodeTap = RawDataTap(node, bufferSize: UInt32(bufferSize))
     }
 
     var plot: FloatPlot {
