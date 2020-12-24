@@ -10,10 +10,10 @@ public struct NodeOutputView: ViewRepresentable {
     var metalFragment: FragmentBuilder
     let bufferSampleCount: UInt32 = 1024
 
-    public init(_ node: Node, color: CrossPlatformColor = CrossPlatformColor(red: 1, green: 1, blue: 1, alpha: 1)) {
+    public init(_ node: Node, color: CrossPlatformColor = CrossPlatformColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1)) {
 
         metalFragment = FragmentBuilder(foregroundColor: color.cgColor,
-                                        backgroundColor: CrossPlatformColor(red: 0, green: 0, blue: 0, alpha: 1).cgColor,
+                                        backgroundColor: CrossPlatformColor(red: 0, green: 0, blue: 0, alpha: 0).cgColor,
                                         isCentered: true,
                                         isFilled: false)
 
