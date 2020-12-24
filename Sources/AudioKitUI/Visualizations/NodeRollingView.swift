@@ -37,7 +37,7 @@ public struct NodeRollingView: ViewRepresentable {
     var rollingData = RollingViewData()
 
     public init(_ node: Node) {
-        nodeTap = RawDataTap(node, bufferSize: 128) { _ in }
+        nodeTap = RawDataTap(node, bufferSize: 128)
     }
 
     let metalFragment = FragmentBuilder(foregroundColor: CrossPlatformColor(red: 0.5, green: 1, blue: 0.5, alpha: 1).cgColor,

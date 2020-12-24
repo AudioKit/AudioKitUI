@@ -7,16 +7,18 @@ import SwiftUI
 
 public struct NodeOutputView: ViewRepresentable {
     var nodeTap: RawDataTap
-    let bufferSampleCount = 128
+    var metalFragment: FragmentBuilder
+    let bufferSampleCount: UInt32 = 1024
 
-    public init(_ node: Node) {
-        nodeTap = RawDataTap(node, bufferSize: UInt32(bufferSampleCount)) { _ in }
-    }
+    public init(_ node: Node, color: CrossPlatformColor = CrossPlatformColor(red: 1, green: 1, blue: 1, alpha: 1)) {
 
-    let metalFragment = FragmentBuilder(foregroundColor: CrossPlatformColor(red: 0.5, green: 0.5, blue: 1, alpha: 1).cgColor,
-                                        backgroundColor: CrossPlatformColor(red: 0.1, green: 0.3, blue: 0.2, alpha: 1).cgColor,
+        metalFragment = FragmentBuilder(foregroundColor: color.cgColor,
+                                        backgroundColor: CrossPlatformColor(red: 0, green: 0, blue: 0, alpha: 1).cgColor,
                                         isCentered: true,
                                         isFilled: false)
+
+        nodeTap = RawDataTap(node, bufferSize: bufferSampleCount)
+    }
 
     var plot: FloatPlot {
         nodeTap.start()
