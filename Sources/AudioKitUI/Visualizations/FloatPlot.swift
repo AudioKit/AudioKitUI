@@ -94,7 +94,6 @@ public class FloatPlot: MTKView, MTKViewDelegate {
         super.init(frame: frameRect, device: device)
 
         self.clearColor = .init(red: 0.0, green: 0.0, blue: 0.0, alpha: 0)
-        self.backgroundColor = .clear
 
         delegate = self
     }

@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "AudioKitUI",
     platforms: [
-        .macOS(.v10_15), .iOS(.v14)
+        .macOS(.v11), .iOS(.v14)
     ],
     products: [
         .library(
