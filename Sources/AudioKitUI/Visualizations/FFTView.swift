@@ -1,5 +1,5 @@
 //
-//  SwiftUIView.swift
+//  FFTView.swift
 //  
 //
 //  Created by Matt Pfeiffer on 12/29/20.
