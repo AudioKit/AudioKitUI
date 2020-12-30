@@ -1,9 +1,4 @@
-//
-//  FFTView.swift
-//  
-//
-//  Created by Matt Pfeiffer on 12/29/20.
-//
+// Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 
 import SwiftUI
 import AudioKit
