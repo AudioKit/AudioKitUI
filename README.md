@@ -13,5 +13,3 @@ To add AudioKitUI to your Xcode project, select File -> Swift Packages -> Add Pa
 ## Examples
 
 Just like AudioKit, the example project for AudioKitUI is the [AudioKit Cookbook](https://github.com/AudioKit/Cookbook/).
-
-https://user-images.githubusercontent.com/15333030/103323278-c1b4a500-4a07-11eb-9c5c-a7d3958d5f98.MP4
