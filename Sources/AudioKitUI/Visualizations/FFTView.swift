@@ -53,7 +53,7 @@ class FFTModel: ObservableObject {
     }
 }
 
-struct FFTView: View {
+public struct FFTView: View {
     @ObservedObject var fft: FFTModel
     
     public init(_ node: Node) {
