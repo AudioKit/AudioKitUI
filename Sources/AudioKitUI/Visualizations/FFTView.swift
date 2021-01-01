@@ -64,7 +64,7 @@ public struct FFTView: View {
     var paddingFraction: CGFloat = 0.2
     var includeCaps: Bool = true
     
-    var body: some View {
+    public var body: some View {
         HStack(spacing: 0.0) {
             ForEach(0 ..< fft.amplitudes.count) { number in
                 AmplitudeBar(amplitude: fft.amplitudes[number], linearGradient: linearGradient, paddingFraction: paddingFraction, includeCaps: includeCaps)
