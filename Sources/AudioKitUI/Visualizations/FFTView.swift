@@ -17,9 +17,10 @@ class FFTModel: ObservableObject {
         nodeTap.start()
     }
     
-    func updateAmplitudes(_ fftData: [Float]) {
+    func updateAmplitudes(_ fftFloats: [Float]) {
+        var fftData = fftFloats
         for index in 0..<fftData.count {
-            if fftData[0].isNaN { return }
+            if fftData[index].isNaN { fftData[index] = 0.0 }
         }
 
         // loop by two through all the fft data
