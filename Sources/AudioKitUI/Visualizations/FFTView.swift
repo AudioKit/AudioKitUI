@@ -41,7 +41,11 @@ class FFTModel: ObservableObject {
             // add the amplitude to our array (further scaling array to look good in visualizer)
             DispatchQueue.main.async {
                 if i / 2 < self.amplitudes.count {
-                    self.amplitudes[i / 2] = self.map(n: scaledAmplitude, start1: 0.3, stop1: 0.9, start2: 0.0, stop2: 1.0)
+                    var mappedAmplitude = self.map(n: scaledAmplitude, start1: 0.3, stop1: 0.9, start2: 0.0, stop2: 1.0)
+                    if mappedAmplitude < 0.0 {
+                        mappedAmplitude = 0.0
+                    }
+                    self.amplitudes[i / 2] = mappedAmplitude
                 }
             }
         }
