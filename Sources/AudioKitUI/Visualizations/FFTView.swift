@@ -18,6 +18,10 @@ class FFTModel: ObservableObject {
     }
     
     func updateAmplitudes(_ fftData: [Float]) {
+        for index in 0..<fftData.count {
+            if fftData[0].isNaN { return }
+        }
+
         // loop by two through all the fft data
         for i in stride(from: 0, to: FFT_SIZE - 1, by: 2) {
             // get the real and imaginary parts of the complex number
