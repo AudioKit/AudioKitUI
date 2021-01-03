@@ -14,6 +14,7 @@ class FFTModel: ObservableObject {
                 self.updateAmplitudes(fftData)
             }
         }
+        nodeTap.isNormalized = false
         nodeTap.start()
     }
     
@@ -40,16 +41,11 @@ class FFTModel: ObservableObject {
                 // scale the resulting data
                 var scaledAmplitude = (amplitude + 250) / 229.80
                 
-                // restrict the range to 0.0 - 1.0
-                if scaledAmplitude < 0 {
-                    scaledAmplitude = 0
-                }
-                if scaledAmplitude > 1.0 {
-                    scaledAmplitude = 1.0
-                }
-                    
                 // further scaling array to look good in visualizer
-                var mappedAmplitude = self.map(n: scaledAmplitude, start1: 0.3, stop1: 0.9, start2: 0.0, stop2: 1.0)
+                var mappedAmplitude = self.map(n: scaledAmplitude, start1: 0.7, stop1: 1.45 , start2: 0.0, stop2: 1.0)
+                if mappedAmplitude > 1.0 {
+                    mappedAmplitude = 1.0
+                }
                 if mappedAmplitude < 0.0 {
                     mappedAmplitude = 0.0
                 }
