@@ -57,9 +57,9 @@ class FFTModel: ObservableObject {
                 tempAmplitudeArray.append(mappedAmplitude)
             }
         }
-        // add the amplitude to our array
+        // swap the amplitude array
         DispatchQueue.main.async {
-            self.amplitudes[i / 2] = mappedAmplitude
+            self.amplitudes = tempAmplitudeArray
         }
     }
     
