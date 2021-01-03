@@ -19,7 +19,7 @@ class FFTModel: ObservableObject {
     
     func updateAmplitudes(_ fftFloats: [Float]) {
         var fftData = fftFloats
-        for index in 0..<fftData.count {
+        for index in 0 ..< fftData.count {
             if fftData[index].isNaN { fftData[index] = 0.0 }
         }
 
@@ -71,7 +71,8 @@ public struct FFTView: View {
     public init(_ node: Node,
                 linearGradient: LinearGradient = LinearGradient(gradient: Gradient(colors: [.red, .yellow, .green]), startPoint: .top, endPoint: .center),
                 paddingFraction: CGFloat = 0.2,
-                includeCaps: Bool = true) {
+                includeCaps: Bool = true)
+    {
         fft = FFTModel(node)
         self.linearGradient = linearGradient
         self.paddingFraction = paddingFraction
