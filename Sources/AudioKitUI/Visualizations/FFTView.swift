@@ -22,37 +22,44 @@ class FFTModel: ObservableObject {
         for index in 0 ..< fftData.count {
             if fftData[index].isNaN { fftData[index] = 0.0 }
         }
+        
+        var tempAmplitudeArray : [Double] = []
 
         // loop by two through all the fft data
         for i in stride(from: 0, to: FFT_SIZE - 1, by: 2) {
-            // get the real and imaginary parts of the complex number
-            let real = fftData[i]
-            let imaginary = fftData[i + 1]
             
-            let normalizedBinMagnitude = 2.0 * sqrt(real * real + imaginary * imaginary) / Float(FFT_SIZE)
-            let amplitude = Double(20.0 * log10(normalizedBinMagnitude))
+            if i / 2 < self.amplitudes.count {
             
-            // scale the resulting data
-            var scaledAmplitude = (amplitude + 250) / 229.80
-            
-            // restrict the range to 0.0 - 1.0
-            if scaledAmplitude < 0 {
-                scaledAmplitude = 0
-            }
-            if scaledAmplitude > 1.0 {
-                scaledAmplitude = 1.0
-            }
-            
-            // add the amplitude to our array (further scaling array to look good in visualizer)
-            DispatchQueue.main.async {
-                if i / 2 < self.amplitudes.count {
-                    var mappedAmplitude = self.map(n: scaledAmplitude, start1: 0.3, stop1: 0.9, start2: 0.0, stop2: 1.0)
-                    if mappedAmplitude < 0.0 {
-                        mappedAmplitude = 0.0
-                    }
-                    self.amplitudes[i / 2] = mappedAmplitude
+                // get the real and imaginary parts of the complex number
+                let real = fftData[i]
+                let imaginary = fftData[i + 1]
+                
+                let normalizedBinMagnitude = 2.0 * sqrt(real * real + imaginary * imaginary) / Float(FFT_SIZE)
+                let amplitude = Double(20.0 * log10(normalizedBinMagnitude))
+                
+                // scale the resulting data
+                var scaledAmplitude = (amplitude + 250) / 229.80
+                
+                // restrict the range to 0.0 - 1.0
+                if scaledAmplitude < 0 {
+                    scaledAmplitude = 0
                 }
+                if scaledAmplitude > 1.0 {
+                    scaledAmplitude = 1.0
+                }
+                    
+                // further scaling array to look good in visualizer
+                var mappedAmplitude = self.map(n: scaledAmplitude, start1: 0.3, stop1: 0.9, start2: 0.0, stop2: 1.0)
+                if mappedAmplitude < 0.0 {
+                    mappedAmplitude = 0.0
+                }
+                
+                tempAmplitudeArray.append(mappedAmplitude)
             }
+        }
+        // swap the amplitude array
+        DispatchQueue.main.async {
+            self.amplitudes = tempAmplitudeArray
         }
     }
     
@@ -85,6 +92,7 @@ public struct FFTView: View {
                 AmplitudeBar(amplitude: fft.amplitudes[number], linearGradient: linearGradient, paddingFraction: paddingFraction, includeCaps: includeCaps)
             }
         }
+        .drawingGroup() // Metal powered rendering
         .background(Color.black)
     }
 }
