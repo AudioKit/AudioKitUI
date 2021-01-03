@@ -24,13 +24,11 @@ class FFTModel: ObservableObject {
             if fftData[index].isNaN { fftData[index] = 0.0 }
         }
         
-        var tempAmplitudeArray : [Double] = []
+        var tempAmplitudeArray: [Double] = []
 
         // loop by two through all the fft data
         for i in stride(from: 0, to: FFT_SIZE - 1, by: 2) {
-            
-            if i / 2 < self.amplitudes.count {
-            
+            if i / 2 < amplitudes.count {
                 // get the real and imaginary parts of the complex number
                 let real = fftData[i]
                 let imaginary = fftData[i + 1]
@@ -42,7 +40,7 @@ class FFTModel: ObservableObject {
                 var scaledAmplitude = (amplitude + 250) / 229.80
                 
                 // further scaling array to look good in visualizer
-                var mappedAmplitude = self.map(n: scaledAmplitude, start1: 0.7, stop1: 1.45 , start2: 0.0, stop2: 1.0)
+                var mappedAmplitude = map(n: scaledAmplitude, start1: 0.7, stop1: 1.45, start2: 0.0, stop2: 1.0)
                 if mappedAmplitude > 1.0 {
                     mappedAmplitude = 1.0
                 }
