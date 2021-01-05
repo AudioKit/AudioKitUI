@@ -7,15 +7,19 @@ class FFTModel: ObservableObject {
     @Published var amplitudes: [Double?] = Array(repeating: nil, count: 50)
     var nodeTap: FFTTap!
     private var FFT_SIZE = 512
+    var node: Node?
 
-    init(_ node: Node) {
-        nodeTap = FFTTap(node) { fftData in
-            DispatchQueue.main.async {
-                self.updateAmplitudes(fftData)
+    func updateNode(_ node: Node) {
+        if node !== self.node {
+            self.node = node
+            nodeTap = FFTTap(node) { fftData in
+                DispatchQueue.main.async {
+                    self.updateAmplitudes(fftData)
+                }
             }
+            nodeTap.isNormalized = false
+            nodeTap.start()
         }
-        nodeTap.isNormalized = false
-        nodeTap.start()
     }
 
     func updateAmplitudes(_ fftFloats: [Float]) {
@@ -64,10 +68,11 @@ class FFTModel: ObservableObject {
 }
 
 public struct FFTView: View {
-    @ObservedObject var fft: FFTModel
+    @StateObject var fft = FFTModel()
     private var linearGradient: LinearGradient
     private var paddingFraction: CGFloat
     private var includeCaps: Bool
+    private var node: Node
 
     public init(_ node: Node,
                 linearGradient: LinearGradient = LinearGradient(gradient: Gradient(colors: [.red, .yellow, .green]),
@@ -76,7 +81,7 @@ public struct FFTView: View {
                 paddingFraction: CGFloat = 0.2,
                 includeCaps: Bool = true)
     {
-        fft = FFTModel(node)
+        self.node = node
         self.linearGradient = linearGradient
         self.paddingFraction = paddingFraction
         self.includeCaps = includeCaps
@@ -92,6 +97,8 @@ public struct FFTView: View {
                                  includeCaps: includeCaps)
                 }
             }
+        }.onAppear {
+            fft.updateNode(node)
         }
         .drawingGroup() // Metal powered rendering
         .background(Color.black)
