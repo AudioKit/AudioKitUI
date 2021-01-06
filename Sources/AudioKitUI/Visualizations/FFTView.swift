@@ -6,7 +6,7 @@ import SwiftUI
 class FFTModel: ObservableObject {
     @Published var amplitudes: [Double?] = Array(repeating: nil, count: 50)
     var nodeTap: FFTTap!
-    private var FFT_SIZE = 512
+    private var FFT_SIZE = 2048
     var node: Node?
 
     func updateNode(_ node: Node) {
@@ -40,11 +40,8 @@ class FFTModel: ObservableObject {
                 let normalizedBinMagnitude = 2.0 * sqrt(real * real + imaginary * imaginary) / Float(FFT_SIZE)
                 let amplitude = Double(20.0 * log10(normalizedBinMagnitude))
 
-                // scale the resulting data
-                let scaledAmplitude = (amplitude + 250) / 229.80
-
-                // further scaling array to look good in visualizer
-                var mappedAmplitude = map(n: scaledAmplitude, start1: 0.7, stop1: 1.45, start2: 0.0, stop2: 1.0)
+                // map amplitude array to visualizer
+                var mappedAmplitude = map(n: amplitude, start1: -150, stop1: -10.0, start2: 0.0, stop2: 1.0)
                 if mappedAmplitude > 1.0 {
                     mappedAmplitude = 1.0
                 }
