@@ -94,10 +94,9 @@ public struct FFTView: View {
         if maxAmplitude < minAmplitude {
             fatalError("Maximum amplitude cannot be less than minimum amplitude")
         }
-        if (minAmplitude > 0.0 || maxAmplitude > 0.0){
+        if minAmplitude > 0.0 || maxAmplitude > 0.0 {
             fatalError("Amplitude values must be less than zero")
         }
-        
     }
 
     public var body: some View {
