@@ -9,6 +9,8 @@ class FFTModel: ObservableObject {
     private var FFT_SIZE = 2048
     var node: Node?
     var numberOfBars: Int = 50
+    var maxAmplitude: Double = -10.0
+    var minAmplitude: Double = -150.0
 
     func updateNode(_ node: Node) {
         if node !== self.node {
@@ -42,7 +44,7 @@ class FFTModel: ObservableObject {
                 let amplitude = Double(20.0 * log10(normalizedBinMagnitude))
 
                 // map amplitude array to visualizer
-                var mappedAmplitude = map(n: amplitude, start1: -150, stop1: -10.0, start2: 0.0, stop2: 1.0)
+                var mappedAmplitude = map(n: amplitude, start1: minAmplitude, stop1: maxAmplitude, start2: 0.0, stop2: 1.0)
                 if mappedAmplitude > 1.0 {
                     mappedAmplitude = 1.0
                 }
@@ -72,6 +74,8 @@ public struct FFTView: View {
     private var includeCaps: Bool
     private var node: Node
     private var numberOfBars: Int
+    private var minAmplitude: Double
+    private var maxAmplitude: Double
 
     public init(_ node: Node,
                 linearGradient: LinearGradient = LinearGradient(gradient: Gradient(colors: [.red, .yellow, .green]),
@@ -79,13 +83,24 @@ public struct FFTView: View {
                                                                 endPoint: .center),
                 paddingFraction: CGFloat = 0.2,
                 includeCaps: Bool = true,
-                numberOfBars: Int = 50)
+                numberOfBars: Int = 50,
+                maxAmplitude: Double = -10.0,
+                minAmplitude: Double = -150.0)
     {
         self.node = node
         self.linearGradient = linearGradient
         self.paddingFraction = paddingFraction
         self.includeCaps = includeCaps
         self.numberOfBars = numberOfBars
+        self.maxAmplitude = maxAmplitude
+        self.minAmplitude = minAmplitude
+
+        if maxAmplitude < minAmplitude {
+            fatalError("Maximum amplitude cannot be less than minimum amplitude")
+        }
+        if minAmplitude > 0.0 || maxAmplitude > 0.0 {
+            fatalError("Amplitude values must be less than zero")
+        }
     }
 
     public var body: some View {
@@ -101,6 +116,8 @@ public struct FFTView: View {
         }.onAppear {
             fft.updateNode(node)
             fft.numberOfBars = self.numberOfBars
+            fft.maxAmplitude = self.maxAmplitude
+            fft.minAmplitude = self.minAmplitude
         }
         .drawingGroup() // Metal powered rendering
         .background(Color.black)
