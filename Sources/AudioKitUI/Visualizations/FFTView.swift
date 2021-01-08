@@ -8,6 +8,7 @@ class FFTModel: ObservableObject {
     var nodeTap: FFTTap!
     private var FFT_SIZE = 2048
     var node: Node?
+    var numberOfBars: Int = 50
     var maxAmplitude: Double = -10.0
     var minAmplitude: Double = -150.0
 
@@ -34,7 +35,7 @@ class FFTModel: ObservableObject {
 
         // loop by two through all the fft data
         for i in stride(from: 0, to: FFT_SIZE - 1, by: 2) {
-            if i / 2 < amplitudes.count {
+            if i / 2 < numberOfBars {
                 // get the real and imaginary parts of the complex number
                 let real = fftData[i]
                 let imaginary = fftData[i + 1]
@@ -72,6 +73,7 @@ public struct FFTView: View {
     private var paddingFraction: CGFloat
     private var includeCaps: Bool
     private var node: Node
+    private var numberOfBars: Int
     private var minAmplitude: Double
     private var maxAmplitude: Double
 
@@ -81,6 +83,7 @@ public struct FFTView: View {
                                                                 endPoint: .center),
                 paddingFraction: CGFloat = 0.2,
                 includeCaps: Bool = true,
+                numberOfBars: Int = 50,
                 maxAmplitude: Double = -10.0,
                 minAmplitude: Double = -150.0)
     {
@@ -88,6 +91,7 @@ public struct FFTView: View {
         self.linearGradient = linearGradient
         self.paddingFraction = paddingFraction
         self.includeCaps = includeCaps
+        self.numberOfBars = numberOfBars
         self.maxAmplitude = maxAmplitude
         self.minAmplitude = minAmplitude
 
@@ -101,7 +105,7 @@ public struct FFTView: View {
 
     public var body: some View {
         HStack(spacing: 0.0) {
-            ForEach(0 ..< fft.amplitudes.count) { number in
+            ForEach(fft.amplitudes.indices, id: \.self) { number in
                 if let amplitude = fft.amplitudes[number] {
                     AmplitudeBar(amplitude: amplitude,
                                  linearGradient: linearGradient,
@@ -111,6 +115,7 @@ public struct FFTView: View {
             }
         }.onAppear {
             fft.updateNode(node)
+            fft.numberOfBars = self.numberOfBars
             fft.maxAmplitude = self.maxAmplitude
             fft.minAmplitude = self.minAmplitude
         }
