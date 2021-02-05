@@ -38,15 +38,21 @@ struct WavetableView: View {
     }
     
     func createWave(width: CGFloat, height: CGFloat) -> some View {
+        let xPaddedLowerBound = width*0.01
+        let xPaddedUpperBound = width*0.99
+        let yPaddedLowerBound = height*0.01
+        let yPaddedUpperBound = height*0.99
+        
         var points: [CGPoint] = []
-        points.append(CGPoint(x: Double(width)*0.01, y: Double(0.5*height)))
+        points.append(CGPoint(x: xPaddedLowerBound, y: 0.5*height))
+        
         for i in 0 ..< wavetableModel.floats.count {
-            let x = map(n: Double(i), start1: 0, stop1: Double(wavetableModel.floats.count), start2: Double(width)*0.01, stop2: Double(width)*0.99)
-            let y = map(n: Double(wavetableModel.floats[i]), start1: -1, stop1: 1, start2: Double(height)*0.99, stop2: Double(height)*0.01)
-            points.append(CGPoint(x: x, y: y))
+            let x = i.mapped(to: xPaddedLowerBound...xPaddedUpperBound, from: 0...wavetableModel.floats.count)
+            let y = CGFloat(wavetableModel.floats[i]).mapped(to: yPaddedLowerBound...yPaddedUpperBound, from: -1...1)
+            points.append(CGPoint(x: x, y: height - y))
         }
-        points.append(CGPoint(x: Double(width)*0.99, y: Double(height*0.5)))
-        points.append(CGPoint(x: Double(width)*0.01, y: Double(height*0.5)))
+        points.append(CGPoint(x: xPaddedUpperBound, y: height*0.5))
+        points.append(CGPoint(x: xPaddedLowerBound, y: height*0.5))
         
         return ZStack {
             backgroundColor
