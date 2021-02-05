@@ -47,8 +47,8 @@ struct WavetableView: View {
         points.append(CGPoint(x: xPaddedLowerBound, y: 0.5*height))
         
         for i in 0 ..< wavetableModel.floats.count {
-            let x = i.mapped(to: xPaddedLowerBound...xPaddedUpperBound, from: 0...wavetableModel.floats.count)
-            let y = CGFloat(wavetableModel.floats[i]).mapped(to: yPaddedLowerBound...yPaddedUpperBound, from: -1...1)
+            let x = i.mapped(from: 0...wavetableModel.floats.count, to: xPaddedLowerBound...xPaddedUpperBound)
+            let y = CGFloat(wavetableModel.floats[i]).mapped(from: -1...1, to: yPaddedLowerBound...yPaddedUpperBound)
             points.append(CGPoint(x: x, y: height - y))
         }
         points.append(CGPoint(x: xPaddedUpperBound, y: height*0.5))
