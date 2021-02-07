@@ -44,7 +44,11 @@ class FFTModel: ObservableObject {
                 let amplitude = Double(20.0 * log10(normalizedBinMagnitude))
 
                 // map amplitude array to visualizer
-                var mappedAmplitude = map(n: amplitude, start1: minAmplitude, stop1: maxAmplitude, start2: 0.0, stop2: 1.0)
+                var mappedAmplitude = map(n: amplitude,
+                                          start1: minAmplitude,
+                                          stop1: maxAmplitude,
+                                          start2: 0.0,
+                                          stop2: 1.0)
                 if mappedAmplitude > 1.0 {
                     mappedAmplitude = 1.0
                 }
@@ -115,9 +119,9 @@ public struct FFTView: View {
             }
         }.onAppear {
             fft.updateNode(node)
-            fft.numberOfBars = self.numberOfBars
-            fft.maxAmplitude = self.maxAmplitude
-            fft.minAmplitude = self.minAmplitude
+            fft.numberOfBars = numberOfBars
+            fft.maxAmplitude = maxAmplitude
+            fft.minAmplitude = minAmplitude
         }
         .drawingGroup() // Metal powered rendering
         .background(Color.black)
@@ -141,7 +145,7 @@ struct AmplitudeBar: View {
             ZStack(alignment: .bottom) {
                 // Colored rectangle in back of ZStack
                 Rectangle()
-                    .fill(self.linearGradient)
+                    .fill(linearGradient)
 
                 // Dynamic black mask padded from bottom in relation to the amplitude
                 Rectangle()
