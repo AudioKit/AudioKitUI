@@ -11,7 +11,7 @@ public struct KeyboardWidget: ViewRepresentable {
 
     #if os(macOS)
     public func makeNSView(context: Context) -> KeyboardView {
-        let view = KeyboardView()
+        let view = KeyboardView(width: 400, height: 100)
         view.delegate = delegate
         view.firstOctave = firstOctave
         view.octaveCount = octaveCount
@@ -34,21 +34,5 @@ public struct KeyboardWidget: ViewRepresentable {
         self.delegate = delegate
         self.firstOctave = firstOctave
         self.octaveCount = octaveCount
-    }
-}
-
-struct KeyboardWidget_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            KeyboardWidget().previewLayout(PreviewLayout.fixed(width: 500, height: 200))
-                .padding()
-                .previewDisplayName("Light Mode")
-
-            KeyboardWidget().previewLayout(PreviewLayout.fixed(width: 500, height: 200))
-                .padding()
-                .background(Color(.systemBackground))
-                .environment(\.colorScheme, .dark)
-                .previewDisplayName("Dark Mode")
-        }
     }
 }
