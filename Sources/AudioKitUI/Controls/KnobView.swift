@@ -4,7 +4,7 @@ import SwiftUI
 
 struct KnobDefaults {
     static let knobPreferredWidth: CGFloat = 60
-    static let knobBgColor = Color.init(hue: 0.5, saturation: 0.75, brightness: 0.5, opacity: 0.55)
+    static let knobBgColor = Color(hue: 0.5, saturation: 0.75, brightness: 0.5, opacity: 0.55)
     static let knobBgCornerRadius: CGFloat = 1.0 * 0.25 * knobPreferredWidth
     static let knobLineCap: CGLineCap = .round
     static let knobCircleWidth = 0.7 * knobPreferredWidth
