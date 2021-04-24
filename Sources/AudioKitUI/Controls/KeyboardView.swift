@@ -649,7 +649,7 @@ extension KeyboardView: MIDIListener {
                                    velocity: MIDIVelocity,
                                    channel: MIDIChannel,
                                    portID: MIDIUniqueID?,
-                                   offset: MIDITimeStamp) {
+                                   timeStamp: MIDITimeStamp?) {
         DispatchQueue.main.async(execute: {
             self.onKeys.insert(noteNumber)
             self.delegate?.noteOn(note: noteNumber)
@@ -669,7 +669,7 @@ extension KeyboardView: MIDIListener {
                                     velocity: MIDIVelocity,
                                     channel: MIDIChannel,
                                     portID: MIDIUniqueID?,
-                                    offset: MIDITimeStamp) {
+                                    timeStamp: MIDITimeStamp?) {
         DispatchQueue.main.async(execute: {
             self.onKeys.remove(noteNumber)
             self.delegate?.noteOff(note: noteNumber)
@@ -689,7 +689,7 @@ extension KeyboardView: MIDIListener {
                                        value: MIDIByte,
                                        channel: MIDIChannel,
                                        portID: MIDIUniqueID?,
-                                       offset: MIDITimeStamp) {
+                                       timeStamp: MIDITimeStamp?) {
         if controller == MIDIByte(MIDIControl.damperOnOff.rawValue) && value == 0 {
             for note in onKeys {
                 delegate?.noteOff(note: note)
@@ -710,7 +710,7 @@ extension KeyboardView: MIDIListener {
                                        pressure: MIDIByte,
                                        channel: MIDIChannel,
                                        portID: MIDIUniqueID?,
-                                       offset: MIDITimeStamp) {
+                                       timeStamp: MIDITimeStamp?) {
         // Do nothing
     }
 
@@ -725,7 +725,7 @@ extension KeyboardView: MIDIListener {
     public func receivedMIDIAftertouch(_ pressure: MIDIByte,
                                        channel: MIDIChannel,
                                        portID: MIDIUniqueID?,
-                                       offset: MIDITimeStamp) {
+                                       timeStamp: MIDITimeStamp?) {
         // Do nothing
     }
 
@@ -740,7 +740,7 @@ extension KeyboardView: MIDIListener {
     public func receivedMIDIPitchWheel(_ pitchWheelValue: MIDIWord,
                                        channel: MIDIChannel,
                                        portID: MIDIUniqueID?,
-                                       offset: MIDITimeStamp) {
+                                       timeStamp: MIDITimeStamp?) {
         // Do nothing
     }
 
@@ -755,7 +755,7 @@ extension KeyboardView: MIDIListener {
     public func receivedMIDIProgramChange(_ program: MIDIByte,
                                           channel: MIDIChannel,
                                           portID: MIDIUniqueID?,
-                                          offset: MIDITimeStamp) {
+                                          timeStamp: MIDITimeStamp?) {
         // Do nothing
     }
 
@@ -767,7 +767,7 @@ extension KeyboardView: MIDIListener {
     ///
     public func receivedMIDISystemCommand(_ data: [MIDIByte],
                                           portID: MIDIUniqueID?,
-                                          offset: MIDITimeStamp) {
+                                          timeStamp: MIDITimeStamp?) {
         // Do nothing
     }
 
