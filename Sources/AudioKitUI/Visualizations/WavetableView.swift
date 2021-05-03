@@ -7,7 +7,7 @@ public class WavetableModel: ObservableObject {
     @Published public var floats: [Float] = Table(.sine).content
     var node: DynamicOscillator?
     
-    public init(){}
+    public init() {}
     
     public func updateNode(_ node: DynamicOscillator) {
         if node !== self.node {
@@ -19,17 +19,16 @@ public class WavetableModel: ObservableObject {
     
     func setFloats(floats: [Float]) {
         self.floats = floats.downSample(to: 128)
-            //downSampleFloats(floats: floats, numberOfOutputSamples: 128)
     }
 }
 
 public struct WavetableView: View {
     var node: DynamicOscillator
     @StateObject var wavetableModel = WavetableModel()
-    private var strokeColor : Color
+    private var strokeColor: Color
     private var strokeLineWidth: CGFloat
-    private var fillColor : Color
-    private var backgroundColor : Color
+    private var fillColor: Color
+    private var backgroundColor: Color
     
     public init(_ node: DynamicOscillator, strokeColor: Color = Color.white, strokeLineWidth: CGFloat = 1.0, fillColor: Color = Color.green.opacity(0.8), backgroundColor: Color = Color.black) {
         self.node = node
