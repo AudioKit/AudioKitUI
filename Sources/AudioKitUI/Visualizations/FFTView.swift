@@ -31,7 +31,7 @@ class FFTModel: ObservableObject {
             if fftData[index].isNaN { fftData[index] = 0.0 }
         }
 
-        var tempAmplitudeArray: [Double] = []
+        var tempAmplitudes: [Double] = []
 
         // loop by two through all the fft data
         for i in stride(from: 0, to: FFT_SIZE - 1, by: 2) {
@@ -56,12 +56,12 @@ class FFTModel: ObservableObject {
                     mappedAmplitude = 0.0
                 }
 
-                tempAmplitudeArray.append(mappedAmplitude)
+                tempAmplitudes.append(mappedAmplitude)
             }
         }
         // swap the amplitude array
         DispatchQueue.main.async {
-            self.amplitudes = tempAmplitudeArray
+            self.amplitudes = tempAmplitudes
         }
     }
 

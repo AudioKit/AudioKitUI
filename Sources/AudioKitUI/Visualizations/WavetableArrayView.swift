@@ -7,7 +7,7 @@ public struct WavetableArrayView: View {
     @StateObject var wavetableModel = WavetableModel()
     var node: DynamicOscillator
     @Binding var selectedValue: AUValue
-    @State var wavetableArray: [Table]
+    @State var wavetables: [Table]
     private var backgroundColor: Color
     private var arrayStrokeColor: Color
     private var selectedStrokeColor: Color
@@ -15,7 +15,7 @@ public struct WavetableArrayView: View {
     
     public init(_ node: DynamicOscillator,
                 selectedValue: Binding<AUValue>,
-                realWavetableArray: [Table],
+                realWavetables: [Table],
                 backgroundColor: Color = Color.black,
                 arrayStrokeColor: Color = Color.white.opacity(0.4),
                 selectedStrokeColor: Color = Color.white.opacity(1.0),
@@ -23,7 +23,7 @@ public struct WavetableArrayView: View {
     {
         self.node = node
         _selectedValue = selectedValue
-        self._wavetableArray = State(initialValue: Table.downSampleTables(inputTables: realWavetableArray))
+        self._wavetables = State(initialValue: Table.downSampleTables(inputTables: realWavetables))
         self.backgroundColor = backgroundColor
         self.arrayStrokeColor = arrayStrokeColor
         self.selectedStrokeColor = selectedStrokeColor
@@ -32,12 +32,12 @@ public struct WavetableArrayView: View {
     
     public var body: some View {
         let selectedIndex = Int(selectedValue)
-        let xOffset = CGFloat(0.21) / CGFloat(wavetableArray.count)
-        let yOffset = CGFloat(-0.77) / CGFloat(wavetableArray.count)
+        let xOffset = CGFloat(0.21) / CGFloat(wavetables.count)
+        let yOffset = CGFloat(-0.77) / CGFloat(wavetables.count)
         
         return GeometryReader { geometry in
             ZStack {
-                StaticWavetableArrayView(wavetableArray: wavetableArray)
+                StaticWavetableArrayView(wavetables: wavetables)
                 fillAndStrokeTable(width: geometry.size.width * 0.75,
                                    height: geometry.size.height * 0.2,
                                    table: wavetableModel.floats)
@@ -75,21 +75,21 @@ public struct WavetableArrayView: View {
 }
 
 struct StaticWavetableArrayView: View {
-    @State var wavetableArray: [Table] = []
+    @State var wavetables: [Table] = []
     @State var arrayStrokeColor = Color.white.opacity(0.4)
     var selectedStrokeColor = Color.white.opacity(1.0)
     
     var body: some View {
-        let xOffset = CGFloat(0.21) / CGFloat(wavetableArray.count)
-        let yOffset = CGFloat(-0.77) / CGFloat(wavetableArray.count)
+        let xOffset = CGFloat(0.21) / CGFloat(wavetables.count)
+        let yOffset = CGFloat(-0.77) / CGFloat(wavetables.count)
 
         return GeometryReader { geometry in
             ZStack {
                 Color.black
-                ForEach((0..<wavetableArray.count).reversed(), id: \.self) { i in
+                ForEach((0..<wavetables.count).reversed(), id: \.self) { i in
                     strokeTable(width: geometry.size.width * 0.75,
                                 height: geometry.size.height * 0.2,
-                                table: wavetableArray[i].content)
+                                table: wavetables[i].content)
                         .frame(width: geometry.size.width * 0.5,
                                height: geometry.size.height * 0.2)
                         .offset(x: CGFloat(i) * geometry.size.width * xOffset-geometry.size.width / 4.3,
