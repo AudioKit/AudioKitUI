@@ -6,7 +6,25 @@
         "repositoryURL": "https://github.com/AudioKit/AudioKit.git",
         "state": {
           "branch": "develop",
-          "revision": "5f6c03abe8e86905a4d8b23fb54eea86ed00f862",
+          "revision": "95365b1878798f75ef72d191abc4fc034342f8af",
+          "version": null
+        }
+      },
+      {
+        "package": "Soundpipe",
+        "repositoryURL": "https://github.com/AudioKit/Soundpipe",
+        "state": {
+          "branch": "main",
+          "revision": "0ec5832d824f6ba572bb07daa589c8fd69fc4c8f",
+          "version": null
+        }
+      },
+      {
+        "package": "SoundpipeAudioKit",
+        "repositoryURL": "https://github.com/AudioKit/SoundpipeAudioKit.git",
+        "state": {
+          "branch": "develop",
+          "revision": "7ba09ad9c976288a1da0a7d894de83f377d7fd75",
           "version": null
         }
       }

@@ -1,6 +1,7 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 
 import AudioKit
+import SoundpipeAudioKit
 import SwiftUI
 
 public class WavetableModel: ObservableObject {
