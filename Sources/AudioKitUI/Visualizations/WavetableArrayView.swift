@@ -1,12 +1,11 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 
 import AudioKit
-import SoundpipeAudioKit
 import SwiftUI
 
 public struct WavetableArrayView: View {
     @StateObject var wavetableModel = WavetableModel()
-    var node: DynamicOscillator
+    var node: DynamicWaveformNode
     @Binding var selectedValue: AUValue
     @State var wavetables: [Table]
     private var backgroundColor: Color
@@ -14,7 +13,7 @@ public struct WavetableArrayView: View {
     private var selectedStrokeColor: Color
     private var fillColor: Color
     
-    public init(_ node: DynamicOscillator,
+    public init(_ node: DynamicWaveformNode,
                 selectedValue: Binding<AUValue>,
                 realWavetables: [Table],
                 backgroundColor: Color = Color.black,

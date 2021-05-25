@@ -15,13 +15,11 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/AudioKit/AudioKit.git", .branch("develop")),
-        // Temporarily adding SoundpipeAudioKit for the DynamicOscillator stuff
-        .package(url: "https://github.com/AudioKit/SoundpipeAudioKit.git", .branch("develop"))
     ],
     targets: [
         .target(
             name: "AudioKitUI",
-            dependencies: ["AudioKit", "SoundpipeAudioKit"]),
+            dependencies: ["AudioKit"]),
         .testTarget(
             name: "AudioKitUITests",
             dependencies: ["AudioKitUI"]),
