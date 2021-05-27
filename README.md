@@ -1,4 +1,4 @@
-# AudioKit User Interfaces for use with AudioKit V5.0 Beta / Developer's Release
+# AudioKit User Interfaces
 
 [![Build Status](https://github.com/AudioKit/AudioKitUI/workflows/CI/badge.svg)](https://github.com/AudioKit/AudioKitUI/actions?query=workflow%3ACI)
 [![License](https://img.shields.io/github/license/AudioKit/AudioKitUI)](https://github.com/AudioKit/AudioKitUI/blob/main/LICENSE)
