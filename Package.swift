@@ -14,7 +14,7 @@ let package = Package(
             targets: ["AudioKitUI"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/AudioKit/AudioKit.git", .branch("develop")),
+        .package(url: "https://github.com/AudioKit/AudioKit.git", .branch("main")),
     ],
     targets: [
         .target(
