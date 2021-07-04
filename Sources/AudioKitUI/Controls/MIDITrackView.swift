@@ -60,6 +60,12 @@ public class MIDITrackView: UIView {
 
     /// How far the view is zoomed in
     public var noteZoomConstant: Double = 10_000.0
+    
+    private var timerMultiplier: Double {
+        let base = (20 + (8.0 / 10.0) + (1.0 / 30.0))
+        let inverse = 1.0 / base
+        return inverse * 60
+    }
 
     /// Initialize the Track View
     public convenience init(frame: CGRect, midiFile: URL!,
@@ -96,19 +102,17 @@ public class MIDITrackView: UIView {
             sequencer.setTempo(self.sequencer.allTempoEvents[0].1)
             previousTempo = self.sequencer.allTempoEvents[0].1
             let tempo = self.sequencer.allTempoEvents[0].1
-            cursorTimer = Timer.scheduledTimer(timeInterval: (1.0 / ((20 + (8.0 / 10.0) + (1.0 / 30.0)))) *
-                                               (1.0 / tempo) * 60.0,
-            target: self,
-            selector: #selector(self.updateCursor),
-            userInfo: nil,
-            repeats: true)
+            cursorTimer = Timer.scheduledTimer(timeInterval: timerMultiplier * (1.0 / tempo),
+                                               target: self,
+                                               selector: #selector(self.updateCursor),
+                                               userInfo: nil,
+                                               repeats: true)
         } else {
-            cursorTimer = Timer.scheduledTimer(timeInterval: (1.0 / ((20 + (8.0 / 10.0) + (1.0 / 30.0)))) *
-                                                (1.0 / sequencer.tempo) * 60.0,
-            target: self,
-            selector: #selector(self.updateCursor),
-            userInfo: nil,
-            repeats: true)
+            cursorTimer = Timer.scheduledTimer(timeInterval: timerMultiplier * (1.0 / sequencer.tempo),
+                                               target: self,
+                                               selector: #selector(self.updateCursor),
+                                               userInfo: nil,
+                                               repeats: true)
         }
     }
 
@@ -172,12 +176,11 @@ public class MIDITrackView: UIView {
         if previousTempo != sequencer.tempo {
             previousTempo = sequencer.tempo
             cursorTimer.invalidate()
-            cursorTimer = Timer.scheduledTimer(timeInterval: (1.0 / ((20 + (8.0 / 10.0) + (1.0 / 30.0)))) *
-                                                (1.0 / sequencer.tempo) * 60.0,
-            target: self,
-            selector: #selector(self.updateCursor),
-            userInfo: nil,
-            repeats: true)
+            cursorTimer = Timer.scheduledTimer(timeInterval: timerMultiplier * (1.0 / sequencer.tempo),
+                                               target: self,
+                                               selector: #selector(self.updateCursor),
+                                               userInfo: nil,
+                                               repeats: true)
         }
         let width = Double(self.frame.size.width)
         playbackCursorPosition += 1
@@ -187,12 +190,11 @@ public class MIDITrackView: UIView {
         } else {
             playbackCursorView.removeFromSuperview()
             cursorTimer.invalidate()
-            scrollTimer = Timer.scheduledTimer(timeInterval: (1.0 / ((20 + (8.0 / 10.0) + (1.0 / 30.0)))) *
-                                                (1.0 / sequencer.tempo) * 60.0,
-            target: self,
-            selector: #selector(self.scrollNotes),
-            userInfo: nil,
-            repeats: true)
+            scrollTimer = Timer.scheduledTimer(timeInterval: timerMultiplier * (1.0 / sequencer.tempo),
+                                               target: self,
+                                               selector: #selector(self.scrollNotes),
+                                               userInfo: nil,
+                                               repeats: true)
         }
         if !sequencer.isPlaying && readyToPlay {
             sequencer.play()
@@ -204,12 +206,11 @@ public class MIDITrackView: UIView {
         if previousTempo != sequencer.tempo {
             previousTempo = sequencer.tempo
             scrollTimer.invalidate()
-            scrollTimer = Timer.scheduledTimer(timeInterval: (1.0 / ((20 + (8.0 / 10.0) + (1.0 / 30.0)))) *
-                                                (1.0 / sequencer.tempo) * 60.0,
-            target: self,
-            selector: #selector(self.scrollNotes),
-            userInfo: nil,
-            repeats: true)
+            scrollTimer = Timer.scheduledTimer(timeInterval: timerMultiplier * (1.0 / sequencer.tempo),
+                                               target: self,
+                                               selector: #selector(self.scrollNotes),
+                                               userInfo: nil,
+                                               repeats: true)
         }
         noteGroupPosition -= 1
         collectiveNoteView.frame.origin.x = CGFloat(noteGroupPosition)
