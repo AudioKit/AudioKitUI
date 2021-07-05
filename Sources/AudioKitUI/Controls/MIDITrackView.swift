@@ -5,7 +5,6 @@ import AudioKit
 import Foundation
 import UIKit
 
-
 /*
 This file contains the code for a horizontal MIDI sequencer view, similar to what you see
 in most Digital Audio Workstations.
