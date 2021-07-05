@@ -60,7 +60,6 @@ public class MIDITrackView: UIView {
 
     /// How far the view is zoomed in
     public var noteZoomConstant: Double = 10_000.0
-    
     private var timerMultiplier: Double {
         let base = (20 + (8.0 / 10.0) + (1.0 / 30.0))
         let inverse = 1.0 / base
