@@ -8,7 +8,7 @@ import UIKit
 /// Displays the values in the table into a nice graph
 public class TableView: UIView {
 
-    var table: Table
+    public var table: Table
     var absmax: Double = 1.0
 
     /// Initialize the table view
