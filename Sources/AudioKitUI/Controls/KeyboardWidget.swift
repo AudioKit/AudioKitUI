@@ -17,7 +17,7 @@ public class KeyboardWidgetSettings: ObservableObject {
 public struct KeyboardWidget: ViewRepresentable {
     var firstOctave: Int
     var octaveCount: Int
-    var polyphonicMode: Int
+    var polyphonicMode: Bool
 
     public typealias UIViewType = KeyboardView
     public var delegate: KeyboardDelegate?
@@ -54,7 +54,7 @@ public struct KeyboardWidget: ViewRepresentable {
     }
     #endif
 
-    public init(delegate: KeyboardDelegate? = nil, firstOctave: Int, octaveCount: Int) {
+    public init(delegate: KeyboardDelegate? = nil, firstOctave: Int, octaveCount: Int, polyphonicMode: Bool) {
         self.delegate = delegate
         self.firstOctave = firstOctave
         self.octaveCount = octaveCount
