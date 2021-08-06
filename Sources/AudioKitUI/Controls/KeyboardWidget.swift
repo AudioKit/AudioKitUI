@@ -25,7 +25,8 @@ public struct KeyboardWidget: ViewRepresentable {
         nsView.firstOctave = firstOctave
         nsView.octaveCount = octaveCount
         nsView.polyphonicMode = polyphonicMode
-        nsView.setNeedsDisplay()
+        nsView.needsDisplay = true
+        nsView.displayIfNeeded()
     }
     #else
     public func makeUIView(context: Context) -> KeyboardView {
