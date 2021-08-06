@@ -3,7 +3,6 @@
 import AudioKit
 import SwiftUI
 
-/// SwiftUI View - Wraps a KeyboardView
 public struct KeyboardWidget: ViewRepresentable {
     var firstOctave: Int
     var octaveCount: Int
