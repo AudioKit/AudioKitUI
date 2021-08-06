@@ -3,16 +3,6 @@
 import AudioKit
 import SwiftUI
 
-/// Settings class for the KeyboardWidget - Publishes to KeyboardView
-public class KeyboardWidgetSettings: ObservableObject {
-    /// Octave Count for the wrapped KeyboardView
-    @Published public var octaveCount: Int = 2
-    /// First Octave for the wrapped KeyboardView
-    @Published public var firstOctave: Int = 0
-    /// Polyphonic Mode toggle for the wrapped KeyboardView
-    @Published public var polyphonicMode: Bool = false
-    public init() {}
-}
 /// SwiftUI View - Wraps a KeyboardView
 public struct KeyboardWidget: ViewRepresentable {
     var firstOctave: Int
@@ -35,7 +25,7 @@ public struct KeyboardWidget: ViewRepresentable {
         nsView.firstOctave = firstOctave
         nsView.octaveCount = octaveCount
         nsView.polyphonicMode = polyphonicMode
-        view.setNeedsDisplay()
+        nsView.setNeedsDisplay()
     }
     #else
     public func makeUIView(context: Context) -> KeyboardView {
