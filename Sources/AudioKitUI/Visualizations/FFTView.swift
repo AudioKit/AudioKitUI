@@ -4,18 +4,18 @@ import AudioKit
 import SwiftUI
 
 class FFTModel: ObservableObject {
-    @Published var amplitudes: [Double?] = Array(repeating: nil, count: 50)
+    @Published var amplitudes: [Double?] = Array(repeating: nil, count: 64)
     var nodeTap: FFTTap!
-    private var FFT_SIZE = 2048
+    private var FFT_SIZE = 64
     var node: Node?
-    var numberOfBars: Int = 50
+    var numberOfBars: Int = 64
     var maxAmplitude: Double = -10.0
     var minAmplitude: Double = -150.0
 
     func updateNode(_ node: Node) {
         if node !== self.node {
             self.node = node
-            nodeTap = FFTTap(node) { fftData in
+            nodeTap = FFTTap(node, bufferSize: 128) { fftData in
                 DispatchQueue.main.async {
                     self.updateAmplitudes(fftData)
                 }
@@ -34,26 +34,24 @@ class FFTModel: ObservableObject {
         var tempAmplitudes: [Double] = []
 
         // loop by two through all the fft data
-        for i in stride(from: 0, to: FFT_SIZE - 1, by: 2) {
-            if i / 2 < numberOfBars {
-                let binMagnitude = fftData[i]
-                let amplitude = Double(10.0 * log10(binMagnitude))
+        for i in stride(from: 0, to: FFT_SIZE - 1, by: 1) {
+            let binMagnitude = fftData[i]
+            let amplitude = Double(10.0 * log10(binMagnitude))
 
-                // map amplitude array to visualizer
-                var mappedAmplitude = map(n: amplitude,
-                                          start1: minAmplitude,
-                                          stop1: maxAmplitude,
-                                          start2: 0.0,
-                                          stop2: 1.0)
-                if mappedAmplitude > 1.0 {
-                    mappedAmplitude = 1.0
-                }
-                if mappedAmplitude < 0.0 {
-                    mappedAmplitude = 0.0
-                }
-
-                tempAmplitudes.append(mappedAmplitude)
+            // map amplitude array to visualizer
+            var mappedAmplitude = map(n: amplitude,
+                                      start1: minAmplitude,
+                                      stop1: maxAmplitude,
+                                      start2: 0.0,
+                                      stop2: 1.0)
+            if mappedAmplitude > 1.0 {
+                mappedAmplitude = 1.0
             }
+            if mappedAmplitude < 0.0 {
+                mappedAmplitude = 0.0
+            }
+
+            tempAmplitudes.append(mappedAmplitude)
         }
         // swap the amplitude array
         DispatchQueue.main.async {
@@ -83,7 +81,7 @@ public struct FFTView: View {
                                                                 endPoint: .center),
                 paddingFraction: CGFloat = 0.2,
                 includeCaps: Bool = true,
-                numberOfBars: Int = 50,
+                numberOfBars: Int = 64,
                 maxAmplitude: Double = -10.0,
                 minAmplitude: Double = -150.0)
     {
