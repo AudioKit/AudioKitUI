@@ -1,5 +1,6 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 
+import Accelerate
 import AudioKit
 import SwiftUI
 
@@ -25,45 +26,31 @@ class FFTModel: ObservableObject {
         }
     }
 
-    func updateAmplitudes(_ fftFloats: [Float]) {
-        var fftData = fftFloats
-        for index in 0 ..< fftData.count {
-            if fftData[index].isNaN { fftData[index] = 0.0 }
-        }
-
-        var tempAmplitudes: [Double] = []
-
-        // loop by two through all the fft data
-        for i in stride(from: 0, to: FFT_SIZE - 1, by: 2) {
-            if i / 2 < numberOfBars {
-                let binMagnitude = fftData[i]
-                let amplitude = Double(10.0 * log10(binMagnitude))
-
-                // map amplitude array to visualizer
-                var mappedAmplitude = map(n: amplitude,
-                                          start1: minAmplitude,
-                                          stop1: maxAmplitude,
-                                          start2: 0.0,
-                                          stop2: 1.0)
-                if mappedAmplitude > 1.0 {
-                    mappedAmplitude = 1.0
-                }
-                if mappedAmplitude < 0.0 {
-                    mappedAmplitude = 0.0
-                }
-
-                tempAmplitudes.append(mappedAmplitude)
-            }
-        }
+    func updateAmplitudes(_ fftData: [Float]) {
+        var tempAmplitudes = Array(repeating: 0.0 as Float, count: numberOfBars)
+        let bins_per_bar = Int((Float(fftData.count) / Float(numberOfBars)).rounded(.up))
+        
+        var one = Float(1.0)
+        var zero = Float(0.0)
+        var decibelNormalizationFactor = Float(1.0 / (maxAmplitude - minAmplitude))
+        var decibelNormalizationOffset = Float(-minAmplitude / (maxAmplitude - minAmplitude))
+        
+        var decibels = [Float](repeating: 0, count: fftData.count)
+        vDSP_vdbcon(fftData, 1, &one, &decibels, 1, vDSP_Length(fftData.count), 0)
+        vDSP_vsmsa(decibels, 1, &decibelNormalizationFactor, &decibelNormalizationOffset, &decibels, 1, vDSP_Length(decibels.count))
+        vDSP_vclip(decibels, 1, &zero, &one, &decibels, 1, vDSP_Length(decibels.count))
+      
+        for i in 0..<decibels.count {
+            let decibel = decibels[i]
+            let bar = i / bins_per_bar
+            
+            tempAmplitudes[bar] += decibel * (1 / Float(bins_per_bar))
+        }        
+        
         // swap the amplitude array
         DispatchQueue.main.async {
             self.amplitudes = tempAmplitudes
         }
-    }
-
-    /// simple mapping function to scale a value to a different range
-    func map(n: Double, start1: Double, stop1: Double, start2: Double, stop2: Double) -> Double {
-        return ((n - start1) / (stop1 - start1)) * (stop2 - start2) + start2
     }
 }
 
