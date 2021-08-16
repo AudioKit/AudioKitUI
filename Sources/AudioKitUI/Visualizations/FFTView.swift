@@ -4,13 +4,13 @@ import AudioKit
 import SwiftUI
 
 class FFTModel: ObservableObject {
-    @Published var amplitudes: [Double?] = Array(repeating: nil, count: 50)
+    @Published var amplitudes: [Float?] = Array(repeating: nil, count: 50)
     var nodeTap: FFTTap!
     private var FFT_SIZE = 2048
     var node: Node?
     var numberOfBars: Int = 50
-    var maxAmplitude: Double = -10.0
-    var minAmplitude: Double = -150.0
+    var maxAmplitude: Float = -10.0
+    var minAmplitude: Float = -150.0
 
     func updateNode(_ node: Node) {
         if node !== self.node {
@@ -74,8 +74,8 @@ public struct FFTView: View {
     private var includeCaps: Bool
     private var node: Node
     private var numberOfBars: Int
-    private var minAmplitude: Double
-    private var maxAmplitude: Double
+    private var minAmplitude: Float
+    private var maxAmplitude: Float
 
     public init(_ node: Node,
                 linearGradient: LinearGradient = LinearGradient(gradient: Gradient(colors: [.red, .yellow, .green]),
@@ -84,8 +84,8 @@ public struct FFTView: View {
                 paddingFraction: CGFloat = 0.2,
                 includeCaps: Bool = true,
                 numberOfBars: Int = 50,
-                maxAmplitude: Double = -10.0,
-                minAmplitude: Double = -150.0)
+                maxAmplitude: Float = -10.0,
+                minAmplitude: Float = -150.0)
     {
         self.node = node
         self.linearGradient = linearGradient
@@ -131,7 +131,7 @@ struct FFTView_Previews: PreviewProvider {
 }
 
 struct AmplitudeBar: View {
-    var amplitude: Double
+    var amplitude: Float
     var linearGradient: LinearGradient
     var paddingFraction: CGFloat = 0.2
     var includeCaps: Bool = true
