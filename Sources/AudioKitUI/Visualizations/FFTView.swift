@@ -28,25 +28,30 @@ class FFTModel: ObservableObject {
 
     func updateAmplitudes(_ fftData: [Float]) {
         var tempAmplitudes = Array(repeating: 0.0 as Float, count: numberOfBars)
-        let bins_per_bar = Int((Float(fftData.count) / Float(numberOfBars)).rounded(.up))
-        
+        let binsPerBar = Int((Float(fftData.count) / Float(numberOfBars)).rounded(.up))
+
         var one = Float(1.0)
         var zero = Float(0.0)
         var decibelNormalizationFactor = Float(1.0 / (maxAmplitude - minAmplitude))
         var decibelNormalizationOffset = Float(-minAmplitude / (maxAmplitude - minAmplitude))
-        
+
         var decibels = [Float](repeating: 0, count: fftData.count)
         vDSP_vdbcon(fftData, 1, &one, &decibels, 1, vDSP_Length(fftData.count), 0)
-        vDSP_vsmsa(decibels, 1, &decibelNormalizationFactor, &decibelNormalizationOffset, &decibels, 1, vDSP_Length(decibels.count))
+        vDSP_vsmsa(
+            decibels, 1,
+            &decibelNormalizationFactor,
+            &decibelNormalizationOffset,
+            &decibels, 1,
+            vDSP_Length(decibels.count)
+        )
         vDSP_vclip(decibels, 1, &zero, &one, &decibels, 1, vDSP_Length(decibels.count))
-      
-        for i in 0..<decibels.count {
-            let decibel = decibels[i]
-            let bar = i / bins_per_bar
-            
-            tempAmplitudes[bar] += decibel * (1 / Float(bins_per_bar))
+
+        for (index, decibel) in decibels.enumerated() {
+            let bar = index / binsPerBar
+
+            tempAmplitudes[bar] += decibel * (1 / Float(binsPerBar))
         }        
-        
+
         // swap the amplitude array
         DispatchQueue.main.async {
             self.amplitudes = tempAmplitudes
