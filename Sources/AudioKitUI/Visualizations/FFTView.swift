@@ -48,8 +48,9 @@ class FFTModel: ObservableObject {
 
         for (index, decibel) in decibels.enumerated() {
             let bar = index / binsPerBar
+            let averagedDecibel = (decibel.isNaN ? 0.0 : decibel) * (1 / Float(binsPerBar))
 
-            tempAmplitudes[bar] += decibel * (1 / Float(binsPerBar))
+            tempAmplitudes[bar] += averagedDecibel
         }        
 
         // swap the amplitude array
