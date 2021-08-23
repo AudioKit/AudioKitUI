@@ -36,8 +36,12 @@ class FFTModel: ObservableObject {
         // loop by two through all the fft data
         for i in stride(from: 0, to: FFT_SIZE - 1, by: 2) {
             if i / 2 < numberOfBars {
-                let binMagnitude = fftData[i]
-                let amplitude = Double(10.0 * log10(binMagnitude))
+                // get the real and imaginary parts of the complex number
+                let real = fftData[i]
+                let imaginary = fftData[i + 1]
+
+                let normalizedBinMagnitude = 2.0 * sqrt(real * real + imaginary * imaginary) / Float(FFT_SIZE)
+                let amplitude = Double(20.0 * log10(normalizedBinMagnitude))
 
                 // map amplitude array to visualizer
                 var mappedAmplitude = map(n: amplitude,
