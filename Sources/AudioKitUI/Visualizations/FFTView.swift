@@ -4,6 +4,16 @@ import Accelerate
 import AudioKit
 import SwiftUI
 
+enum FFTXScale {
+    case linear
+    case log
+}
+
+enum FFTBinAggregation {
+    case max
+    case average
+}
+
 class FFTModel: ObservableObject {
     @Published var amplitudes: [Float?] = Array(repeating: nil, count: 50)
     var nodeTap: FFTTap!
@@ -11,7 +21,11 @@ class FFTModel: ObservableObject {
     var node: Node?
     var numberOfBars: Int = 50
     var maxAmplitude: Float = -10.0
+    var nyquistFrequency: Float = 22050.0
     var minAmplitude: Float = -150.0
+    var xScale: FFTXScale = .log
+    var binAggregation: FFTBinAggregation = .max
+    
 
     func updateNode(_ node: Node) {
         if node !== self.node {
@@ -47,10 +61,22 @@ class FFTModel: ObservableObject {
         vDSP_vclip(decibels, 1, &zero, &one, &decibels, 1, vDSP_Length(decibels.count))
 
         for (index, decibel) in decibels.enumerated() {
-            let bar = index / binsPerBar
-            let averagedDecibel = (decibel.isNaN ? 0.0 : decibel) * (1 / Float(binsPerBar))
+            var bar = 0
 
-            tempAmplitudes[bar] += averagedDecibel
+            switch xScale {
+            case .linear:
+                bar = index / binsPerBar
+            case .log:
+                let frequency = nyquistFrequency / Float(fftData.count) * Float(index + 1)
+                bar = Int(log10(1 + frequency) / log10(1 + nyquistFrequency) * Float(numberOfBars)) - 1
+            }
+
+            switch binAggregation {
+            case .max:
+                tempAmplitudes[bar] = max(decibel.isNaN ? 0.0 : decibel, tempAmplitudes[bar])
+            case .average:
+                tempAmplitudes[bar] += (decibel.isNaN ? 0.0 : decibel) * (1 / Float(binsPerBar))
+            }
         }        
 
         // swap the amplitude array
