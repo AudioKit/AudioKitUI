@@ -35,7 +35,7 @@ class FFTModel: ObservableObject {
                     self.updateAmplitudes(fftData)
                 }
             }
-            nodeTap.isNormalized = false
+            nodeTap.isNormalized = true
             nodeTap.start()
         }
     }
@@ -50,7 +50,7 @@ class FFTModel: ObservableObject {
         var decibelNormalizationOffset = Float(-minAmplitude / (maxAmplitude - minAmplitude))
 
         var decibels = [Float](repeating: 0, count: fftData.count)
-        vDSP_vdbcon(fftData, 1, &one, &decibels, 1, vDSP_Length(fftData.count), 0)
+        vDSP_vdbcon(fftData, 1, &one, &decibels, 1, vDSP_Length(fftData.count), 1)
         vDSP_vsmsa(
             decibels, 1,
             &decibelNormalizationFactor,
