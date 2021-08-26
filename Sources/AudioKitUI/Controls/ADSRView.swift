@@ -4,7 +4,6 @@ import AudioKit
 #if !os(macOS) || targetEnvironment(macCatalyst)
 
 import AVFoundation
-
 import UIKit
 
 /// A click and draggable view of an ADSR Envelope (Atttack, Decay, Sustain, Release)
