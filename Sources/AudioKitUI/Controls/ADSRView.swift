@@ -41,9 +41,6 @@ import UIKit
     /// Use gradient or solid color sections, Default: false
     open var useGradient: Bool = false { didSet { setNeedsDisplay() } }
 
-    /// Draw control points or not, Default: false - needs better math to work properly
-    open var drawControlPoints: Bool = false { didSet { setNeedsDisplay() } }
-
     /// How much area to leave before attack to allow manipulation if attack == 0
     open var attackPaddingPercent: CGFloat = 0.06
 
@@ -194,12 +191,10 @@ import UIKit
                          sustainLevel: CGFloat = 0.583,         // normalised
                          releaseAmount: CGFloat = 0.5,          // normalised
                          attackPadPercentage: CGFloat = 0.1,    // how much % width of the view should pad attack
-                         releasePadPercentage: CGFloat = 0.1,   // how much % width of the view should pad attack
-                         attackCurveAmount: CGFloat = 1.0,      // how much % width of the view should pad attack
-                         decayCurveAmount: CGFloat = 1.0,       // how much % width of the view should pad attack
-                         releaseCurveAmount: CGFloat = 1.0,     // how much curve to apply
-                         attackPointPlacement: CGFloat = 0.5,
-                         drawControlPoints: Bool = false
+                         releasePadPercentage: CGFloat = 0.1,   // how much % width of the view should pad release
+                         attackCurveAmount: CGFloat = 1.0,      // how much curve to apply to attack portion
+                         decayCurveAmount: CGFloat = 1.0,       // how much curve to apply to decay portion
+                         releaseCurveAmount: CGFloat = 1.0      // how much curve to apply to release portion
     )
     {
         //// General Declarations
@@ -409,30 +404,6 @@ import UIKit
 
         context?.restoreGState()
 
-        if !drawControlPoints {
-            return
-        }
-
-        // attackDot
-        let attackCurveAdjustment = (attackCurveAmount * attackAmount * 5.5) //FIXME - why this 6 works?
-        let attackDotPointX = quadBezier(percent: 0.5, start: initialPoint.x,
-                                         control: attackCurveControlPoint.x, end: highPoint.x) + attackCurveAdjustment
-        let attackDotPointY = quadBezier(percent: 0.5, start: initialPoint.y,
-                                         control: attackCurveControlPoint.y, end: highPoint.y) + attackCurveAdjustment
-        let attackDotPoint = CGPoint(x: attackDotPointX, y: attackDotPointY)
-        context?.drawDot(at: attackDotPoint, color: curveColor)
-
-        // decayDot
-        context?.drawDot(at: sustainPoint, color: curveColor)
-
-        // releaseDot
-        let releaseCurveAdjustment = (releaseCurveAmount * releaseAmount * 5.5 ) //FIXME - why this 6 works?
-        let releaseCurveAdjustmentY = (releaseCurveAmount * releaseAmount * 5.5 * sustainLevel ) //FIXME - why this 6 works?
-        let releaseDotPointX = quadBezier(percent: 0.5, start: releasePoint.x, control: releaseCurveControlPoint.x, end: endPoint.x) + releaseCurveAdjustment
-        let releaseDotPointY = quadBezier(percent: 0.5, start: releasePoint.y, control: releaseCurveControlPoint.y, end: endPoint.y) - releaseCurveAdjustmentY
-        let releaseDotPoint = CGPoint(x: releaseDotPointX, y: releaseDotPointY)
-        context?.drawDot(at: releaseDotPoint, color: curveColor)
-
     }
 
     private func quadBezier(percent: CGFloat, start: CGFloat, control: CGFloat, end: CGFloat) -> CGFloat {
@@ -454,22 +425,7 @@ import UIKit
                         releasePadPercentage: releasePaddingPercent,
                         attackCurveAmount: CGFloat(attackCurveAmount),
                         decayCurveAmount: CGFloat(decayCurveAmount),
-                        releaseCurveAmount: CGFloat(releaseCurveAmount),
-                        drawControlPoints: drawControlPoints)
-    }
-}
-
-public extension CGContext {
-
-    func drawDot(at point: CGPoint, color: UIColor) {
-        saveGState()
-        let dot = UIBezierPath(arcCenter: point, radius: 6,
-                               startAngle: 0, endAngle: CGFloat((Double.pi * 2)), clockwise: true)
-        color.setStroke()
-        color.setFill()
-        dot.stroke()
-        dot.fill()
-        restoreGState()
+                        releaseCurveAmount: CGFloat(releaseCurveAmount))
     }
 }
 
