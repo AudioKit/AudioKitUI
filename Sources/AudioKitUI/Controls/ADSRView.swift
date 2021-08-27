@@ -14,28 +14,28 @@ import UIKit
     public typealias ADSRCallback = (Float, Float, Float, Float) -> Void
 
     /// Attack amount, Default: 0.5
-    open var attackAmount: Float = 0.5 { didSet { setNeedsDisplay() } }
+    open var attack: Float = 0.5 { didSet { setNeedsDisplay() } }
 
     /// Decay amount, Default: 0.5
-    open var decayAmount: Float = 0.5 { didSet { setNeedsDisplay() } }
+    open var decay: Float = 0.5 { didSet { setNeedsDisplay() } }
 
     /// Sustain Level (0-1), Default: 0.5
-    open var sustainLevel: Float = 0.5 { didSet { setNeedsDisplay() } }
+    open var sustain: Float = 0.5 { didSet { setNeedsDisplay() } }
 
     /// Release amount, Default: 0.5
-    open var releaseAmount: Float = 0.5 { didSet { setNeedsDisplay() } }
+    open var release: Float = 0.5 { didSet { setNeedsDisplay() } }
 
     /// How much to slow the  drag - lower is slower, Default: 0.005
     open var dragSlew: Float = 0.005
 
     /// How much curve to apply to the attack section - 0 = no curve, 1 = full curve, Default: 1.0
-    open var attackCurveAmount: Float = 1.0 { didSet { setNeedsDisplay() } }
+    open var attackCurve: Float = 1.0 { didSet { setNeedsDisplay() } }
 
     /// How much curve to apply to the decay section - 0 = no curve, 1 = full curve, Default: 1.0
-    open var decayCurveAmount: Float = 1.0 { didSet { setNeedsDisplay() } }
+    open var decayCurve: Float = 1.0 { didSet { setNeedsDisplay() } }
 
     /// How much curve to apply to the release section - 0 = no curve, 1 = full curve, Default: 1.0
-    open var releaseCurveAmount: Float = 1.0 { didSet { setNeedsDisplay() } }
+    open var releaseCurve: Float = 1.0 { didSet { setNeedsDisplay() } }
 
     /// Use gradient or solid color sections, Default: false
     open var useGradient: Bool = false { didSet { setNeedsDisplay() } }
@@ -79,10 +79,10 @@ import UIKit
 
     private var lastPoint = CGPoint.zero
 
-    public func setAllCurves(curveAmount: Float) {
-        attackCurveAmount = curveAmount
-        decayCurveAmount = curveAmount
-        releaseCurveAmount = curveAmount
+    public func setAllCurves(curve: Float) {
+        attackCurve = curve
+        decayCurve = curve
+        releaseCurve = curve
     }
 
     public func setAllColors(color: UIColor) {
@@ -153,28 +153,28 @@ import UIKit
 
             if currentDragArea != "" {
                 if currentDragArea == "ds" {
-                    sustainLevel -= Float(touchLocation.y - lastPoint.y) * dragSlew
-                    decayAmount += Float(touchLocation.x - lastPoint.x) * dragSlew
+                    sustain -= Float(touchLocation.y - lastPoint.y) * dragSlew
+                    decay += Float(touchLocation.x - lastPoint.x) * dragSlew
                 }
                 if currentDragArea == "a" {
-                    attackAmount += Float(touchLocation.x - lastPoint.x) * dragSlew
-                    attackAmount -= Float(touchLocation.y - lastPoint.y) * dragSlew
+                    attack += Float(touchLocation.x - lastPoint.x) * dragSlew
+                    attack -= Float(touchLocation.y - lastPoint.y) * dragSlew
                 }
                 if currentDragArea == "r" {
-                    releaseAmount += Float(touchLocation.x - lastPoint.x) * dragSlew
-                    releaseAmount -= Float(touchLocation.y - lastPoint.y) * dragSlew
+                    release += Float(touchLocation.x - lastPoint.x) * dragSlew
+                    release -= Float(touchLocation.y - lastPoint.y) * dragSlew
                 }
             }
-            attackAmount = max(min(attackAmount, 1), 0)
-            decayAmount = max(min(decayAmount, 1), 0)
-            sustainLevel = max(min(sustainLevel, 1), 0)
-            releaseAmount = max(min(releaseAmount, 1), 0)
+            attack = max(min(attack, 1), 0)
+            decay = max(min(decay, 1), 0)
+            sustain = max(min(sustain, 1), 0)
+            release = max(min(release, 1), 0)
 
             if let callback = callback {
-                callback(attackAmount,
-                         decayAmount,
-                         sustainLevel,
-                         releaseAmount)
+                callback(attack,
+                         decay,
+                         sustain,
+                         release)
             }
             lastPoint = touchLocation
         }
@@ -185,15 +185,15 @@ import UIKit
 
     /// Draw the ADSR envelope
     func drawCurveCanvas(size: CGSize = CGSize(width: 440, height: 151),
-                         attackAmount: CGFloat = 0.5,           // normalised
-                         decayAmount: CGFloat = 0.5,            // normalised
-                         sustainLevel: CGFloat = 0.583,         // normalised
-                         releaseAmount: CGFloat = 0.5,          // normalised
+                         attack: CGFloat = 0.5,           // normalised
+                         decay: CGFloat = 0.5,            // normalised
+                         sustain: CGFloat = 0.583,         // normalised
+                         release: CGFloat = 0.5,          // normalised
                          attackPadPercentage: CGFloat = 0.1,    // how much % width of the view should pad attack
                          releasePadPercentage: CGFloat = 0.1,   // how much % width of the view should pad release
-                         attackCurveAmount: CGFloat = 1.0,      // how much curve to apply to attack portion
-                         decayCurveAmount: CGFloat = 1.0,       // how much curve to apply to decay portion
-                         releaseCurveAmount: CGFloat = 1.0      // how much curve to apply to release portion
+                         attackCurve: CGFloat = 1.0,      // how much curve to apply to attack portion
+                         decayCurve: CGFloat = 1.0,       // how much curve to apply to decay portion
+                         releaseCurve: CGFloat = 1.0      // how much curve to apply to release portion
     )
     {
         //// General Declarations
@@ -208,10 +208,10 @@ import UIKit
         let releaseClickRoom = floor(CGFloat(releasePadPercentage * width)) // to allow attack to be clicked even if zero
         let endPointMax = width - releaseClickRoom
         let sectionMax = floor((width * (1.0 - attackPadPercentage - releasePadPercentage)) / 3.3)
-        let attackSize = floor(attackAmount * sectionMax)
-        let decaySize = floor(decayAmount * sectionMax)
-        let sustainSize = floor(sustainLevel * (height - buffer) + buffer)
-        let releaseSize = releaseAmount * sectionMax
+        let attackSize = floor(attack * sectionMax)
+        let decaySize = floor(decay * sectionMax)
+        let sustainSize = floor(sustain * (height - buffer) + buffer)
+        let releaseSize = release * sectionMax
 
         let initialPoint = CGPoint(x: attackClickRoom, y: height)
         let endAxes = CGPoint(x: width, y: height)
@@ -236,20 +236,20 @@ import UIKit
         let attackMidPoint = initialPoint.midPoint(highPoint)
         let decayMidPoint = highPoint.midPoint(sustainPoint)
         let releaseMidPoint = releasePoint.midPoint(endPoint)
-        let attackCurveControlPoint = CGPoint(x: (attackCurveAmount * initialToHighControlPoint.x)
-                                            + ((1.0 - attackCurveAmount) * attackMidPoint.x),
-                                         y: (attackCurveAmount * initialToHighControlPoint.y)
-                                            + ((1.0 - attackCurveAmount) * attackMidPoint.y))
+        let attackCurveControlPoint = CGPoint(x: (attackCurve * initialToHighControlPoint.x)
+                                            + ((1.0 - attackCurve) * attackMidPoint.x),
+                                         y: (attackCurve * initialToHighControlPoint.y)
+                                            + ((1.0 - attackCurve) * attackMidPoint.y))
 
-        let decayCurveControlPoint = CGPoint(x: (decayCurveAmount * highToSustainControlPoint.x)
-                                            + ((1.0 - decayCurveAmount) * decayMidPoint.x),
-                                         y: (decayCurveAmount * highToSustainControlPoint.y)
-                                            + ((1.0 - decayCurveAmount) * decayMidPoint.y))
+        let decayCurveControlPoint = CGPoint(x: (decayCurve * highToSustainControlPoint.x)
+                                            + ((1.0 - decayCurve) * decayMidPoint.x),
+                                         y: (decayCurve * highToSustainControlPoint.y)
+                                            + ((1.0 - decayCurve) * decayMidPoint.y))
 
-        let releaseCurveControlPoint = CGPoint(x: (releaseCurveAmount * releaseToEndControlPoint.x)
-                                            + ((1.0 - releaseCurveAmount) * releaseMidPoint.x),
-                                         y: (releaseCurveAmount * releaseToEndControlPoint.y)
-                                            + ((1.0 - releaseCurveAmount) * releaseMidPoint.y))
+        let releaseCurveControlPoint = CGPoint(x: (releaseCurve * releaseToEndControlPoint.x)
+                                            + ((1.0 - releaseCurve) * releaseMidPoint.x),
+                                         y: (releaseCurve * releaseToEndControlPoint.y)
+                                            + ((1.0 - releaseCurve) * releaseMidPoint.y))
 
         //// attackTouchArea Drawing
         context?.saveGState()
@@ -416,15 +416,15 @@ import UIKit
     /// Draw the view
     override public func draw(_ rect: CGRect) {
         drawCurveCanvas(size: rect.size,
-                        attackAmount: CGFloat(attackAmount),
-                        decayAmount: CGFloat(decayAmount),
-                        sustainLevel: 1.0 - CGFloat(sustainLevel),
-                        releaseAmount: CGFloat(releaseAmount),
+                        attack: CGFloat(attack),
+                        decay: CGFloat(decay),
+                        sustain: 1.0 - CGFloat(sustain),
+                        release: CGFloat(release),
                         attackPadPercentage: attackPaddingPercent,
                         releasePadPercentage: releasePaddingPercent,
-                        attackCurveAmount: CGFloat(attackCurveAmount),
-                        decayCurveAmount: CGFloat(decayCurveAmount),
-                        releaseCurveAmount: CGFloat(releaseCurveAmount))
+                        attackCurve: CGFloat(attackCurve),
+                        decayCurve: CGFloat(decayCurve),
+                        releaseCurve: CGFloat(releaseCurve))
     }
 }
 
