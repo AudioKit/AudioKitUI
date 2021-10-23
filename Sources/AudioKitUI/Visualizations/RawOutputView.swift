@@ -9,7 +9,7 @@ class RawOutputModel: ObservableObject {
     var bufferSize: Int = 1024
     var nodeTap: RawDataTap!
     var node: Node?
-    
+
     init() {
         if isPreview {
             for _ in 0...100 {
@@ -30,7 +30,7 @@ class RawOutputModel: ObservableObject {
             nodeTap.start()
         }
     }
-    
+
     func updateData(_ data: [CGFloat]) {
         self.data = data
     }
@@ -42,21 +42,20 @@ public struct RawOutputView: View {
     @Binding var isNormalized: Bool
     @Binding var scaleFactor: CGFloat
     var bufferSize: Int = 1024
-    var node: Node? = nil
-    
+    var node: Node?
+
     public init(_ node: Node? = nil,
                 bufferSize: Int = 1024,
                 strokeColor: Binding<Color> = .constant(Color.black),
                 isNormalized: Binding<Bool> = .constant(false),
-                scaleFactor: Binding<CGFloat> = .constant(1.0))
-    {
+                scaleFactor: Binding<CGFloat> = .constant(1.0)) {
         self.node = node
         self.bufferSize = bufferSize
         self._strokeColor = strokeColor
         self._isNormalized = isNormalized
         self._scaleFactor = scaleFactor
     }
-    
+
     public var body: some View {
         RawAudioPlot(data: rawOutputModel.data, isNormalized: isNormalized, scaleFactor: scaleFactor)
             .stroke(strokeColor)
@@ -72,10 +71,10 @@ struct RawAudioPlot: Shape {
     var data: [CGFloat]
     var isNormalized: Bool
     var scaleFactor: CGFloat = 1.0
-    
+
     func path(in rect: CGRect) -> Path {
         var coordinates: [CGPoint] = []
-        
+
         var rangeValue: CGFloat = 1.0
         if isNormalized {
             if let max = data.max() {
@@ -86,14 +85,14 @@ struct RawAudioPlot: Shape {
         } else {
             rangeValue = rangeValue / scaleFactor
         }
-        
+
         for index in 0 ..< data.count {
             let x = index.mapped(from: 0...data.count, to: rect.minX...rect.maxX)
             let y = data[index].mappedInverted(from: -rangeValue...rangeValue, to: rect.minY...rect.maxY)
-            
+
             coordinates.append(CGPoint(x: x, y: y))
         }
-        
+
         return Path { path in
             path.addLines(coordinates)
         }
