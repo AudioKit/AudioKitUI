@@ -80,6 +80,7 @@ public struct FFTView: View {
     private var numberOfBars: Int
     private var minAmplitude: Double
     private var maxAmplitude: Double
+    private var backgroundColor: Color
 
     public init(_ node: Node,
                 linearGradient: LinearGradient = LinearGradient(gradient: Gradient(colors: [.red, .yellow, .green]),
@@ -89,7 +90,8 @@ public struct FFTView: View {
                 includeCaps: Bool = true,
                 numberOfBars: Int = 50,
                 maxAmplitude: Double = -10.0,
-                minAmplitude: Double = -150.0)
+                minAmplitude: Double = -150.0
+                backgroundColor: Color = Color.black)
     {
         self.node = node
         self.linearGradient = linearGradient
@@ -98,6 +100,7 @@ public struct FFTView: View {
         self.numberOfBars = numberOfBars
         self.maxAmplitude = maxAmplitude
         self.minAmplitude = minAmplitude
+        self.backgroundColor = backgroundColor
 
         if maxAmplitude < minAmplitude {
             fatalError("Maximum amplitude cannot be less than minimum amplitude")
@@ -124,7 +127,7 @@ public struct FFTView: View {
             fft.minAmplitude = minAmplitude
         }
         .drawingGroup() // Metal powered rendering
-        .background(Color.black)
+        .background(backgroundColor)
     }
 }
 
