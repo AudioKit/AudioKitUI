@@ -90,7 +90,7 @@ public struct FFTView: View {
                 includeCaps: Bool = true,
                 numberOfBars: Int = 50,
                 maxAmplitude: Double = -10.0,
-                minAmplitude: Double = -150.0
+                minAmplitude: Double = -150.0,
                 backgroundColor: Color = Color.black)
     {
         self.node = node
