@@ -43,8 +43,8 @@ public struct Knob: View {
                 }
                 var change = Float((dragPoint.location.x - lastLocation.x) * KnobDefaults.knobDragSensitivity)
                 change -= Float((dragPoint.location.y - lastLocation.y) * KnobDefaults.knobDragSensitivity)
-                value = value +  change * ((range.upperBound - range.lowerBound) + range.lowerBound)
-                value = min(range.upperBound, max(range.lowerBound, value))
+                let tempValue = value +  change * ((range.upperBound - range.lowerBound) + range.lowerBound)
+                value = min(range.upperBound, max(range.lowerBound, tempValue))
                 lastLocation = dragPoint.location
                 displayString = String(format: "%0.4f", value)
             }
