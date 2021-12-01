@@ -117,7 +117,8 @@ public struct FFTView: View {
                     AmplitudeBar(amplitude: amplitude,
                                  linearGradient: linearGradient,
                                  paddingFraction: paddingFraction,
-                                 includeCaps: includeCaps)
+                                 includeCaps: includeCaps,
+                                 backgroundColor: backgroundColor)
                 }
             }
         }.onAppear {
@@ -142,6 +143,7 @@ struct AmplitudeBar: View {
     var linearGradient: LinearGradient
     var paddingFraction: CGFloat = 0.2
     var includeCaps: Bool = true
+    var backgroundColor: Color = Color.black
 
     var body: some View {
         GeometryReader { geometry in
@@ -152,7 +154,7 @@ struct AmplitudeBar: View {
 
                 // Dynamic black mask padded from bottom in relation to the amplitude
                 Rectangle()
-                    .fill(Color.black)
+                    .fill(backgroundColor)
                     .mask(Rectangle().padding(.bottom, geometry.size.height * CGFloat(amplitude)))
                     .animation(.easeOut(duration: 0.15))
 
@@ -162,7 +164,7 @@ struct AmplitudeBar: View {
                 }
             }
             .padding(geometry.size.width * paddingFraction / 2)
-            .border(Color.black, width: geometry.size.width * paddingFraction / 2)
+            .border(backgroundColor, width: geometry.size.width * paddingFraction / 2)
         }
     }
 
