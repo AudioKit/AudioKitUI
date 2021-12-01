@@ -69,6 +69,7 @@ public struct FFTView: View {
     private var maxAmplitude: Float
     private let defaultBarCount: Int = 64
     private let maxBarCount: Int = 128
+    private var backgroundColor: Color
 
     public init(_ node: Node,
                 linearGradient: LinearGradient = LinearGradient(gradient: Gradient(colors: [.red, .yellow, .green]),
@@ -79,7 +80,8 @@ public struct FFTView: View {
                 validBinCount: FFTValidBinCount? = nil,
                 barCount: Int? = nil,
                 maxAmplitude: Float = -10.0,
-                minAmplitude: Float = -150.0)
+                minAmplitude: Float = -150.0,
+                backgroundColor: Color = Color.black)
     {
         self.node = node
         self.linearGradient = linearGradient
@@ -88,6 +90,7 @@ public struct FFTView: View {
         self.maxAmplitude = maxAmplitude
         self.minAmplitude = minAmplitude
         self.fftValidBinCount = validBinCount
+        self.backgroundColor = backgroundColor
 
         if maxAmplitude < minAmplitude {
             fatalError("Maximum amplitude cannot be less than minimum amplitude")
@@ -125,7 +128,8 @@ public struct FFTView: View {
                     AmplitudeBar(amplitude: 0.0,
                                  linearGradient: linearGradient,
                                  paddingFraction: paddingFraction,
-                                 includeCaps: includeCaps)
+                                 includeCaps: includeCaps,
+                                 backgroundColor: backgroundColor)
                 }
             }
         }.onAppear {
@@ -134,7 +138,7 @@ public struct FFTView: View {
             fft.minAmplitude = self.minAmplitude
         }
         .drawingGroup() // Metal powered rendering
-        .background(Color.black)
+        .background(backgroundColor)
     }
 }
 
@@ -149,6 +153,7 @@ struct AmplitudeBar: View {
     var linearGradient: LinearGradient
     var paddingFraction: CGFloat = 0.2
     var includeCaps: Bool = true
+    var backgroundColor: Color = Color.black
 
     var body: some View {
         GeometryReader { geometry in
@@ -159,7 +164,7 @@ struct AmplitudeBar: View {
 
                 // Dynamic black mask padded from bottom in relation to the amplitude
                 Rectangle()
-                    .fill(Color.black)
+                    .fill(backgroundColor)
                     .mask(Rectangle().padding(.bottom, geometry.size.height * CGFloat(amplitude)))
                     .animation(.easeOut(duration: 0.15))
 
@@ -169,7 +174,7 @@ struct AmplitudeBar: View {
                 }
             }
             .padding(geometry.size.width * paddingFraction / 2)
-            .border(Color.black, width: geometry.size.width * paddingFraction / 2)
+            .border(backgroundColor, width: geometry.size.width * paddingFraction / 2)
         }
     }
 

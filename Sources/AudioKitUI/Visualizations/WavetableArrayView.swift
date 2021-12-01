@@ -7,7 +7,7 @@ public struct WavetableArrayView: View {
     @StateObject var wavetableModel = WavetableModel()
     var node: DynamicWaveformNode
     @Binding var selectedValue: AUValue
-    @State var wavetables: [Table]
+    @State var wavetables: [AudioKit.Table]
     private var backgroundColor: Color
     private var arrayStrokeColor: Color
     private var selectedStrokeColor: Color
@@ -15,7 +15,7 @@ public struct WavetableArrayView: View {
     
     public init(_ node: DynamicWaveformNode,
                 selectedValue: Binding<AUValue>,
-                realWavetables: [Table],
+                realWavetables: [AudioKit.Table],
                 backgroundColor: Color = Color.black,
                 arrayStrokeColor: Color = Color.white.opacity(0.4),
                 selectedStrokeColor: Color = Color.white.opacity(1.0),
@@ -75,7 +75,7 @@ public struct WavetableArrayView: View {
 }
 
 struct StaticWavetableArrayView: View {
-    @State var wavetables: [Table] = []
+    @State var wavetables: [AudioKit.Table] = []
     @State var arrayStrokeColor = Color.white.opacity(0.4)
     var selectedStrokeColor = Color.white.opacity(1.0)
     
