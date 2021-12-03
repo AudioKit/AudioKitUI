@@ -24,11 +24,13 @@ public class FragmentBuilder {
     var isFFT: Bool = false
 
     init(foregroundColor: CGColor = Color.white.cg,
+         backgroundColor: CGColor = Color.clear.cg,
          isCentered: Bool = true,
          isFilled: Bool = true,
          isFFT: Bool = false)
     {
         self.foregroundColor = foregroundColor
+        self.backgroundColor = backgroundColor
         self.isCentered = isCentered
         self.isFilled = isFilled
         self.isFFT = isFFT
