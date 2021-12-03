@@ -10,7 +10,10 @@ public struct NodeOutputView: ViewRepresentable {
     private var metalFragment: FragmentBuilder
 
     public init(_ node: Node, color: Color = .gray, backgroundColor: Color = .clear, bufferSize: Int = 1024) {
-        metalFragment = FragmentBuilder(foregroundColor: color.cg, backgroundColor: backgroundColor.cg, isCentered: true, isFilled: false)
+        metalFragment = FragmentBuilder(foregroundColor: color.cg,
+                                        backgroundColor: backgroundColor.cg,
+                                        isCentered: true,
+                                        isFilled: false)
         nodeTap = RawDataTap(node, bufferSize: UInt32(bufferSize))
     }
 
