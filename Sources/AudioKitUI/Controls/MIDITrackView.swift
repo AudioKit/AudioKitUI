@@ -1,10 +1,9 @@
 
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
-import SwiftUI
 import AudioKit
-import UIKit
+import SwiftUI
 
-struct NoteGroup: UIViewRepresentable {
+struct NoteGroup: ViewRepresentable {
     @Binding var isPlaying: Bool
     @Binding var sequencerTempo: Double
     let noteMap: MIDIFileTrackNoteMap
@@ -12,6 +11,57 @@ struct NoteGroup: UIViewRepresentable {
     let trackHeight: CGFloat
     let noteZoom: CGFloat
 
+    #if os(macOS)
+    func makeNSView(context: CGContext) -> some UIView {
+        let view = NSView(frame: CGRect(x: 0, y: 0, width: length, height: trackHeight))
+        populateViewNotes(view, context: context)
+        return view
+    }
+
+    func updateNSView(_ nsView: NSViewType, context: CGContext) {
+        if isPlaying {
+            setupTimer(nsView)
+        }
+    }
+
+    func scrollNotes(_ nsView: NSView) {
+        uiView.frame.origin.x -= 1
+    }
+    func populateViewNotes(_ nsView: NSView, context: CGContext) {
+        let noteList = noteMap.noteList
+        let low = noteMap.loNote
+        let high = noteMap.hiNote
+        let range = (high - low) + 1
+        let noteh = trackHeight / CGFloat(range)
+        let maxh = trackHeight - noteh
+        for note in noteList {
+            let noteNumber = note.noteNumber - low
+            let noteStart = Double(note.noteStartTime)
+            let noteDuration = Double(note.noteDuration)
+            let noteLength = Double(noteDuration * noteZoom)
+            let notePosition = Double(noteStart * noteZoom)
+            let noteLevel = (maxh - (Double(noteNumber) * noteh))
+            let singleNoteRect = CGRect(x: notePosition, y: noteLevel, width: noteLength, height: noteh)
+            let singleNoteView = NSView(frame: singleNoteRect)
+            singleNoteView.backgroundColor = UIColor.red
+            singleNoteView.layer.cornerRadius = noteh * 0.5
+            nsView.addSubview(singleNoteView)
+        }
+    }
+    func setupTimer(_ nsView: NSView) {
+        let base = (20 + (8.0 / 10.0) + (1.0 / 30.0))
+        let inverse = 1.0 / base
+        let multiplier = inverse * 60 * (10_000 / noteZoom)
+        let scrollTimer = Timer.scheduledTimer(
+            withTimeInterval: multiplier * (1/sequencerTempo), repeats: true) { timer in
+            scrollNotes(nsView)
+            if !isPlaying {
+                timer.invalidate()
+            }
+        }
+        RunLoop.main.add(scrollTimer, forMode: .common)
+    }
+    #else
     func makeUIView(context: Context) -> some UIView {
         let view = UIView(frame: CGRect(x: 0, y: 0, width: length, height: trackHeight))
         populateViewNotes(view, context: context)
@@ -61,6 +111,7 @@ struct NoteGroup: UIViewRepresentable {
         }
         RunLoop.main.add(scrollTimer, forMode: .common)
     }
+    #endif
 }
 /// MIDI track UI similar to the one in your DAW
 public struct MIDITrackView: View {
