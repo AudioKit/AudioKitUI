@@ -48,9 +48,9 @@ struct NoteGroup: ViewRepresentable {
         }
     }
     func setupTimer(_ nsView: NSView) {
-        let base = (20 + (8.0 / 10.0) + (1.0 / 30.0))
-        let inverse = 1.0 / base
-        let multiplier = inverse * 60 * (10_000 / noteZoom)
+        let base: Double = (20 + (8.0 / 10.0) + (1.0 / 30.0))
+        let inverse: Double = 1.0 / base
+        let multiplier: Double = inverse * 60 * (10_000 / noteZoom)
         let scrollTimer = Timer.scheduledTimer(
             withTimeInterval: multiplier * (1/sequencerTempo), repeats: true) { timer in
             scrollNotes(nsView)
@@ -98,9 +98,9 @@ struct NoteGroup: ViewRepresentable {
         }
     }
     func setupTimer(_ uiView: UIView) {
-        let base = (20 + (8.0 / 10.0) + (1.0 / 30.0))
-        let inverse = 1.0 / base
-        let multiplier = inverse * 60 * (10_000 / noteZoom)
+        let base: Double = (20 + (8.0 / 10.0) + (1.0 / 30.0))
+        let inverse: Double = 1.0 / base
+        let multiplier: Double = inverse * 60 * (10_000 / noteZoom)
         let scrollTimer = Timer.scheduledTimer(
             withTimeInterval: multiplier * (1/sequencerTempo), repeats: true) { timer in
             scrollNotes(uiView)
