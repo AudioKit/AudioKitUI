@@ -35,14 +35,14 @@ struct NoteGroup: ViewRepresentable {
         let maxh = trackHeight - noteh
         for note in noteList {
             let noteNumber = note.noteNumber - low
-            let noteStart = Double(note.noteStartTime)
-            let noteDuration = Double(note.noteDuration)
-            let noteLength = Double(noteDuration * noteZoom)
-            let notePosition = Double(noteStart * noteZoom)
-            let noteLevel = (maxh - (Double(noteNumber) * noteh))
+            let noteStart = note.noteStartTime
+            let noteDuration = note.noteDuration
+            let noteLength = CGFloat(noteDuration) * noteZoom
+            let notePosition = CGFloat(noteStart) * noteZoom
+            let noteLevel = (maxh - (CGFloat(noteNumber) * noteh))
             let singleNoteRect = CGRect(x: notePosition, y: noteLevel, width: noteLength, height: noteh)
             let singleNoteView = NSView(frame: singleNoteRect)
-            singleNoteView.backgroundColor = UIColor.red
+            singleNoteView.backgroundColor = NSColor.red
             singleNoteView.layer.cornerRadius = noteh * 0.5
             nsView.addSubview(singleNoteView)
         }
@@ -85,11 +85,11 @@ struct NoteGroup: ViewRepresentable {
         let maxh = trackHeight - noteh
         for note in noteList {
             let noteNumber = note.noteNumber - low
-            let noteStart = Double(note.noteStartTime)
-            let noteDuration = Double(note.noteDuration)
-            let noteLength = Double(noteDuration * noteZoom)
-            let notePosition = Double(noteStart * noteZoom)
-            let noteLevel = (maxh - (Double(noteNumber) * noteh))
+            let noteStart = note.noteStartTime
+            let noteDuration = note.noteDuration
+            let noteLength = CGFloat(noteDuration) * noteZoom
+            let notePosition = CGFloat(noteStart) * noteZoom
+            let noteLevel = (maxh - (CGFloat(noteNumber) * noteh))
             let singleNoteRect = CGRect(x: notePosition, y: noteLevel, width: noteLength, height: noteh)
             let singleNoteView = UIView(frame: singleNoteRect)
             singleNoteView.backgroundColor = UIColor.red
