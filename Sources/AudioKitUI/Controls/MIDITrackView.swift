@@ -122,6 +122,7 @@ public struct MIDITrackView: View {
     /// Sets the zoom level of the track
     public var noteZoom: CGFloat = 50_000
 
+    public init() {}
     public var body: some View {
         let sequencer = AppleSequencer(fromURL: fileURL)
         VStack {
