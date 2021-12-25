@@ -1,219 +1,200 @@
-// Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
-
+import SwiftUI
 import AudioKit
-#if targetEnvironment(macCatalyst) || os(iOS)
-import Foundation
-import UIKit
 
-/*
-This file contains the code for a horizontal MIDI sequencer view, similar to what you see
-in most Digital Audio Workstations.
-To add this view to your app, it's as simple as specifying the size/position of the view you
-would like, giving it a MIDI File URL and track number, adding an MIDISampler,
-adding an AppleSequencer,
- and adding the track view to the view controller
+// This class will need a re-work -- will push a commit to AudioKit/AudioKit soon
+extension MIDIFileTrackNoteMap {
+    public func getNoteList() -> [MIDINoteDuration] {
+        var finalNoteList = [MIDINoteDuration]()
+        var eventPosition = 0.0
+        var noteNumber = 0
+        var noteOn = 0
+        var noteOff = 0
+        var velocityEvent: Int?
+        var notesInProgress: [Int: (Double, Double)] = [:]
+        for event in midiTrack.channelEvents {
+            let data = event.data
+            let eventTypeNumber = data[0]
+            let eventType = event.status?.type?.description ?? "No Event"
 
-For example:
+            //Usually the third element of a note event is the velocity
+            if data.count > 2 {
+                velocityEvent = Int(data[2])
+            }
 
-var trackView1: MIDITrackView = MIDITrackView(frame: CGRect(x: , y: , width: , height: ),
-midiFile: MIDIFile(url: urltoyourmidifile),
-trackNumber: The MIDI track number you want to display,
- sampler: MIDISampler,
- sequencer: AppleSequencer)
+            if noteOn == 0 {
+                if eventType == "Note On" {
+                    noteOn = Int(eventTypeNumber)
+                }
+            }
+            if noteOff == 0 {
+                if eventType == "Note Off" {
+                    noteOff = Int(eventTypeNumber)
+                }
+            }
 
-//Inside View Controller
+            if eventTypeNumber == noteOn {
+                //A note played with a velocity of zero is the equivalent
+                //of a noteOff command
+                if velocityEvent == 0 {
+                    eventPosition = (event.positionInBeats ?? 1.0) / Double(self.midiFile.ticksPerBeat ?? 1)
+                    noteNumber = Int(data[1])
+                    if let prevPosValue = notesInProgress[noteNumber]?.0 {
+                        notesInProgress[noteNumber] = (prevPosValue, eventPosition)
+                        var noteTracker: MIDINoteDuration = MIDINoteDuration(
+                            noteOnPosition: 0.0,
+                            noteOffPosition: 0.0, noteNumber: 0)
+                        if let note = notesInProgress[noteNumber] {
+                            noteTracker = MIDINoteDuration(
+                                noteOnPosition:
+                                    note.0,
+                                noteOffPosition:
+                                    note.1,
+                                noteNumber: noteNumber)
+                        }
+                        notesInProgress.removeValue(forKey: noteNumber)
+                        finalNoteList.append(noteTracker)
+                    }
+                } else {
+                    eventPosition = (event.positionInBeats ?? 1.0) / Double(self.midiFile.ticksPerBeat ?? 1)
+                    noteNumber = Int(data[1])
+                    notesInProgress[noteNumber] = (eventPosition, 0.0)
+                }
+            }
 
-self.view.addSubview(self.trackView1)
+            if eventTypeNumber == noteOff {
+                eventPosition = (event.positionInBeats ?? 1.0) / Double(self.midiFile.ticksPerBeat ?? 1)
+                noteNumber = Int(data[1])
+                if let prevPosValue = notesInProgress[noteNumber]?.0 {
+                    notesInProgress[noteNumber] = (prevPosValue, eventPosition)
+                    var noteTracker: MIDINoteDuration = MIDINoteDuration(
+                        noteOnPosition: 0.0,
+                        noteOffPosition: 0.0,
+                        noteNumber: 0)
+                    if let note = notesInProgress[noteNumber] {
+                        noteTracker = MIDINoteDuration(
+                            noteOnPosition:
+                                note.0,
+                            noteOffPosition:
+                                note.1,
+                            noteNumber: noteNumber)
+                    }
+                    notesInProgress.removeValue(forKey: noteNumber)
+                    finalNoteList.append(noteTracker)
+                }
+            }
 
-self.trackView1.play()
-
-If you are using an AppleSampler or Sampler, sequencer, etc,
-you will want to play the track directly before you play through the sequencer
-so the sound is synced with the playback.
-
-This file is still in development. I have tried loading some forms of MIDI files, and they do not yet work.
-I have recently set up the playback to be synced with automated tempos which change over time.
-*/
-
-/// Display a MIDI Sequence in a track
-public class MIDITrackView: UIView {
- //Quarter note at 120 bpm is 20.8333... pixels - standard
-    var length: Double!
-    var playbackCursorRect: CGRect!
-    var playbackCursorView: UIView!
-    var collectiveNoteView: UIView!
-    var cursorTimer: Timer!
-    var scrollTimer: Timer!
-    var readyToPlay: Bool = false
-    var playbackCursorPosition: Double = 0.0
-    var noteGroupPosition: Double = 0.0
-    /// MIDI Track Note Map
-    public var midiTrackNoteMap: MIDIFileTrackNoteMap!
-    /// Sampler
-    public var sampler: MIDISampler!
-    /// Sequencer
-    public var sequencer: AppleSequencer!
-    var previousTempo = 0.0
-    var trackLength: Double {
-        return midiTrackNoteMap.endOfTrack
+            eventPosition = 0.0
+            noteNumber = 0
+            velocityEvent = nil
+        }
+        return finalNoteList
     }
-
-    /// How far the view is zoomed in
-    public var noteZoomConstant: Double = 10_000.0
-    private var timerMultiplier: Double {
-        let base = (20 + (8.0 / 10.0) + (1.0 / 30.0))
-        let inverse = 1.0 / base
-        return inverse * 60
-    }
-
-    /// Initialize the Track View
-    public convenience init(frame: CGRect, midiFile: URL!,
-                            trackNumber: Int,
-                            sampler: MIDISampler,
-                            sequencer: AppleSequencer) {
-        self.init(frame: frame)
-        clipsToBounds = true
-        self.sampler = sampler
-        self.sequencer = sequencer
-        self.midiTrackNoteMap = MIDIFileTrackNoteMap(midiFile: MIDIFile(url: midiFile), trackNumber: trackNumber)
-        populateViewNotes()
-    }
-
-    /// Default init from superclass
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
-        clipsToBounds = true
-    }
-
-    /// Initialization within Interface Builder
-    public required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        clipsToBounds = true
-    }
-
-    /// Cursor which displays for the first few seconds of the midi clip until it goes out of bounds
-    public func play() {
-        playbackCursorRect = CGRect(x: 0, y: 0, width: 3, height: Double(self.frame.height))
-        playbackCursorView = UIView(frame: playbackCursorRect)
-        playbackCursorView.backgroundColor = .white
-        collectiveNoteView.addSubview(self.playbackCursorView)
-        if self.sequencer.allTempoEvents.count == 1 {
-            sequencer.setTempo(self.sequencer.allTempoEvents[0].1)
-            previousTempo = self.sequencer.allTempoEvents[0].1
-            let tempo = self.sequencer.allTempoEvents[0].1
-            cursorTimer = Timer.scheduledTimer(timeInterval: timerMultiplier * (1.0 / tempo),
-                                               target: self,
-                                               selector: #selector(self.updateCursor),
-                                               userInfo: nil,
-                                               repeats: true)
+    public func getLowNote(noteList: [MIDINoteDuration]) -> Int {
+        if noteList.count >= 2 {
+            return (noteList.min(by: { $0.noteNumber < $1.noteNumber })?.noteNumber) ?? 0
         } else {
-            cursorTimer = Timer.scheduledTimer(timeInterval: timerMultiplier * (1.0 / sequencer.tempo),
-                                               target: self,
-                                               selector: #selector(self.updateCursor),
-                                               userInfo: nil,
-                                               repeats: true)
+            return 0
         }
     }
-
-    /// Stop
-    public func stop() {
-        if let ctimer = cursorTimer {
-            ctimer.invalidate()
-        }
-        if let stimer = scrollTimer {
-            stimer.invalidate()
-        }
-        sequencer.stop()
-    }
-
-    /// Populate view notes
-    public func populateViewNotes() {
-
-        let noteDescriptor = midiTrackNoteMap
-        var noteRange = 0
-        var noteList: [MIDINoteDuration] = [MIDINoteDuration]()
-        if let noteR = noteDescriptor?.noteRange {
-            noteRange = noteR
-        }
-        if let noteL = noteDescriptor?.noteList {
-            noteList = noteL
-        }
-
-        let trackHeight = Double(self.frame.size.height)
-
-        let noteHeight = trackHeight / Double(noteRange)
-        let maxHeight = Double(trackHeight - (noteHeight))
-
-        let loNote = midiTrackNoteMap.loNote
-
-        let zoomConstant = noteZoomConstant
-        length = trackLength * zoomConstant
-
-        //Create invisible scroll view which moves all the notes
-        let collectiveNoteViewRect = CGRect(x: 0, y: 0, width: trackLength * noteZoomConstant, height: trackHeight)
-        collectiveNoteView = UIView(frame: collectiveNoteViewRect)
-        noteGroupPosition = Double(collectiveNoteViewRect.origin.x)
-        self.addSubview(collectiveNoteView)
-        for note in noteList {
-            let noteNumber = note.noteNumber - loNote
-            let noteStart = Double(note.noteStartTime)
-            let noteDuration = Double(note.noteDuration)
-            let noteLength = Double(noteDuration * zoomConstant)
-            let notePosition = Double(noteStart * zoomConstant)
-            let noteLevel = (maxHeight - (Double(noteNumber) * noteHeight))
-            let singleNoteRect = CGRect(x: notePosition, y: noteLevel, width: noteLength, height: noteHeight)
-            let singleNoteView = UIView(frame: singleNoteRect)
-            singleNoteView.backgroundColor = UIColor.white
-            collectiveNoteView.addSubview(singleNoteView)
-        }
-
-        readyToPlay = true
-    }
-
-    /// Move the playback cursor across the screen
-    @objc func updateCursor() {
-        if previousTempo != sequencer.tempo {
-            previousTempo = sequencer.tempo
-            cursorTimer.invalidate()
-            cursorTimer = Timer.scheduledTimer(timeInterval: timerMultiplier * (1.0 / sequencer.tempo),
-                                               target: self,
-                                               selector: #selector(self.updateCursor),
-                                               userInfo: nil,
-                                               repeats: true)
-        }
-        let width = Double(self.frame.size.width)
-        playbackCursorPosition += 1
-        if Double(self.playbackCursorView.frame.origin.x) < (width - 20) {
-            playbackCursorRect = CGRect(x: playbackCursorPosition, y: 0, width: 3, height: Double(self.frame.height))
-            playbackCursorView.frame = playbackCursorRect
+    public func getHiNote(noteList: [MIDINoteDuration]) -> Int {
+        if noteList.count >= 2 {
+            return (noteList.max(by: { $0.noteNumber < $1.noteNumber })?.noteNumber) ?? 0
         } else {
-            playbackCursorView.removeFromSuperview()
-            cursorTimer.invalidate()
-            scrollTimer = Timer.scheduledTimer(timeInterval: timerMultiplier * (1.0 / sequencer.tempo),
-                                               target: self,
-                                               selector: #selector(self.scrollNotes),
-                                               userInfo: nil,
-                                               repeats: true)
+            return 0
         }
-        if !sequencer.isPlaying && readyToPlay {
-            sequencer.play()
-        }
-    }
-
- /// Move the note view across the screen
-    @objc func scrollNotes() {
-        if previousTempo != sequencer.tempo {
-            previousTempo = sequencer.tempo
-            scrollTimer.invalidate()
-            scrollTimer = Timer.scheduledTimer(timeInterval: timerMultiplier * (1.0 / sequencer.tempo),
-                                               target: self,
-                                               selector: #selector(self.scrollNotes),
-                                               userInfo: nil,
-                                               repeats: true)
-        }
-        noteGroupPosition -= 1
-        collectiveNoteView.frame.origin.x = CGFloat(noteGroupPosition)
     }
 }
+struct NoteGroup: UIViewRepresentable {
+    @Binding var isPlaying: Bool
+    @Binding var sequencerTempo: Double
+    let noteMap: MIDIFileTrackNoteMap
+    let length: CGFloat
+    let trackHeight: CGFloat
+    let noteZoom: CGFloat
 
-#endif
+    func makeUIView(context: Context) -> some UIView {
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: length, height: trackHeight))
+        populateViewNotes(view, context: context)
+        return view
+    }
+
+    func updateUIView(_ uiView: UIViewType, context: Context) {
+        if isPlaying {
+            setupTimer(uiView)
+        }
+    }
+
+    func scrollNotes(_ uiView: UIView) {
+        uiView.frame.origin.x -= 1
+    }
+    func populateViewNotes(_ uiView: UIView, context: Context) {
+        let noteList = noteMap.getNoteList()
+        let low = noteMap.getLowNote(noteList: noteList)
+        let hi = noteMap.getHiNote(noteList: noteList)
+        let range = (hi - low) + 1
+        let noteh = trackHeight / CGFloat(range)
+        let maxh = trackHeight - noteh
+        for note in noteList {
+            let noteNumber = note.noteNumber - low
+            let noteStart = Double(note.noteStartTime)
+            let noteDuration = Double(note.noteDuration)
+            let noteLength = Double(noteDuration * noteZoom)
+            let notePosition = Double(noteStart * noteZoom)
+            let noteLevel = (maxh - (Double(noteNumber) * noteh))
+            let singleNoteRect = CGRect(x: notePosition, y: noteLevel, width: noteLength, height: noteh)
+            let singleNoteView = UIView(frame: singleNoteRect)
+            singleNoteView.backgroundColor = UIColor.red
+            singleNoteView.layer.cornerRadius = noteh * 0.5
+            uiView.addSubview(singleNoteView)
+        }
+    }
+    func setupTimer(_ uiView: UIView) {
+        let base = (20 + (8.0 / 10.0) + (1.0 / 30.0))
+        let inverse = 1.0 / base
+        let multiplier = inverse * 60 * (10_000 / noteZoom)
+        let scrollTimer = Timer.scheduledTimer(withTimeInterval: multiplier * (1/sequencerTempo), repeats: true) { timer in
+            scrollNotes(uiView)
+            if !isPlaying {
+                timer.invalidate()
+            }
+        }
+        RunLoop.main.add(scrollTimer, forMode: .common)
+    }
+}
+/// MIDI track UI similar to the one in your DAW
+public struct MIDITrackView: View {
+    @State public var isPlaying = false
+    @State var sequencerTempo = 0.0
+    let trackWidth: CGFloat
+    let trackHeight: CGFloat
+    public var fileURL: URL
+    /// Sets the zoom level of the track
+    public var noteZoom: CGFloat = 50_000
+    
+    public var body: some View {
+        let sequencer = AppleSequencer(fromURL: fileURL)
+        VStack {
+            ForEach(sequencer.tracks.indices, id: \.self) { number in
+                if number < sequencer.tracks.count - 1 {
+                    let noteMap = MIDIFileTrackNoteMap(midiFile: MIDIFile(url: fileURL), trackNumber: number)
+                    let length = CGFloat(noteMap.endOfTrack) * noteZoom
+                    NoteGroup(isPlaying: $isPlaying, sequencerTempo: $sequencerTempo, noteMap: noteMap, length: length, trackHeight: trackHeight, noteZoom: noteZoom)
+                        .frame(width: trackWidth, height: trackHeight, alignment: .center)
+                        .background(Color.green)
+                        .cornerRadius(10)
+                }
+            }
+        }
+        .onTapGesture {
+            isPlaying.toggle()
+            if isPlaying {
+                sequencer.play()
+                sequencerTempo = sequencer.allTempoEvents[0].1
+            } else {
+                if sequencer.isPlaying {
+                    sequencer.stop()
+                }
+            }
+        }
+    }
+}
