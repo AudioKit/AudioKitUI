@@ -1,4 +1,3 @@
-
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 import AudioKit
 import SwiftUI
@@ -12,13 +11,13 @@ struct NoteGroup: ViewRepresentable {
     let noteZoom: CGFloat
 
     #if os(macOS)
-    func makeNSView(context: CGContext) -> some UIView {
+    func makeNSView(context: Context) -> some NSView {
         let view = NSView(frame: CGRect(x: 0, y: 0, width: length, height: trackHeight))
         populateViewNotes(view, context: context)
         return view
     }
 
-    func updateNSView(_ nsView: NSViewType, context: CGContext) {
+    func updateNSView(_ nsView: NSViewType, context: Context) {
         if isPlaying {
             setupTimer(nsView)
         }
@@ -27,7 +26,7 @@ struct NoteGroup: ViewRepresentable {
     func scrollNotes(_ nsView: NSView) {
         uiView.frame.origin.x -= 1
     }
-    func populateViewNotes(_ nsView: NSView, context: CGContext) {
+    func populateViewNotes(_ nsView: NSView, context: Context) {
         let noteList = noteMap.noteList
         let low = noteMap.loNote
         let high = noteMap.hiNote
