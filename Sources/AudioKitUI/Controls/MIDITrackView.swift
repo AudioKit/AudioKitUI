@@ -155,8 +155,7 @@ struct NoteGroup: UIViewRepresentable {
         let inverse = 1.0 / base
         let multiplier = inverse * 60 * (10_000 / noteZoom)
         let scrollTimer = Timer.scheduledTimer(
-            withTimeInterval: multiplier * (1/sequencerTempo), repeats: true)
-        { timer in
+            withTimeInterval: multiplier * (1/sequencerTempo), repeats: true) { timer in
             scrollNotes(uiView)
             if !isPlaying {
                 timer.invalidate()
