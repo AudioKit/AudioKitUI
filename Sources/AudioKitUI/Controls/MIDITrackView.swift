@@ -24,7 +24,7 @@ struct NoteGroup: ViewRepresentable {
     }
 
     func scrollNotes(_ nsView: NSView) {
-        uiView.frame.origin.x -= 1
+        nsView.frame.origin.x -= 1
     }
     func populateViewNotes(_ nsView: NSView, context: Context) {
         let noteList = noteMap.noteList
