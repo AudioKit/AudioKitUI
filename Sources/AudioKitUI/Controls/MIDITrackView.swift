@@ -42,15 +42,15 @@ struct NoteGroup: ViewRepresentable {
             let noteLevel = (maxh - (CGFloat(noteNumber) * noteh))
             let singleNoteRect = CGRect(x: notePosition, y: noteLevel, width: noteLength, height: noteh)
             let singleNoteView = NSView(frame: singleNoteRect)
-            singleNoteView.backgroundColor = NSColor.red
-            singleNoteView.layer.cornerRadius = noteh * 0.5
+            singleNoteView.layer?.backgroundColor = NSColor.red.cgColor
+            singleNoteView.layer?.cornerRadius = noteh * 0.5
             nsView.addSubview(singleNoteView)
         }
     }
     func setupTimer(_ nsView: NSView) {
         let base: Double = (20 + (8.0 / 10.0) + (1.0 / 30.0))
         let inverse: Double = 1.0 / base
-        let multiplier: Double = inverse * 60 * (10_000 / noteZoom)
+        let multiplier: Double = inverse * 60 * (10_000 / Double(noteZoom))
         let scrollTimer = Timer.scheduledTimer(
             withTimeInterval: multiplier * (1/sequencerTempo), repeats: true) { timer in
             scrollNotes(nsView)
@@ -100,7 +100,7 @@ struct NoteGroup: ViewRepresentable {
     func setupTimer(_ uiView: UIView) {
         let base: Double = (20 + (8.0 / 10.0) + (1.0 / 30.0))
         let inverse: Double = 1.0 / base
-        let multiplier: Double = inverse * 60 * (10_000 / noteZoom)
+        let multiplier: Double = inverse * 60 * (10_000 / Double(noteZoom))
         let scrollTimer = Timer.scheduledTimer(
             withTimeInterval: multiplier * (1/sequencerTempo), repeats: true) { timer in
             scrollNotes(uiView)
