@@ -18,7 +18,7 @@ extension MIDIFileTrackNoteMap {
             let eventTypeNumber = data[0]
             let eventType = event.status?.type?.description ?? "No Event"
 
-            //Usually the third element of a note event is the velocity
+            // Usually the third element of a note event is the velocity
             if data.count > 2 {
                 velocityEvent = Int(data[2])
             }
@@ -35,8 +35,8 @@ extension MIDIFileTrackNoteMap {
             }
 
             if eventTypeNumber == noteOn {
-                //A note played with a velocity of zero is the equivalent
-                //of a noteOff command
+                // A note played with a velocity of zero is the equivalent
+                // of a noteOff command
                 if velocityEvent == 0 {
                     eventPosition = (event.positionInBeats ?? 1.0) / Double(self.midiFile.ticksPerBeat ?? 1)
                     noteNumber = Int(data[1])
