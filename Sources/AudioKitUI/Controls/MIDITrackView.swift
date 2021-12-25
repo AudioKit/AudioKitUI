@@ -2,27 +2,8 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 import SwiftUI
 import AudioKit
+import UIKit
 
-// This class will need a re-work -- will push a commit to AudioKit/AudioKit soon
-extension MIDIFileTrackNoteMap {
-    public func getNoteList() -> [MIDINoteDuration] {
-        return self.noteList
-    }
-    public func getLowNote(noteList: [MIDINoteDuration]) -> Int {
-        if noteList.count >= 2 {
-            return (noteList.min(by: { $0.noteNumber < $1.noteNumber })?.noteNumber) ?? 0
-        } else {
-            return 0
-        }
-    }
-    public func getHiNote(noteList: [MIDINoteDuration]) -> Int {
-        if noteList.count >= 2 {
-            return (noteList.max(by: { $0.noteNumber < $1.noteNumber })?.noteNumber) ?? 0
-        } else {
-            return 0
-        }
-    }
-}
 struct NoteGroup: UIViewRepresentable {
     @Binding var isPlaying: Bool
     @Binding var sequencerTempo: Double
@@ -47,9 +28,9 @@ struct NoteGroup: UIViewRepresentable {
         uiView.frame.origin.x -= 1
     }
     func populateViewNotes(_ uiView: UIView, context: Context) {
-        let noteList = noteMap.getNoteList()
-        let low = noteMap.getLowNote(noteList: noteList)
-        let high = noteMap.getHiNote(noteList: noteList)
+        let noteList = noteMap.noteList
+        let low = noteMap.loNote
+        let high = noteMap.hiNote
         let range = (high - low) + 1
         let noteh = trackHeight / CGFloat(range)
         let maxh = trackHeight - noteh
