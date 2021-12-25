@@ -132,8 +132,8 @@ struct NoteGroup: UIViewRepresentable {
     func populateViewNotes(_ uiView: UIView, context: Context) {
         let noteList = noteMap.getNoteList()
         let low = noteMap.getLowNote(noteList: noteList)
-        let hi = noteMap.getHiNote(noteList: noteList)
-        let range = (hi - low) + 1
+        let high = noteMap.getHiNote(noteList: noteList)
+        let range = (high - low) + 1
         let noteh = trackHeight / CGFloat(range)
         let maxh = trackHeight - noteh
         for note in noteList {
@@ -154,7 +154,9 @@ struct NoteGroup: UIViewRepresentable {
         let base = (20 + (8.0 / 10.0) + (1.0 / 30.0))
         let inverse = 1.0 / base
         let multiplier = inverse * 60 * (10_000 / noteZoom)
-        let scrollTimer = Timer.scheduledTimer(withTimeInterval: multiplier * (1/sequencerTempo), repeats: true) { timer in
+        let scrollTimer = Timer.scheduledTimer(
+            withTimeInterval: multiplier * (1/sequencerTempo), repeats: true)
+        { timer in
             scrollNotes(uiView)
             if !isPlaying {
                 timer.invalidate()
