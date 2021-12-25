@@ -1,3 +1,5 @@
+
+// Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 import SwiftUI
 import AudioKit
 
@@ -170,7 +172,7 @@ public struct MIDITrackView: View {
     public var fileURL: URL
     /// Sets the zoom level of the track
     public var noteZoom: CGFloat = 50_000
-    
+
     public var body: some View {
         let sequencer = AppleSequencer(fromURL: fileURL)
         VStack {
@@ -178,7 +180,11 @@ public struct MIDITrackView: View {
                 if number < sequencer.tracks.count - 1 {
                     let noteMap = MIDIFileTrackNoteMap(midiFile: MIDIFile(url: fileURL), trackNumber: number)
                     let length = CGFloat(noteMap.endOfTrack) * noteZoom
-                    NoteGroup(isPlaying: $isPlaying, sequencerTempo: $sequencerTempo, noteMap: noteMap, length: length, trackHeight: trackHeight, noteZoom: noteZoom)
+                    NoteGroup(isPlaying: $isPlaying,
+                              sequencerTempo: $sequencerTempo,
+                              noteMap: noteMap, length: length,
+                              trackHeight: trackHeight,
+                              noteZoom: noteZoom)
                         .frame(width: trackWidth, height: trackHeight, alignment: .center)
                         .background(Color.green)
                         .cornerRadius(10)
