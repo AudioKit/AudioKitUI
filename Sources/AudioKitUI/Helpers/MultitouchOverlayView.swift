@@ -1,7 +1,7 @@
 import SwiftUI
 import UIKit
 
-typealias TouchCallback = ([CGPoint])->Void
+public typealias TouchCallback = ([CGPoint])->Void
 
 public struct MultitouchOverlayView: UIViewRepresentable {
 
