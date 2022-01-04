@@ -5,7 +5,7 @@ typealias TouchCallback = ([CGPoint])->Void
 
 public struct MultitouchOverlayView: UIViewRepresentable {
 
-    var callback: TouchCallback
+    public var callback: TouchCallback
 
     public func makeUIView(context: UIViewRepresentableContext<MultitouchOverlayView>) -> MultitouchOverlayView.UIViewType {
         let v = UIView(frame: .zero)
