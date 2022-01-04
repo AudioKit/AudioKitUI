@@ -3,7 +3,7 @@ import UIKit
 
 typealias TouchCallback = ([CGPoint])->Void
 
-struct MultitouchOverlayView: UIViewRepresentable {
+public struct MultitouchOverlayView: UIViewRepresentable {
 
     var callback: TouchCallback
 
