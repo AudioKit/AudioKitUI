@@ -1,0 +1,49 @@
+import SwiftUI
+import UIKit
+
+typealias TouchCallback = ([CGPoint])->Void
+
+struct MultitouchOverlayView: UIViewRepresentable {
+
+    var callback: TouchCallback
+
+    func makeUIView(context: UIViewRepresentableContext<MultitouchOverlayView>) -> MultitouchOverlayView.UIViewType {
+        let v = UIView(frame: .zero)
+        let gesture = MultitouchGestureRecognizer(target: context.coordinator, callback: callback)
+        v.addGestureRecognizer(gesture)
+        return v
+    }
+
+    func updateUIView(_ uiView: UIView, context: UIViewRepresentableContext<MultitouchOverlayView>) {}
+}
+
+class MultitouchGestureRecognizer: UIGestureRecognizer {
+
+    var callback: TouchCallback = { _ in }
+    var touchLocations = [UITouch: CGPoint]()
+
+    init(target: Any?, callback: @escaping TouchCallback) {
+        self.callback = callback
+        super.init(target: target, action: nil)
+    }
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
+        for touch in touches { touchLocations[touch] = touch.location(in: super.view) }
+        callback(Array(touchLocations.values))
+    }
+
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
+        for touch in touches { touchLocations[touch] = touch.location(in: super.view) }
+        callback(Array(touchLocations.values))
+    }
+
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent) {
+        for touch in touches { touchLocations.removeValue(forKey: touch) }
+        callback(Array(touchLocations.values))
+    }
+
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent) {
+        for touch in touches { touchLocations.removeValue(forKey: touch) }
+        callback(Array(touchLocations.values))
+    }
+}
