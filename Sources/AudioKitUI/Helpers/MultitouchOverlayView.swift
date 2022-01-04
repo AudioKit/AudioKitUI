@@ -1,3 +1,4 @@
+#if !os(macOS) || targetEnvironment(macCatalyst)
 import SwiftUI
 import UIKit
 
@@ -51,3 +52,4 @@ class MultitouchRecognizer: UIGestureRecognizer {
         callback(Array(touchLocations.values))
     }
 }
+#endif
