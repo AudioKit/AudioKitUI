@@ -9,7 +9,7 @@ struct MultitouchOverlayView: UIViewRepresentable {
 
     func makeUIView(context: UIViewRepresentableContext<MultitouchOverlayView>) -> MultitouchOverlayView.UIViewType {
         let v = UIView(frame: .zero)
-        let gesture = MultitouchGestureRecognizer(target: context.coordinator, callback: callback)
+        let gesture = MultitouchRecognizer(target: context.coordinator, callback: callback)
         v.addGestureRecognizer(gesture)
         return v
     }
@@ -17,7 +17,7 @@ struct MultitouchOverlayView: UIViewRepresentable {
     func updateUIView(_ uiView: UIView, context: UIViewRepresentableContext<MultitouchOverlayView>) {}
 }
 
-class MultitouchGestureRecognizer: UIGestureRecognizer {
+class MultitouchRecognizer: UIGestureRecognizer {
 
     var callback: TouchCallback = { _ in }
     var touchLocations = [UITouch: CGPoint]()
