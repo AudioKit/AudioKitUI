@@ -12,7 +12,7 @@ public struct ReverbPresetStepper: View {
     
     public var body: some View {
         GeometryReader { geo in
-            let font = Font.system(size: geo.size.height * 0.55, weight: .light)
+            let font = Font.system(size: geo.size.height * 0.45, weight: .light)
             ZStack {
                 RoundedRectangle(cornerRadius: 10).fill(Color.primary.opacity(0.17))
                 HStack {

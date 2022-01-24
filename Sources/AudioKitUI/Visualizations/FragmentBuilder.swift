@@ -45,7 +45,7 @@ public class FragmentBuilder {
 
         float y = (-in.t.y + \(isCentered ? 0.5 : 1));
         float d = \(isFilled ? "fmax(fabs(y) - fabs(sample), 0)" : "fabs(y - sample)");
-        float alpha = \(isFFT ? "fabs(1/(50 * d))" : "smoothstep(0.01, 0.04, d)");
+        float alpha = \(isFFT ? "fabs(1/(50 * d))" : "smoothstep(0.01, 0.02, d)");
         return { mix(foregroundColor, backgroundColor, alpha) };
         """
     }

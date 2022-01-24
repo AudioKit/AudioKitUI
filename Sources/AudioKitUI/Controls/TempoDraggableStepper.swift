@@ -15,9 +15,9 @@ public struct TempoDraggableStepper: View {
         GeometryReader { geo in
             let font = Font.system(size: geo.size.height * 0.6, weight: .light)
             HStack {
-                Text("TEMPO ").fontWeight(.bold).font(font)
+                Text("TEMPO").fontWeight(.semibold).font(font).padding(.trailing, 5)
                 Text("◀").font(font).onTapGesture { tempo -= 1 }
-                Text("\(Int(tempo))").font(font).frame(width: geo.size.height * 1.5)
+                Text("\(Int(tempo))").font(font).frame(width: geo.size.height * 1.3)
                     .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .global)
                                 .onChanged({ touch in
                         if let initialTouchPoint = initialTouchPoint {
@@ -32,7 +32,6 @@ public struct TempoDraggableStepper: View {
                     }) )
 
                 Text("▶").font(font).onTapGesture { tempo += 1 }
-                Spacer()
             }.frame(width: geo.size.width, height: geo.size.height)
         }
     }
