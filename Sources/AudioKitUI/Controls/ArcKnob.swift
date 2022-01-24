@@ -19,8 +19,8 @@ public struct ArcKnob: View {
     @Binding var value: Float
     var range: ClosedRange<Float>
     var title: String = ""
-    var textColor: Color
-    var arcColor: Color
+    var textColor: Color = Color.primary
+    var arcColor: Color = Color.primary
     @State var displayString: String = ""
 
     public init(value: Binding<Float>, range: ClosedRange<Float>, title: String, textColor: Color, arcColor: Color) {
