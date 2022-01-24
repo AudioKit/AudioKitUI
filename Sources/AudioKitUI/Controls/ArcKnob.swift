@@ -63,7 +63,7 @@ public struct ArcKnob: View {
         let trim = ArcKnobDefaults.knobTrimMin + CGFloat(normalizedValue) * (ArcKnobDefaults.knobTrimMax - ArcKnobDefaults.knobTrimMin)
         GeometryReader { geometry in
             ZStack {
-                Rectangle().fill(.black).opacity(0.00001) // Hack to make gesture work from "clear portion" of knob
+                Rectangle().fill(Color.black).opacity(0.00001) // Hack to make gesture work from "clear portion" of knob
             VStack {
                 // Title of ArcKnob
                 Text(displayString == "" ? title : displayString).fontWeight(.semibold).font(Font.system(size: geometry.size.height / 8)).foregroundColor(textColor)
