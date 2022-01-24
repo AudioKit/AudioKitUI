@@ -1,5 +1,7 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 
+#if !os(macOS) || targetEnvironment(macCatalyst)
+
 import SwiftUI
 
 public struct TapCountingDrumPadGrid: View {
@@ -68,3 +70,5 @@ public struct TapCountingDrumPadGrid: View {
         }
     }
 }
+
+#endif
