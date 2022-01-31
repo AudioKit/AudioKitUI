@@ -17,7 +17,6 @@ public struct TapCountingDrumPadGrid: View {
         self.cols = cols
         self.callback = callback
         drumPadTouchCount = Array(repeating: 0, count: rows * cols)
-        print(drumPadTouchCount)
     }
 
     let padColors =  [Color(red: 79.0/255.0, green: 118.0/255.0, blue: 142.0/255.0),
@@ -31,7 +30,6 @@ public struct TapCountingDrumPadGrid: View {
     ]
 
     func padColor(_ idx: Int) -> Color {
-        print(drumPadTouchCount)
         if idx < drumPadTouchCount.count {
             return padColors[idx].opacity(max(0.0, 1.0 - 0.2 * Double(drumPadTouchCount[idx])))
         } else {
