@@ -8,7 +8,7 @@ public struct TapCountingDrumPadGrid: View {
     var names: [String]
     var rows = 2
     var cols = 4
-    var drumPadTouchCount: [Int] = []
+    @State var drumPadTouchCount: [Int]
     var callback: ([Int]) -> Void = { _ in }
 
     public init(names: [String], rows: Int = 2, cols: Int = 4, callback: @escaping ([Int]) -> Void) {
@@ -17,6 +17,7 @@ public struct TapCountingDrumPadGrid: View {
         self.cols = cols
         self.callback = callback
         drumPadTouchCount = Array(repeating: 0, count: rows * cols)
+        print(drumPadTouchCount)
     }
 
     let padColors =  [Color(red: 79.0/255.0, green: 118.0/255.0, blue: 142.0/255.0),
@@ -30,7 +31,12 @@ public struct TapCountingDrumPadGrid: View {
     ]
 
     func padColor(_ idx: Int) -> Color {
-        padColors[idx].opacity(max(0.0, 1.0 - 0.2 * Double(drumPadTouchCount[idx])))
+        print(drumPadTouchCount)
+        if idx < drumPadTouchCount.count {
+            return padColors[idx].opacity(max(0.0, 1.0 - 0.2 * Double(drumPadTouchCount[idx])))
+        } else {
+            return Color.clear
+        }
     }
 
     public var body: some View {
@@ -57,7 +63,7 @@ public struct TapCountingDrumPadGrid: View {
                 }
             }.overlay(
                 MultitouchOverlayView { touchLocations in
-                    var drumPadTouchCount = Array(repeating: 0, count: count)
+                    drumPadTouchCount = Array(repeating: 0, count: count)
                     for touch in touchLocations {
                         let row = Int(touch.y / (padHeight + 10))
                         let column = Int(touch.x / (padWidth + 7))
