@@ -33,23 +33,28 @@ class MultitouchRecognizer: UIGestureRecognizer {
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
+        touchLocations.removeAll()
         for touch in touches { touchLocations[touch] = touch.location(in: super.view) }
         callback(Array(touchLocations.values))
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
+        touchLocations.removeAll()
         for touch in touches { touchLocations[touch] = touch.location(in: super.view) }
         callback(Array(touchLocations.values))
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent) {
+        touchLocations.removeAll()
         for touch in touches { touchLocations.removeValue(forKey: touch) }
         callback(Array(touchLocations.values))
     }
 
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent) {
+        touchLocations.removeAll()
         for touch in touches { touchLocations.removeValue(forKey: touch) }
         callback(Array(touchLocations.values))
     }
+
 }
 #endif

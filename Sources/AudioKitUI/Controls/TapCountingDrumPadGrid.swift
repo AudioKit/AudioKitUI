@@ -31,10 +31,29 @@ public struct TapCountingDrumPadGrid: View {
 
     func padColor(_ idx: Int) -> Color {
         if idx < drumPadTouchCount.count {
-            return padColors[idx].opacity(max(0.0, 1.0 - 0.2 * Double(drumPadTouchCount[idx])))
+            return padColors[idx].opacity(max(0.5, 1.0 - 0.2 * Double(drumPadTouchCount[idx])))
         } else {
             return Color.clear
         }
+    }
+
+    @State var padWidth: CGFloat = 0
+    @State var padHeight: CGFloat = 0
+
+    func updateSize(_ gp: GeometryProxy) {
+        padWidth = gp.size.width / CGFloat(cols) - 5
+        padHeight = gp.size.height / CGFloat(rows)
+    }
+
+    func calculateDrumPadTouchCounts(_ touchLocations: [CGPoint]) -> [Int] {
+        var returnArray = Array(repeating: 0, count: rows * cols)
+        for touch in touchLocations {
+            let row = Int(touch.y / (padHeight + 10))
+            let column = Int(touch.x / (padWidth + 7))
+            let idx = row * cols + column
+            if idx < returnArray.count { returnArray[idx] += 1 }
+        }
+        return returnArray
     }
 
     public var body: some View {
@@ -61,13 +80,8 @@ public struct TapCountingDrumPadGrid: View {
                 }
             }.overlay(
                 MultitouchOverlayView { touchLocations in
-                    drumPadTouchCount = Array(repeating: 0, count: count)
-                    for touch in touchLocations {
-                        let row = Int(touch.y / (padHeight + 10))
-                        let column = Int(touch.x / (padWidth + 7))
-                        let idx = row * cols + column
-                        if idx < drumPadTouchCount.count { drumPadTouchCount[idx] += 1 }
-                    }
+                    updateSize(gp)
+                    drumPadTouchCount = calculateDrumPadTouchCounts(touchLocations)
                     callback(drumPadTouchCount)
                 }
             )
