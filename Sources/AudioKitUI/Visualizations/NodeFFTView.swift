@@ -19,18 +19,16 @@ public struct NodeFFTView: ViewRepresentable {
     internal var plot: FloatPlot {
         nodeTap.start()
 
-        let isFFT = false
-        let isCentered = false
         let metalFragmentOrig = """
-        float sample = waveform.sample(s, \(isFFT ? "(pow(10, in.t.x) - 1.0) / 9.0" : "in.t.x")).x;
+        float sample = waveform.sample(s, (pow(10, in.t.x) - 1.0) / 9.0).x;
 
         half4 backgroundColor = half4(colorParameters[1]);
         half4 foregroundColor = half4(colorParameters[0]);
 
-        float y = (in.t.y - \(isCentered ? 0.5 : 1));
+        float y = (in.t.y - 1);
         bool isFilled = parameters[0] != 0;
         float d = isFilled ? fmax(fabs(y) - fabs(sample), 0) : fabs(y - sample);
-        float alpha = \(isFFT ? "fabs(1/(50 * d))" : "smoothstep(0.01, 0.04, d)");
+        float alpha = fabs(1/(50 * d));
         return { mix(foregroundColor, backgroundColor, alpha) };
         """
 
