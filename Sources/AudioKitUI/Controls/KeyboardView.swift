@@ -299,7 +299,7 @@ import CoreMIDI
         setNeedsDisplay()
     }
 
-    /// Programatically remove key press without calling delegate
+    /// Programmatically remove key press without calling delegate
     ///
     /// Note: you can programmatically 'release' a note that has been pressed
     /// manually, but in such a case, the delegate.noteOff() will not be called
@@ -612,7 +612,7 @@ public class KeyboardView: NSView {
     }
 
     /// React to mouse dragging
-    /// - Parameter event: Drage event
+    /// - Parameter event: Drag event
     override public func mouseDragged(with event: NSEvent) {
 
         if polyphonicMode {

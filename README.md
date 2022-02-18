@@ -11,7 +11,7 @@
 
 </div>
 
-Waveform plots and controls that can be used to jump start your AudioKit-powered app. 
+Waveform plots and controls that can be used to jump start your AudioKit-powered app.
 
 ## Documentation
 
@@ -24,7 +24,7 @@ We use SwiftUI so you need to target iOS 13+ and macOS 10.15+.
 
 ## Installation via Swift Package Manager
 
-To add AudioKitUI to your Xcode project, select File -> Swift Packages -> Add Package Dependency. Enter `https://github.com/AudioKit/AudioKitUI` for the URL. 
+To add AudioKitUI to your Xcode project, select File -> Swift Packages -> Add Package Dependency. Enter `https://github.com/AudioKit/AudioKitUI` for the URL.
 
 ## Examples
 

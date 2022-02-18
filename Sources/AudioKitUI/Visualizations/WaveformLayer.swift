@@ -53,7 +53,7 @@ public class WaveformLayer: CAShapeLayer {
     ///   - size: Layer size
     ///   - fillColor: Fill Color
     ///   - strokeColor: Stroke color
-    ///   - backgroundColor: Backround color
+    ///   - backgroundColor: Background color
     ///   - opacity: Opacity
     ///   - isMirrored: Whether or not to display mirrored
     public convenience init(table: [Float],
