@@ -178,7 +178,7 @@ struct AmplitudeBar: View {
         }
     }
 
-    // Creates the Cap View - seperate method allows variable definitions inside a GeometryReader
+    // Creates the Cap View - separate method allows variable definitions inside a GeometryReader
     func addCap(width: CGFloat, height: CGFloat) -> some View {
         let padding = width * paddingFraction / 2
         let capHeight = height * 0.005
@@ -189,7 +189,7 @@ struct AmplitudeBar: View {
         return Rectangle()
             .fill(Color.white)
             .frame(height: capHeight)
-            .offset(x: 0.0, y: -height > capOffset - capHeight ? capMaxOffset : capOffset) // prevents offset from pushing cap outside of it's frame
+            .offset(x: 0.0, y: -height > capOffset - capHeight ? capMaxOffset : capOffset) // prevents offset from pushing cap outside of its frame
             .animation(.easeOut(duration: 0.6))
     }
 }

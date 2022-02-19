@@ -105,7 +105,7 @@ public class TableView: NSView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    /// Draw table view in  a rectange
+    /// Draw table view in a rectangle
     /// - Parameter rect: Rectangle to draw in
     override public func draw(_ rect: CGRect) {
 

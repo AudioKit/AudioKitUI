@@ -2,7 +2,7 @@ import SwiftUI
 
 public struct TempoDraggableStepper: View {
     @Binding var tempo: Float
-    var sensitivty: Float = 1.0
+    var sensitivity: Float = 1.0
 
     public init(tempo: Binding<Float>) {
         _tempo = tempo
@@ -21,7 +21,7 @@ public struct TempoDraggableStepper: View {
                     .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .global)
                                 .onChanged({ touch in
                         if let initialTouchPoint = initialTouchPoint {
-                            tempo = max(1, initialTempo + Float(touch.location.x - initialTouchPoint.x + (initialTouchPoint.y - touch.location.y)) * sensitivty / 30.0)
+                            tempo = max(1, initialTempo + Float(touch.location.x - initialTouchPoint.x + (initialTouchPoint.y - touch.location.y)) * sensitivity / 30.0)
                         } else {
                             initialTouchPoint = touch.location
                             initialTempo = tempo
