@@ -42,7 +42,7 @@ struct NoteGroup: ViewRepresentable {
             let noteLevel = (maxh - (CGFloat(noteNumber) * noteh))
             let singleNoteRect = CGRect(x: notePosition, y: noteLevel, width: noteLength, height: noteh)
             let singleNoteView = NSView(frame: singleNoteRect)
-            singleNoteView.layer?.backgroundColor = NSColor.red.cgColor
+            singleNoteView.layer?.backgroundColor = NSColor.cyan.cgColor
             singleNoteView.layer?.cornerRadius = noteh * 0.5
             nsView.addSubview(singleNoteView)
         }
@@ -92,7 +92,7 @@ struct NoteGroup: ViewRepresentable {
             let noteLevel = (maxh - (CGFloat(noteNumber) * noteh))
             let singleNoteRect = CGRect(x: notePosition, y: noteLevel, width: noteLength, height: noteh)
             let singleNoteView = UIView(frame: singleNoteRect)
-            singleNoteView.backgroundColor = UIColor.red
+            singleNoteView.backgroundColor = UIColor.cyan
             singleNoteView.layer.cornerRadius = noteh * 0.5
             uiView.addSubview(singleNoteView)
         }
@@ -141,7 +141,7 @@ public struct MIDITrackView: View {
                               trackHeight: trackHeight,
                               noteZoom: noteZoom)
                         .frame(width: trackWidth, height: trackHeight, alignment: .center)
-                        .background(Color.green)
+                        .background(Color(.sRGB, white: 0.2, opacity: 1.0))
                         .cornerRadius(10)
                 }
             }
