@@ -9,6 +9,7 @@ struct NoteGroup: ViewRepresentable {
     let length: CGFloat
     let trackHeight: CGFloat
     let noteZoom: CGFloat
+    let noteColor: Color
 
     #if os(macOS)
     func makeNSView(context: Context) -> some NSView {
@@ -42,7 +43,7 @@ struct NoteGroup: ViewRepresentable {
             let noteLevel = (maxh - (CGFloat(noteNumber) * noteh))
             let singleNoteRect = CGRect(x: notePosition, y: noteLevel, width: noteLength, height: noteh)
             let singleNoteView = NSView(frame: singleNoteRect)
-            singleNoteView.layer?.backgroundColor = NSColor.cyan.cgColor
+            singleNoteView.layer?.backgroundColor = noteColor.cgColor
             singleNoteView.layer?.cornerRadius = noteh * 0.5
             nsView.addSubview(singleNoteView)
         }
@@ -92,7 +93,7 @@ struct NoteGroup: ViewRepresentable {
             let noteLevel = (maxh - (CGFloat(noteNumber) * noteh))
             let singleNoteRect = CGRect(x: notePosition, y: noteLevel, width: noteLength, height: noteh)
             let singleNoteView = UIView(frame: singleNoteRect)
-            singleNoteView.backgroundColor = UIColor.cyan
+            singleNoteView.backgroundColor = UIColor(cgColor: noteColor.cgColor!)
             singleNoteView.layer.cornerRadius = noteh * 0.5
             uiView.addSubview(singleNoteView)
         }
@@ -121,6 +122,8 @@ public struct MIDITrackView: View {
     public var fileURL: URL
     /// Sets the zoom level of the track
     public var noteZoom: CGFloat = 50_000
+    public var noteColor = Color(.init(srgbRed: 0, green: 1.0, blue: 1.0, alpha: 1.0)) // cyan
+    public var trackColor = Color(.sRGB, white: 0.2, opacity: 1.0)
 
     public init(trackWidth: CGFloat, trackHeight: CGFloat, fileURL: URL, noteZoom: CGFloat = 50_000) {
         self.trackWidth = trackWidth
@@ -139,9 +142,10 @@ public struct MIDITrackView: View {
                               sequencerTempo: $sequencerTempo,
                               noteMap: noteMap, length: length,
                               trackHeight: trackHeight,
-                              noteZoom: noteZoom)
+                              noteZoom: noteZoom,
+                              noteColor: noteColor)
                         .frame(width: trackWidth, height: trackHeight, alignment: .center)
-                        .background(Color(.sRGB, white: 0.2, opacity: 1.0))
+                        .background(trackColor)
                         .cornerRadius(10)
                 }
             }
