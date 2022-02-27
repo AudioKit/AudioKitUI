@@ -122,7 +122,7 @@ public struct MIDITrackView: View {
     public var fileURL: URL
     /// Sets the zoom level of the track
     public var noteZoom: CGFloat = 50_000
-    public var noteColor = Color(.init(srgbRed: 0, green: 1.0, blue: 1.0, alpha: 1.0)) // cyan
+    public var noteColor = Color(CGColor.init(srgbRed: 0, green: 1.0, blue: 1.0, alpha: 1.0)) // cyan
     public var trackColor = Color(.sRGB, white: 0.2, opacity: 1.0)
 
     public init(trackWidth: CGFloat, trackHeight: CGFloat, fileURL: URL, noteZoom: CGFloat = 50_000) {
