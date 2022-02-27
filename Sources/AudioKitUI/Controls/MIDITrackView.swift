@@ -134,20 +134,18 @@ public struct MIDITrackView: View {
     public var body: some View {
         let sequencer = AppleSequencer(fromURL: fileURL)
         VStack {
-            ForEach(sequencer.tracks.indices, id: \.self) { number in
-                if number < sequencer.tracks.count - 1 {
-                    let noteMap = MIDIFileTrackNoteMap(midiFile: MIDIFile(url: fileURL), trackNumber: number)
-                    let length = CGFloat(noteMap.endOfTrack) * noteZoom
-                    NoteGroup(isPlaying: $isPlaying,
-                              sequencerTempo: $sequencerTempo,
-                              noteMap: noteMap, length: length,
-                              trackHeight: trackHeight,
-                              noteZoom: noteZoom,
-                              noteColor: noteColor)
-                        .frame(width: trackWidth, height: trackHeight, alignment: .center)
-                        .background(trackColor)
-                        .cornerRadius(10)
-                }
+            ForEach(sequencer.tracks.indices.dropLast(), id: \.self) { number in
+                let noteMap = MIDIFileTrackNoteMap(midiFile: MIDIFile(url: fileURL), trackNumber: number)
+                let length = CGFloat(noteMap.endOfTrack) * noteZoom
+                NoteGroup(isPlaying: $isPlaying,
+                          sequencerTempo: $sequencerTempo,
+                          noteMap: noteMap, length: length,
+                          trackHeight: trackHeight,
+                          noteZoom: noteZoom,
+                          noteColor: noteColor)
+                    .frame(width: trackWidth, height: trackHeight, alignment: .center)
+                    .background(trackColor)
+                    .cornerRadius(10)
             }
         }
         .onTapGesture {
