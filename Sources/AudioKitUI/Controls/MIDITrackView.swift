@@ -12,12 +12,12 @@ import Foundation
 class NoteView: NSView {
     var viewModel: MIDITrackViewModel?
     var cancellable = Set<AnyCancellable>()
-    
-    func addViewModel( _ wm: MIDITrackViewModel) {
-        self.viewModel = wm
+
+    func addViewModel( _ withModel: MIDITrackViewModel) {
+        self.viewModel = withModel
         self.viewModel?.$trackPosition
-            .sink(receiveValue: { [unowned self] w in
-                self.frame.origin.x = w
+            .sink(receiveValue: { [unowned self] pixelValue in
+                self.frame.origin.x = pixelValue
             }).store(in: &cancellable)
     }
 }
@@ -25,12 +25,12 @@ class NoteView: NSView {
 class NoteView: UIView {
     var viewModel: MIDITrackViewModel?
     var cancellable = Set<AnyCancellable>()
-    
-    func addViewModel( _ wm: MIDITrackViewModel) {
-        self.viewModel = wm
+
+    func addViewModel( _ withModel: MIDITrackViewModel) {
+        self.viewModel = withModel
         self.viewModel?.$trackPosition
-            .sink(receiveValue: { [unowned self] w in
-                self.frame.origin.x = w
+            .sink(receiveValue: { [unowned self] pixelValue in
+                self.frame.origin.x = pixelValue
             }).store(in: &cancellable)
     }
 }
@@ -78,7 +78,7 @@ struct NotesModel: ViewRepresentable {
             viewModel.trackPosition = 0
         }
     }
-    
+
     func populateViewNotes(_ nsView: NSView, context: Context, noteMap: MIDIFileTrackNoteMap) {
         let noteList = noteMap.noteList
         let low = noteMap.loNote
@@ -114,7 +114,7 @@ struct NotesModel: ViewRepresentable {
             return view
         }
     }
-    
+
     func updateUIView(_ uiView: UIViewType, context: Context) {
         if let fileURL = fileURL {
             let noteMap = MIDIFileTrackNoteMap(midiFile: MIDIFile(url: fileURL), trackNumber: trackNumber)
@@ -125,8 +125,7 @@ struct NotesModel: ViewRepresentable {
             uiView.frame.origin.x = 0
             populateViewNotes(uiView, context: context, noteMap: noteMap)
         } else {
-            if uiView.subviews.count > 0
-            {
+            if uiView.subviews.count > 0 {
                 uiView.subviews.forEach({ $0.removeFromSuperview()})
             }
             uiView.frame.size.width = 0
@@ -136,7 +135,7 @@ struct NotesModel: ViewRepresentable {
             viewModel.trackPosition = 0
         }
     }
-    
+
     func populateViewNotes(_ uiView: UIView, context: Context, noteMap: MIDIFileTrackNoteMap) {
         let noteList = noteMap.noteList
         let low = noteMap.loNote
@@ -171,7 +170,7 @@ public class MIDITrackViewModel: ObservableObject {
     public init() {
         engine.output = Reverb(sampler, dryWetMix: 0.2)
     }
-    
+
     public func startEngine() {
         do {
             try engine.start()
@@ -187,7 +186,9 @@ public class MIDITrackViewModel: ObservableObject {
         let inverse: Double = 1.0 / base
         let multiplier: Double = inverse * 60 * (10_000 / Double(50_000.0))
         sequencer.play()
-        trackTimer = Timer.scheduledTimer(timeInterval: multiplier * (1/lastTempo), target: self, selector: #selector(self.update), userInfo: nil, repeats: true)
+        trackTimer = Timer.scheduledTimer(timeInterval: multiplier * (1/lastTempo),
+                                          target: self, selector: #selector(self.update),
+                                          userInfo: nil, repeats: true)
         RunLoop.main.add(trackTimer, forMode: .common)
     }
 
