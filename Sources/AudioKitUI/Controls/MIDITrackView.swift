@@ -94,7 +94,7 @@ struct NotesModel: ViewRepresentable {
             let noteLevel = (maxh - (CGFloat(noteNumber) * noteh))
             let singleNoteRect = CGRect(x: notePosition, y: noteLevel, width: noteLength, height: noteh)
             let singleNoteView = NSView(frame: singleNoteRect)
-            singleNoteView.layer?.backgroundColor = noteColor.cgColor
+            singleNoteView.layer?.backgroundColor = CGColor(red: 0.0, green: 1.0, blue: 0.0, alpha: 1.0)
             singleNoteView.layer?.cornerRadius = noteh * 0.5
             nsView.addSubview(singleNoteView)
         }
