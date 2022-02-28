@@ -46,7 +46,7 @@ struct NotesModel: ViewRepresentable {
         if let fileURL = fileURL {
             let noteMap = MIDIFileTrackNoteMap(midiFile: MIDIFile(url: fileURL), trackNumber: trackNumber)
             let length = CGFloat(noteMap.endOfTrack) * noteZoom
-            let view = NoteView(frame: NSRect(x:0, y:0, width: length, height: trackHeight))
+            let view = NoteView(frame: NSRect(x: 0, y: 0, width: length, height: trackHeight))
             view.addViewModel(viewModel)
             populateViewNotes(view, context: context, noteMap: noteMap)
             return view
@@ -56,7 +56,7 @@ struct NotesModel: ViewRepresentable {
             return view
         }
     }
-    
+
     func updateNSView(_ nsView: NSViewType, context: Context) {
         if let fileURL = fileURL {
             let noteMap = MIDIFileTrackNoteMap(midiFile: MIDIFile(url: fileURL), trackNumber: trackNumber)
@@ -67,8 +67,7 @@ struct NotesModel: ViewRepresentable {
             nsView.frame.origin.x = 0
             populateViewNotes(nsView, context: context, noteMap: noteMap)
         } else {
-            if nsView.subviews.count > 0
-            {
+            if nsView.subviews.count > 0 {
                 nsView.subviews.forEach({ $0.removeFromSuperview()})
             }
             nsView.frame.size.width = 0
