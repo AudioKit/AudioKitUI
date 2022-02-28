@@ -1,8 +1,27 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 import AudioKit
+#if os(macOS)
+import AppKit
+#else
+import UIKit
+#endif
 import SwiftUI
 import Combine
 import Foundation
+#if os(macOS)
+class NoteView: NSView {
+    var viewModel: MIDITrackViewModel?
+    var cancellable = Set<AnyCancellable>()
+    
+    func addViewModel( _ wm: MIDITrackViewModel) {
+        self.viewModel = wm
+        self.viewModel?.$trackPosition
+            .sink(receiveValue: { [unowned self] w in
+                self.frame.origin.x = w
+            }).store(in: &cancellable)
+    }
+}
+#else
 class NoteView: UIView {
     var viewModel: MIDITrackViewModel?
     var cancellable = Set<AnyCancellable>()
@@ -15,13 +34,72 @@ class NoteView: UIView {
             }).store(in: &cancellable)
     }
 }
-struct NotesModel: UIViewRepresentable {
+#endif
+struct NotesModel: ViewRepresentable {
     @Binding var fileURL: URL?
     var viewModel: MIDITrackViewModel
     let trackNumber: Int
     let trackHeight: CGFloat
     let noteZoom: CGFloat = 50_000.0
+    #if os(macOS)
+    func makeNSView(context: Context) -> some NSView {
+        if let fileURL = fileURL {
+            let noteMap = MIDIFileTrackNoteMap(midiFile: MIDIFile(url: fileURL), trackNumber: trackNumber)
+            let length = CGFloat(noteMap.endOfTrack) * noteZoom
+            let view = NoteView(frame: NSRect(x:0, y:0, width: length, height: trackHeight))
+            view.addViewModel(viewModel)
+            populateViewNotes(view, context: context, noteMap: noteMap)
+            return view
+        } else {
+            let view = NoteView()
+            view.addViewModel(viewModel)
+            return view
+        }
+    }
     
+    func updateNSView(_ nsView: NSViewType, context: Context) {
+        if let fileURL = fileURL {
+            let noteMap = MIDIFileTrackNoteMap(midiFile: MIDIFile(url: fileURL), trackNumber: trackNumber)
+            let length = CGFloat(noteMap.endOfTrack) * noteZoom
+            nsView.frame.size.width = length
+            nsView.frame.size.height = trackHeight
+            nsView.frame.origin.y = 0
+            nsView.frame.origin.x = 0
+            populateViewNotes(nsView, context: context, noteMap: noteMap)
+        } else {
+            if nsView.subviews.count > 0
+            {
+                nsView.subviews.forEach({ $0.removeFromSuperview()})
+            }
+            nsView.frame.size.width = 0
+            nsView.frame.size.height = 0
+            nsView.frame.origin.y = 0
+            nsView.frame.origin.x = 0
+            viewModel.trackPosition = 0
+        }
+    }
+    
+    func populateViewNotes(_ nsView: NSView, context: Context, noteMap: MIDIFileTrackNoteMap) {
+        let noteList = noteMap.noteList
+        let low = noteMap.loNote
+        let range = noteMap.noteRange
+        let noteh = trackHeight / CGFloat(range)
+        let maxh = trackHeight - noteh
+        for note in noteList {
+            let noteNumber = note.noteNumber - low
+            let noteStart = note.noteStartTime
+            let noteDuration = note.noteDuration
+            let noteLength = CGFloat(noteDuration) * noteZoom
+            let notePosition = CGFloat(noteStart) * noteZoom
+            let noteLevel = (maxh - (CGFloat(noteNumber) * noteh))
+            let singleNoteRect = CGRect(x: notePosition, y: noteLevel, width: noteLength, height: noteh)
+            let singleNoteView = NSView(frame: singleNoteRect)
+            singleNoteView.layer?.backgroundColor = CGColor(red: 0.0, green: 1.0, blue: 0.0, alpha: 1.0)
+            singleNoteView.layer?.cornerRadius = noteh * 0.5
+            nsView.addSubview(singleNoteView)
+        }
+    }
+    #else
     func makeUIView(context: Context) -> some UIView {
         if let fileURL = fileURL {
             let noteMap = MIDIFileTrackNoteMap(midiFile: MIDIFile(url: fileURL), trackNumber: trackNumber)
@@ -80,6 +158,7 @@ struct NotesModel: UIViewRepresentable {
             uiView.addSubview(singleNoteView)
         }
     }
+    #endif
 }
 
 public class MIDITrackViewModel: ObservableObject {
