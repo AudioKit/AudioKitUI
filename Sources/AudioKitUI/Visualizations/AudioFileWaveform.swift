@@ -23,8 +23,8 @@ class AudioFileWaveformViewModel: ObservableObject {
         let numberOfSamples = signal.count
         let numberOfOutputArrays = numberOfSamples / windowSize
         var outputArray: [Float] = []
-        for i in 0...numberOfOutputArrays-1 {
-            let startIndex = i * windowSize
+        for index in 0...numberOfOutputArrays-1 {
+            let startIndex = index * windowSize
             let endIndex = startIndex + windowSize >= signal.count ? signal.count-1 : startIndex + windowSize
             let arrayToAnalyze = Array(signal[startIndex..<endIndex])
             var rms: Float = 0
@@ -37,11 +37,11 @@ class AudioFileWaveformViewModel: ObservableObject {
 
 public struct AudioFileWaveform: View {
     @ObservedObject var viewModel: AudioFileWaveformViewModel
-    
+
     public init(url: URL) {
         viewModel = AudioFileWaveformViewModel(url: url)
     }
-    
+
     public var body: some View {
         AudioWaveform(rmsVals: viewModel.rmsValues)
             .fill(Color.gray)
