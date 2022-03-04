@@ -6,15 +6,17 @@ import Accelerate
 
 class AudioFileWaveformViewModel: ObservableObject {
     @Published var rmsValues = [Float]()
+    var rmsWindowSize: Double
     
-    init(url: URL) {
+    init(url: URL, rmsWindowSize: Double) {
+        self.rmsWindowSize = rmsWindowSize
         rmsValues = getRMSValues(url: url)
     }
 
     func getRMSValues(url: URL) -> [Float] {
         if let audioInformation = loadAudioSignal(audioURL: url) {
             let signal = audioInformation.signal
-            return createRMSAnalysisArray(signal: signal, windowSize: Int(audioInformation.rate/256))
+            return createRMSAnalysisArray(signal: signal, windowSize: Int(audioInformation.rate/rmsWindowSize))
         }
         return []
     }
@@ -38,8 +40,9 @@ class AudioFileWaveformViewModel: ObservableObject {
 public struct AudioFileWaveform: View {
     @ObservedObject var viewModel: AudioFileWaveformViewModel
 
-    public init(url: URL) {
-        viewModel = AudioFileWaveformViewModel(url: url)
+    public init(url: URL, rmsWindowSize: Double = 256) {
+        viewModel = AudioFileWaveformViewModel(url: url,
+                                               rmsWindowSize: rmsWindowSize)
     }
 
     public var body: some View {
