@@ -30,7 +30,7 @@ struct TrackView_Previews: PreviewProvider {
         let segment1 = try! MockSegment(audioFileURL: TestAudioURLs.drumloop.url(), playbackStartTime: 0.0)
         let segment2 = try! MockSegment(audioFileURL: TestAudioURLs.drumloop.url(), playbackStartTime: 5.0)
         let segments = [segment1, segment2]
-        
+
         return TrackView<MockSegment>(segments: segments)
     }
 }
@@ -41,8 +41,8 @@ public protocol ViewableSegment: Identifiable {
     var rmsValuesForRange: [Float] { get }
 }
 
-fileprivate let RMS_FRAMES_PER_SECOND: Double = 50
-fileprivate let PIXELS_PER_RMS_FRAME: Double = 1
+private let RMS_FRAMES_PER_SECOND: Double = 50
+private let PIXELS_PER_RMS_FRAME: Double = 1
 
 public struct MockSegment: ViewableSegment, StreamableAudioSegment {
     public var id = UUID()
@@ -50,7 +50,7 @@ public struct MockSegment: ViewableSegment, StreamableAudioSegment {
     public var playbackStartTime: TimeInterval
     public var fileStartTime: TimeInterval = 0
     public var fileEndTime: TimeInterval
-    public var completionHandler: AVAudioNodeCompletionHandler? = nil
+    public var completionHandler: AVAudioNodeCompletionHandler?
     private var rmsValues: [Float]
 
     public var rmsValuesForRange: [Float] {
