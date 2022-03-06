@@ -6,43 +6,70 @@ import AVFoundation
 
 public struct TrackView<Segment: ViewableSegment>: View {
     var segments: [Segment]
+    var rmsFramesPerSecond: Double
+    var pixelsPerRMS: Double
 
-    public init(segments: [Segment]) {
+    public init(segments: [Segment], rmsFramesPerSecond: Double = 50, pixelsPerRMS: Double = 1) {
         self.segments = segments
+        self.rmsFramesPerSecond = rmsFramesPerSecond
+        self.pixelsPerRMS = pixelsPerRMS
     }
 
     public var body: some View {
         ZStack(alignment: .topLeading) {
             Color.gray.opacity(0.1)
             ForEach(segments) { segment in
-                AudioWaveform(rmsVals: segment.rmsValuesForRange)
-                    .fill(Color.black)
-                    .background(Color.gray.opacity(0.1))
-                    .offset(x: segment.playbackStartTime * RMS_FRAMES_PER_SECOND * PIXELS_PER_RMS_FRAME)
-                    .frame(width: PIXELS_PER_RMS_FRAME * Double(segment.rmsValuesForRange.count))
+                SegmentView<Segment>(segment: segment,
+                                     rmsFramesPerSecond: rmsFramesPerSecond,
+                                     pixelsPerRMS: pixelsPerRMS)
             }
         }
     }
 }
 
+struct SegmentView<Segment: ViewableSegment>: View {
+    var segment: Segment
+    var rmsFramesPerSecond: Double
+    var pixelsPerRMS: Double
+
+    var rmsValuesForRange: [Float] {
+        let startingIndex = Int(segment.fileStartTime * rmsFramesPerSecond)
+        let endingIndex = Int(segment.fileEndTime * rmsFramesPerSecond)-1
+        return Array(segment.rmsValues[startingIndex...endingIndex])
+    }
+
+    var body: some View {
+            AudioWaveform(rmsVals: rmsValuesForRange)
+                .fill(Color.black)
+                .background(Color.gray.opacity(0.1))
+                .frame(width: pixelsPerRMS * Double(rmsValuesForRange.count))
+                .offset(x: segment.playbackStartTime * rmsFramesPerSecond * pixelsPerRMS)
+    }
+}
+
 struct TrackView_Previews: PreviewProvider {
     static var previews: some View {
-        let segment1 = try! MockSegment(audioFileURL: TestAudioURLs.drumloop.url(), playbackStartTime: 0.0)
-        let segment2 = try! MockSegment(audioFileURL: TestAudioURLs.drumloop.url(), playbackStartTime: 5.0)
+        let rmsFramesPerSecond: Double = 50
+
+        let segment1 = try! MockSegment(audioFileURL: TestAudioURLs.drumloop.url(),
+                                        playbackStartTime: 0.0,
+                                        rmsFramesPerSecond: 50)
+        let segment2 = try! MockSegment(audioFileURL: TestAudioURLs.drumloop.url(),
+                                        playbackStartTime: 5.0,
+                                        rmsFramesPerSecond: 50)
         let segments = [segment1, segment2]
 
-        return TrackView<MockSegment>(segments: segments)
+        return TrackView<MockSegment>(segments: segments, rmsFramesPerSecond: rmsFramesPerSecond)
     }
 }
 
 public protocol ViewableSegment: Identifiable {
     var playbackStartTime: TimeInterval { get }
     var playbackEndTime: TimeInterval { get }
-    var rmsValuesForRange: [Float] { get }
+    var fileStartTime: TimeInterval { get }
+    var fileEndTime: TimeInterval { get }
+    var rmsValues: [Float] { get }
 }
-
-private let RMS_FRAMES_PER_SECOND: Double = 50
-private let PIXELS_PER_RMS_FRAME: Double = 1
 
 public struct MockSegment: ViewableSegment, StreamableAudioSegment {
     public var id = UUID()
@@ -51,24 +78,20 @@ public struct MockSegment: ViewableSegment, StreamableAudioSegment {
     public var fileStartTime: TimeInterval = 0
     public var fileEndTime: TimeInterval
     public var completionHandler: AVAudioNodeCompletionHandler?
-    private var rmsValues: [Float]
-
-    public var rmsValuesForRange: [Float] {
-        let startingIndex = Int(fileStartTime * RMS_FRAMES_PER_SECOND)
-        let endingIndex = Int(fileEndTime * RMS_FRAMES_PER_SECOND)-1
-        return Array(rmsValues[startingIndex...endingIndex])
-    }
+    public var rmsValues: [Float]
+    var rmsFramesPerSecond: Double
 
     public var playbackEndTime: TimeInterval {
         let duration = fileEndTime - fileStartTime
         return playbackStartTime + duration
     }
 
-    public init(audioFileURL: URL, playbackStartTime: TimeInterval) throws {
+    public init(audioFileURL: URL, playbackStartTime: TimeInterval, rmsFramesPerSecond: Double) throws {
         do {
             self.playbackStartTime = playbackStartTime
+            self.rmsFramesPerSecond = rmsFramesPerSecond
             audioFile = try AVAudioFile(forReading: audioFileURL)
-            rmsValues = AudioHelpers.getRMSValues(url: audioFileURL, rmsFramesPerSecond: RMS_FRAMES_PER_SECOND)
+            rmsValues = AudioHelpers.getRMSValues(url: audioFileURL, rmsFramesPerSecond: rmsFramesPerSecond)
             fileEndTime = AudioHelpers.getFileEndTime(audioFile)
         } catch {
             throw error
