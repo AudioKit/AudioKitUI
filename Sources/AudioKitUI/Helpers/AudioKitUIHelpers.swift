@@ -2,7 +2,7 @@
 
 import SwiftUI
 import Accelerate
-import AVFAudio
+import AVFoundation
 import AudioKit
 
 #if os(iOS)

@@ -2,7 +2,7 @@
 
 import SwiftUI
 import AudioKit
-import AVFAudio
+import AVFoundation
 
 public struct TrackView<Segment: ViewableSegment>: View {
     var segments: [Segment]
