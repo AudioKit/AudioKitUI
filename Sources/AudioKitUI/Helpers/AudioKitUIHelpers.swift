@@ -1,6 +1,9 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 
 import SwiftUI
+import Accelerate
+import AVFAudio
+import AudioKit
 
 #if os(iOS)
 
@@ -64,3 +67,36 @@ extension CGRect {
          self.init(width: CGFloat(width), height: CGFloat(height))
      }
  }
+
+// TODO: refactor these to extensions where possible
+class AudioHelpers {
+    static func getRMSValues(url: URL, rmsFramesPerSecond: Double) -> [Float] {
+        if let audioInformation = loadAudioSignal(audioURL: url) {
+            let signal = audioInformation.signal
+            let windowSize = Int(audioInformation.rate/rmsFramesPerSecond)
+            return createRMSAnalysisArray(signal: signal, windowSize: windowSize)
+        }
+        return []
+    }
+
+    static func createRMSAnalysisArray(signal: [Float], windowSize: Int) -> [Float] {
+        let numberOfSamples = signal.count
+        let numberOfOutputArrays = numberOfSamples / windowSize
+        var outputArray: [Float] = []
+        for index in 0...numberOfOutputArrays-1 {
+            let startIndex = index * windowSize
+            let endIndex = startIndex + windowSize >= signal.count ? signal.count-1 : startIndex + windowSize
+            let arrayToAnalyze = Array(signal[startIndex..<endIndex])
+            var rms: Float = 0
+            vDSP_rmsqv(arrayToAnalyze, 1, &rms, UInt(windowSize))
+            outputArray.append(rms)
+        }
+        return outputArray
+    }
+
+    static func getFileEndTime(_ audioFile: AVAudioFile) -> TimeInterval {
+        let sampleRate = audioFile.processingFormat.sampleRate
+        let numberOfSamples = audioFile.length
+        return Double(numberOfSamples) / sampleRate
+    }
+}
