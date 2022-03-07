@@ -10,30 +10,7 @@ class AudioFileWaveformViewModel: ObservableObject {
     
     init(url: URL, rmsWindowSize: Double) {
         self.rmsWindowSize = rmsWindowSize
-        rmsValues = getRMSValues(url: url)
-    }
-
-    func getRMSValues(url: URL) -> [Float] {
-        if let audioInformation = loadAudioSignal(audioURL: url) {
-            let signal = audioInformation.signal
-            return createRMSAnalysisArray(signal: signal, windowSize: Int(audioInformation.rate/rmsWindowSize))
-        }
-        return []
-    }
-
-    func createRMSAnalysisArray(signal: [Float], windowSize: Int) -> [Float] {
-        let numberOfSamples = signal.count
-        let numberOfOutputArrays = numberOfSamples / windowSize
-        var outputArray: [Float] = []
-        for index in 0...numberOfOutputArrays-1 {
-            let startIndex = index * windowSize
-            let endIndex = startIndex + windowSize >= signal.count ? signal.count-1 : startIndex + windowSize
-            let arrayToAnalyze = Array(signal[startIndex..<endIndex])
-            var rms: Float = 0
-            vDSP_rmsqv(arrayToAnalyze, 1, &rms, UInt(windowSize))
-            outputArray.append(rms)
-        }
-        return outputArray
+        rmsValues = AudioHelpers.getRMSValues(url: url, rmsFramesPerSecond: rmsWindowSize)
     }
 }
 
