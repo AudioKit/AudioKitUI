@@ -4,9 +4,6 @@ import Accelerate
 import AVFoundation
 import AudioKit
 import SwiftUI
-import Accelerate
-import AVFoundation
-import AudioKit
 
 #if os(iOS)
 
