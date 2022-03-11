@@ -4,6 +4,9 @@ import Accelerate
 import AVFoundation
 import AudioKit
 import SwiftUI
+import Accelerate
+import AVFoundation
+import AudioKit
 
 #if os(iOS)
 
@@ -110,9 +113,6 @@ class AudioHelpers {
 
     static func getFileEndTime(_ audioFile: AVAudioFile) -> TimeInterval {
         let sampleRate = audioFile.processingFormat.sampleRate
-        print("getFileEndTime format sample rate: \(audioFile.fileFormat.sampleRate)")
-        print("getFileEndTime processing sample rate: \(audioFile.processingFormat.sampleRate)")
-        print("getFileEndTime length: \(audioFile.length)")
         let numberOfSamples = audioFile.length
         return Double(numberOfSamples) / sampleRate
     }

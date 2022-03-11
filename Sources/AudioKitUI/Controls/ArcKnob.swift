@@ -62,21 +62,20 @@ public struct ArcKnob: View {
     public var body: some View {
         let trim = ArcKnobDefaults.knobTrimMin + CGFloat(normalizedValue) * (ArcKnobDefaults.knobTrimMax - ArcKnobDefaults.knobTrimMin)
         GeometryReader { geometry in
-            ZStack {
-                Rectangle().fill(Color.black).opacity(0.00001) // Hack to make gesture work from "clear portion" of knob
+            
             VStack {
                 // Title of ArcKnob
                 Text(displayString == "" ? title : displayString).fontWeight(.semibold).font(Font.system(size: geometry.size.height / 8)).foregroundColor(textColor)
-
+                
                 ZStack(alignment: .center) {
-
+                    
                     // Stroke entire trim of knob
                     Circle()
                         .trim(from: ArcKnobDefaults.knobTrimMin, to: ArcKnobDefaults.knobTrimMax)
                         .rotation(.degrees(-270))
                         .stroke(Color.black ,style: StrokeStyle(lineWidth: ArcKnobDefaults.knobStrokeWidth, lineCap: ArcKnobDefaults.knobLineCap))
                         .frame(width: ArcKnobDefaults.knobCircleWidth, height: ArcKnobDefaults.knobCircleWidth)
-
+                    
                     // Stroke value trim of knob
                     Circle()
                         .trim(from: ArcKnobDefaults.knobTrimMin, to: trim)
@@ -84,8 +83,10 @@ public struct ArcKnob: View {
                         .stroke(arcColor, style: StrokeStyle(lineWidth: ArcKnobDefaults.knobStrokeWidth + 1, lineCap: ArcKnobDefaults.knobLineCap))
                         .frame(width: ArcKnobDefaults.knobCircleWidth, height: ArcKnobDefaults.knobCircleWidth)
                 }
-
-            }}.gesture(dragGesture)
+                
+            }
+            .contentShape(Circle())
+            .gesture(dragGesture)
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
         }
     }
