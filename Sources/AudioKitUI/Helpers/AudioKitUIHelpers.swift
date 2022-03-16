@@ -6,7 +6,6 @@ import AudioKit
 import SwiftUI
 
 
-#if !os(macOS) || targetEnvironment(macCatalyst)
 #if os(iOS)
 
 struct DeviceRotationViewModifier: ViewModifier {

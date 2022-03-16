@@ -116,7 +116,7 @@ public struct FFTView: View {
 
     public var body: some View {
         HStack(spacing: 0.0) {
-			ForEach(0 ..< barCount, id: \.self) {
+            ForEach(0 ..< barCount, id: \.self) {
                 if $0 < fft.amplitudes.count {
                     if let amplitude = fft.amplitudes[$0] {
                         AmplitudeBar(amplitude: amplitude,
