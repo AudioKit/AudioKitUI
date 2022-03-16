@@ -30,7 +30,7 @@ class AmplitudeModel: ObservableObject {
     }
 }
 
-struct AmplitudeView: View {
+public struct AmplitudeView: View {
     @StateObject var amplitudeModel = AmplitudeModel()
     var node: Node
     @State var stereoMode: StereoMode = .center
@@ -58,7 +58,7 @@ struct AmplitudeView: View {
         self._numberOfSegments = State(initialValue: numberOfSegments)
     }
     
-    var body: some View {
+    public var body: some View {
         let isClipping = amplitudeModel.amplitude >= 1.0 ? true : false
         let numberOfBlackSegments = numberOfSegments - 1
         

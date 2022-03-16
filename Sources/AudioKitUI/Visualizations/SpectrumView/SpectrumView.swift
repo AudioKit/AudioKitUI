@@ -167,7 +167,7 @@ class SpectrumModel: ObservableObject {
 
 // MARK: SpectrumView
 
-struct SpectrumView: View {
+public struct SpectrumView: View {
     @StateObject var spectrum = SpectrumModel()
     var node: Node
     @State var frequencyDisplayed: CGFloat = 100.0
