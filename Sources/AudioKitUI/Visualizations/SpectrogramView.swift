@@ -164,7 +164,7 @@ class SpectrogramModel: ObservableObject {
 
 // MARK: SpectrogramView
 
-struct SpectrogramView: View {
+public struct SpectrogramView: View {
     @StateObject var spectrogram = SpectrogramModel()
     var node: Node
     
@@ -175,7 +175,7 @@ struct SpectrogramView: View {
     @State var sideColor = Color.white.opacity(0.2)
     @State var backgroundColor = Color.black
     
-    var body: some View {
+    public var body: some View {
         let xOffset = CGFloat(0.22) / CGFloat(spectrogram.fftDataReadings.maxItems)
         let yOffset = CGFloat(-0.8) / CGFloat(spectrogram.fftDataReadings.maxItems)
         

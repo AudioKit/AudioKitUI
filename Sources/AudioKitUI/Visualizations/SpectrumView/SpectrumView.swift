@@ -167,7 +167,7 @@ class SpectrumModel: ObservableObject {
 
 // MARK: SpectrumView
 
-struct SpectrumView: View {
+public struct SpectrumView: View {
     @StateObject var spectrum = SpectrumModel()
     var node: Node
     @State var frequencyDisplayed: CGFloat = 100.0
@@ -316,7 +316,7 @@ struct SpectrumView: View {
         }
         
         return ZStack {
-            ForEach(1..<mappedPoints.count) {
+            ForEach(1..<mappedPoints.count, id: \.self) {
                 if mappedPoints[$0].x > 0.00001 {
                     Circle()
                         .fill(plotPointColor)
@@ -391,7 +391,7 @@ struct HorizontalAxis: View {
         
         return ZStack {
             GeometryReader { geo in
-                ForEach(0..<verticalLineXLocationsMapped.count) { i in
+                ForEach(0..<verticalLineXLocationsMapped.count, id: \.self) { i in
                     Path { path in
                         path.move(to: CGPoint(x: verticalLineXLocationsMapped[i] * geo.size.width, y: 0.0))
                         path.addLine(to: CGPoint(x: verticalLineXLocationsMapped[i] * geo.size.width, y: geo.size.height))
@@ -436,7 +436,7 @@ struct VerticalAxis: View {
         
         return ZStack {
             GeometryReader { geo in
-                ForEach(0..<horizontalLineYLocationsMapped.count) { i in
+                ForEach(0..<horizontalLineYLocationsMapped.count, id: \.self) { i in
                     if horizontalLineYLocationsMapped[i] > 0.0 && horizontalLineYLocationsMapped[i] < 1.0 {
                         MorphableShape(controlPoints: AnimatableVector(with: locationData[i].locationData))
                             .stroke(Color(red: 1.0, green: 1.0, blue: 1.0, opacity: 0.4))
