@@ -8,9 +8,13 @@ class Refresher: ObservableObject {
     @Published var version = 0
 }
 
-struct ParameterEditor: View {
+public struct ParameterEditor: View {
     var param: NodeParameter
     @StateObject var refresher = Refresher()
+
+    public init(param: NodeParameter) {
+        self.param = param
+    }
 
     func getBinding() -> Binding<Float> {
         Binding(get: { param.value }, set: { param.value = $0; refresher.version += 1; })
@@ -24,7 +28,7 @@ struct ParameterEditor: View {
         Array(Int(param.range.lowerBound)...Int(param.range.upperBound))
     }
 
-    var body: some View {
+    public var body: some View {
         VStack(alignment: .leading) {
             Text("\(param.def.name): \(param.value)").font(.caption)
 
