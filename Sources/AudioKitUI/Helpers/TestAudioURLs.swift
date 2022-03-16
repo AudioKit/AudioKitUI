@@ -3,7 +3,7 @@
 import Foundation
 
 enum TestAudioURLs: String {
-    case drumloop = "drumloop.wav"
+    case drumloop = "drumloop.wav", short = "short.aif"
 
     func url() -> URL {
         let path = Bundle.module.path(forResource: self.rawValue, ofType: nil)!

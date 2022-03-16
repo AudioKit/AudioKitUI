@@ -1,9 +1,9 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 
-import SwiftUI
 import Accelerate
 import AVFoundation
 import AudioKit
+import SwiftUI
 
 #if os(iOS)
 
@@ -70,10 +70,24 @@ extension CGRect {
 
 // TODO: refactor these to extensions where possible
 class AudioHelpers {
+    static func getRMSValues(url: URL, windowSize: Int) -> [Float] {
+        if let audioInformation = loadAudioSignal(audioURL: url) {
+            let signal = audioInformation.signal
+
+            guard windowSize < signal.count else { return [] }
+
+            return createRMSAnalysisArray(signal: signal, windowSize: windowSize)
+        }
+        return []
+    }
+
     static func getRMSValues(url: URL, rmsFramesPerSecond: Double) -> [Float] {
         if let audioInformation = loadAudioSignal(audioURL: url) {
             let signal = audioInformation.signal
             let windowSize = Int(audioInformation.rate/rmsFramesPerSecond)
+
+            guard windowSize < signal.count else { return [] }
+
             return createRMSAnalysisArray(signal: signal, windowSize: windowSize)
         }
         return []

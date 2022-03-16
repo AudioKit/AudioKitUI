@@ -6,30 +6,39 @@ import Accelerate
 
 class AudioFileWaveformViewModel: ObservableObject {
     @Published var rmsValues = [Float]()
-    var rmsWindowSize: Double
-    
-    init(url: URL, rmsWindowSize: Double) {
-        self.rmsWindowSize = rmsWindowSize
-        rmsValues = AudioHelpers.getRMSValues(url: url, rmsFramesPerSecond: rmsWindowSize)
+
+    init(url: URL, rmsFramesPerSecond: Double) {
+        rmsValues = AudioHelpers.getRMSValues(url: url, rmsFramesPerSecond: rmsFramesPerSecond)
+    }
+
+    init(url: URL, rmsSamplesPerWindow: Int) {
+        rmsValues = AudioHelpers.getRMSValues(url: url, windowSize: rmsSamplesPerWindow)
     }
 }
 
 public struct AudioFileWaveform: View {
     @ObservedObject var viewModel: AudioFileWaveformViewModel
 
-    public init(url: URL, rmsWindowSize: Double = 256) {
+    public init(url: URL, rmsSamplesPerWindow: Int = 256) {
         viewModel = AudioFileWaveformViewModel(url: url,
-                                               rmsWindowSize: rmsWindowSize)
+                                               rmsSamplesPerWindow: rmsSamplesPerWindow)
     }
 
     public var body: some View {
-        AudioWaveform(rmsVals: viewModel.rmsValues)
-            .fill(Color.gray)
+        if viewModel.rmsValues.count > 2 {
+            AudioWaveform(rmsVals: viewModel.rmsValues)
+                .fill(Color.gray)
+        } else {
+            AudioWaveform(rmsVals: viewModel.rmsValues)
+                .stroke(Color.gray)
+        }
     }
 }
 
 struct AudioFileWaveform_Previews: PreviewProvider {
     static var previews: some View {
         AudioFileWaveform(url: TestAudioURLs.drumloop.url())
+        AudioFileWaveform(url: TestAudioURLs.short.url(), rmsSamplesPerWindow: 1)
+        AudioFileWaveform(url: TestAudioURLs.short.url())
     }
 }

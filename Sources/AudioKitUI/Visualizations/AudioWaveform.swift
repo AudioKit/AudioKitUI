@@ -2,14 +2,26 @@
 
 import SwiftUI
 
-struct AudioWaveform: Shape {
+public struct AudioWaveform: Shape {
     var rmsVals: [Float]
 
-    func path(in rect: CGRect) -> Path {
+    public init(rmsVals: [Float]) {
+        self.rmsVals = rmsVals
+    }
+
+    public func path(in rect: CGRect) -> Path {
+
+        guard rmsVals.count > 2 else {
+            var path = Path()
+            path.move(to: CGPoint(x: rect.minX, y: rect.height*0.5))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.height*0.5))
+            return path
+        }
+
         var points = [CGPoint]()
 
         // starting point
-        points.append(CGPoint(x: 0, y: rect.height*0.5))
+        points.append(CGPoint(x: rect.minX, y: rect.height*0.5))
 
         // top of wave
         for index in 0..<rmsVals.count {
@@ -27,8 +39,8 @@ struct AudioWaveform: Shape {
 
         // move back to start
         let y = CGFloat(rmsVals[0]).mapped(from: 0...1, to: rect.height*0.5...rect.height)
-        points.append(CGPoint(x: 0, y: y))
-        points.append(CGPoint(x: 0, y: rect.height*0.5))
+        points.append(CGPoint(x: rect.minX, y: y))
+        points.append(CGPoint(x: rect.minX, y: rect.height*0.5))
 
         var path = Path()
         path.addLines(points)
