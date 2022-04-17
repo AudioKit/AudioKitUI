@@ -2,7 +2,12 @@
 
 import SwiftUI
 
-struct PianoRollNote: Equatable, Hashable {
+public struct PianoRollNote: Equatable, Hashable {
+    public init(start: Int, length: Int, pitch: Int) {
+        self.start = start
+        self.length = length
+        self.pitch = pitch
+    }
 
     /// The start step.
     var start: Int
@@ -15,7 +20,12 @@ struct PianoRollNote: Equatable, Hashable {
 
 }
 
-struct PianoRollModel {
+public struct PianoRollModel: Equatable {
+    public init(notes: [PianoRollNote], length: Int, height: Int) {
+        self.notes = notes
+        self.length = length
+        self.height = height
+    }
 
     /// The sequence being edited.
     var notes:[PianoRollNote]
@@ -40,12 +50,20 @@ struct PianoRollNoteView: View {
                    height: gridSize.height)
             .offset(x: gridSize.width * CGFloat(note.start),
                     y: gridSize.height * CGFloat(note.pitch))
+            .gesture(DragGesture()
+                .onChanged{ value in
+                    print("dragged a note")
+                })
     }
 }
 
-struct PianoRoll: View {
+public struct PianoRoll: View {
 
     @Binding var model: PianoRollModel
+
+    public init(model: Binding<PianoRollModel>) {
+        _model = model
+    }
 
     func drawGrid(cx: GraphicsContext, size: CGSize) {
         var x: CGFloat = 0
@@ -73,7 +91,7 @@ struct PianoRoll: View {
         }
     }
 
-    var body: some View {
+    public var body: some View {
         ZStack {
             Canvas { cx, size in
                 drawGrid(cx: cx, size: size)
@@ -90,14 +108,16 @@ struct PianoRoll: View {
     }
 }
 
-struct PianoRollTestView: View {
+public struct PianoRollTestView: View {
+
+    public init() { }
 
     @State var model = PianoRollModel(notes: [
         PianoRollNote(start: 1, length: 2, pitch: 3),
         PianoRollNote(start: 5, length: 1, pitch: 4)
     ], length: 16, height: 16)
 
-    var body: some View {
+    public var body: some View {
         PianoRoll(model: $model).padding()
     }
 }
