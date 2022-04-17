@@ -46,8 +46,8 @@ struct PianoRollNoteView: View {
 
     func snap() -> PianoRollNote {
         var n = note
-        n.start += Int(offset.width / CGFloat(gridSize.width))
-        n.pitch += Int(offset.height / CGFloat(gridSize.height))
+        n.start += Int(offset.width / CGFloat(gridSize.width) + (offset.width > 0 ? 0.5 : -0.5))
+        n.pitch += Int(offset.height / CGFloat(gridSize.height) + (offset.height > 0 ? 0.5 : -0.5))
         return n
     }
 
