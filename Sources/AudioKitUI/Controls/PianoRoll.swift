@@ -2,12 +2,14 @@
 
 import SwiftUI
 
-public struct PianoRollNote: Equatable, Hashable {
+public struct PianoRollNote: Equatable, Identifiable {
     public init(start: Int, length: Int, pitch: Int) {
         self.start = start
         self.length = length
         self.pitch = pitch
     }
+
+    public var id = UUID()
 
     /// The start step.
     var start: Int
@@ -82,8 +84,10 @@ struct PianoRollNoteView: View {
                     offset = value.translation
                 }
                 .onEnded{ value in
-                    note = snap()
-                    offset = CGSize.zero
+                    withAnimation(.easeOut) {
+                        note = snap()
+                        offset = CGSize.zero
+                    }
                 })
     }
 }
@@ -128,7 +132,7 @@ public struct PianoRoll: View {
                 drawGrid(cx: cx, size: size)
             }
             GeometryReader { proxy in
-                ForEach(model.notes, id: \.self) { note in
+                ForEach(model.notes) { note in
                     PianoRollNoteView(
                         note: $model.notes[model.notes.firstIndex(of: note)!],
                         gridSize: CGSize(width: proxy.size.width / CGFloat(model.length),
