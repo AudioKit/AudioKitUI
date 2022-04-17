@@ -44,14 +44,25 @@ struct PianoRollNoteView: View {
     @State var offset = CGSize.zero
     @State var hovering = false
 
+    func snap() -> PianoRollNote {
+        var n = note
+        n.start += Int(offset.width / CGFloat(gridSize.width))
+        n.pitch += Int(offset.height / CGFloat(gridSize.height))
+        return n
+    }
+
+    func noteOffset(note: PianoRollNote) -> CGSize {
+        CGSize(width: gridSize.width * CGFloat(note.start),
+               height: gridSize.height * CGFloat(note.pitch))
+    }
+
     var body: some View {
         if offset != CGSize.zero {
             Rectangle()
                 .foregroundColor(.black)
                 .frame(width: gridSize.width * CGFloat(note.length),
                        height: gridSize.height)
-                .offset(x: gridSize.width * CGFloat(note.start + Int(offset.width / CGFloat(gridSize.width))),
-                        y: gridSize.height * CGFloat(note.pitch + Int(offset.height / CGFloat(gridSize.height))))
+                .offset(noteOffset(note: snap()))
                 .zIndex(-1)
         }
         Rectangle()
@@ -67,8 +78,7 @@ struct PianoRollNoteView: View {
                     offset = value.translation
                 }
                 .onEnded{ value in
-                    note.start += Int(value.translation.width / CGFloat(gridSize.width))
-                    note.pitch += Int(value.translation.height / CGFloat(gridSize.height))
+                    note = snap()
                     offset = CGSize.zero
                 })
     }
