@@ -42,11 +42,13 @@ struct PianoRollNoteView: View {
     @Binding var note: PianoRollNote
     var gridSize: CGSize
     @State var draggingNote: PianoRollNote?
+    @State var hovering = false
 
     var body: some View {
         Rectangle()
             .cornerRadius(5.0)
-            .foregroundColor(.cyan.opacity(0.8))
+            .foregroundColor(.cyan.opacity(hovering ? 1.0 : 0.8))
+            .onHover { over in hovering = over }
             .frame(width: gridSize.width * CGFloat(draggingNote?.length ?? note.length),
                    height: gridSize.height)
             .offset(x: gridSize.width * CGFloat(draggingNote?.start ?? note.start),
