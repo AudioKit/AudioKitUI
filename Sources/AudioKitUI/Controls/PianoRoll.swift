@@ -34,7 +34,29 @@ struct PianoRoll: View {
 
     var body: some View {
         Canvas { cx, size in
-            cx.draw(Text("This is a test"), at: CGPoint(x: 100, y: 100))
+            var x: CGFloat = 0
+            for _ in 0 ... model.length {
+
+                var path = Path()
+                path.move(to: CGPoint(x: x, y: 0))
+                path.addLine(to: CGPoint(x: x, y: size.height))
+
+                cx.stroke(path, with: .color(.gray), lineWidth: 1)
+
+                x += size.width / CGFloat(model.length)
+            }
+
+            var y: CGFloat = 0
+            for _ in 0 ... model.height {
+
+                var path = Path()
+                path.move(to: CGPoint(x: 0, y: y))
+                path.addLine(to: CGPoint(x: size.width, y: y))
+
+                cx.stroke(path, with: .color(.gray), lineWidth: 1)
+
+                y += size.height / CGFloat(model.height)
+            }
         }
     }
 }
@@ -44,7 +66,7 @@ struct PianoRollTestView: View {
     @State var model = PianoRollModel(notes: [], length: 16, height: 16)
 
     var body: some View {
-        PianoRoll(model: $model)
+        PianoRoll(model: $model).padding()
     }
 }
 
