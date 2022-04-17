@@ -46,6 +46,9 @@ struct PianoRollNoteView: View {
 
     var body: some View {
         Rectangle()
+            .foregroundColor(.black)
+            .zIndex(-1)
+        Rectangle()
             .cornerRadius(5.0)
             .foregroundColor(.cyan.opacity(hovering ? 1.0 : 0.8))
             .onHover { over in hovering = over }
