@@ -35,7 +35,7 @@ struct PianoRollNoteView: View {
     var body: some View {
         Rectangle()
             .cornerRadius(5.0)
-            .foregroundColor(.cyan)
+            .foregroundColor(.cyan.opacity(0.8))
             .frame(width: gridSize.width * CGFloat(note.length),
                    height: gridSize.height)
             .offset(x: gridSize.width * CGFloat(note.start),
