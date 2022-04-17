@@ -41,18 +41,29 @@ public struct PianoRollModel: Equatable {
 struct PianoRollNoteView: View {
     @Binding var note: PianoRollNote
     var gridSize: CGSize
+    @State var draggingNote: PianoRollNote?
 
     var body: some View {
         Rectangle()
             .cornerRadius(5.0)
             .foregroundColor(.cyan.opacity(0.8))
-            .frame(width: gridSize.width * CGFloat(note.length),
+            .frame(width: gridSize.width * CGFloat(draggingNote?.length ?? note.length),
                    height: gridSize.height)
-            .offset(x: gridSize.width * CGFloat(note.start),
-                    y: gridSize.height * CGFloat(note.pitch))
+            .offset(x: gridSize.width * CGFloat(draggingNote?.start ?? note.start),
+                    y: gridSize.height * CGFloat(draggingNote?.pitch ?? note.pitch))
             .gesture(DragGesture()
                 .onChanged{ value in
-                    print("dragged a note")
+                    var n = note
+                    n.start += Int(value.translation.width / CGFloat(gridSize.width))
+                    n.pitch += Int(value.translation.height / CGFloat(gridSize.height))
+                    print("n: \(n)")
+                    draggingNote = n
+                }
+                .onEnded{ value in
+                    if let draggingNote = draggingNote {
+                        note = draggingNote
+                        print("ended: \(draggingNote)")
+                    }
                 })
     }
 }
