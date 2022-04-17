@@ -45,9 +45,11 @@ struct PianoRollNoteView: View {
     @State var hovering = false
 
     var body: some View {
-        Rectangle()
-            .foregroundColor(.black)
-            .zIndex(-1)
+        if offset != CGSize.zero {
+            Rectangle()
+                .foregroundColor(.black)
+                .zIndex(-1)
+        }
         Rectangle()
             .cornerRadius(5.0)
             .foregroundColor(.cyan.opacity(hovering ? 1.0 : 0.8))
