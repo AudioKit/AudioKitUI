@@ -38,6 +38,10 @@ public struct PianoRollModel: Equatable {
 
 }
 
+func sign(_ x: CGFloat) -> CGFloat {
+    x > 0 ? 1 : -1
+}
+
 struct PianoRollNoteView: View {
     @Binding var note: PianoRollNote
     var gridSize: CGSize
@@ -46,8 +50,8 @@ struct PianoRollNoteView: View {
 
     func snap() -> PianoRollNote {
         var n = note
-        n.start += Int(offset.width / CGFloat(gridSize.width) + (offset.width > 0 ? 0.5 : -0.5))
-        n.pitch += Int(offset.height / CGFloat(gridSize.height) + (offset.height > 0 ? 0.5 : -0.5))
+        n.start += Int(offset.width / CGFloat(gridSize.width) + sign(offset.width) * 0.5)
+        n.pitch += Int(offset.height / CGFloat(gridSize.height) + sign(offset.height) * 0.5)
         return n
     }
 
