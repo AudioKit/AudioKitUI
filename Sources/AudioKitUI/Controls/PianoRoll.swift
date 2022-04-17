@@ -48,6 +48,10 @@ struct PianoRollNoteView: View {
         if offset != CGSize.zero {
             Rectangle()
                 .foregroundColor(.black)
+                .frame(width: gridSize.width * CGFloat(note.length),
+                       height: gridSize.height)
+                .offset(x: gridSize.width * CGFloat(note.start + Int(offset.width / CGFloat(gridSize.width))),
+                        y: gridSize.height * CGFloat(note.pitch + Int(offset.height / CGFloat(gridSize.height))))
                 .zIndex(-1)
         }
         Rectangle()
