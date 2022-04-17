@@ -41,7 +41,7 @@ public struct PianoRollModel: Equatable {
 struct PianoRollNoteView: View {
     @Binding var note: PianoRollNote
     var gridSize: CGSize
-    @State var draggingNote: PianoRollNote?
+    @State var offset = CGSize.zero
     @State var hovering = false
 
     var body: some View {
@@ -49,23 +49,18 @@ struct PianoRollNoteView: View {
             .cornerRadius(5.0)
             .foregroundColor(.cyan.opacity(hovering ? 1.0 : 0.8))
             .onHover { over in hovering = over }
-            .frame(width: gridSize.width * CGFloat(draggingNote?.length ?? note.length),
+            .frame(width: gridSize.width * CGFloat(note.length),
                    height: gridSize.height)
-            .offset(x: gridSize.width * CGFloat(draggingNote?.start ?? note.start),
-                    y: gridSize.height * CGFloat(draggingNote?.pitch ?? note.pitch))
+            .offset(x: gridSize.width * CGFloat(note.start) + offset.width,
+                    y: gridSize.height * CGFloat(note.pitch) + offset.height)
             .gesture(DragGesture()
                 .onChanged{ value in
-                    var n = note
-                    n.start += Int(value.translation.width / CGFloat(gridSize.width))
-                    n.pitch += Int(value.translation.height / CGFloat(gridSize.height))
-                    print("n: \(n)")
-                    draggingNote = n
+                    offset = value.translation
                 }
                 .onEnded{ value in
-                    if let draggingNote = draggingNote {
-                        note = draggingNote
-                        print("ended: \(draggingNote)")
-                    }
+                    note.start += Int(value.translation.width / CGFloat(gridSize.width))
+                    note.pitch += Int(value.translation.height / CGFloat(gridSize.height))
+                    offset = CGSize.zero
                 })
     }
 }
