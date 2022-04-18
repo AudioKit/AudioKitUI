@@ -133,7 +133,7 @@ struct PianoRollNoteView: View {
 public struct PianoRoll: View {
 
     @Binding var model: PianoRollModel
-    var gridSize = CGSize(width: 40, height: 20)
+    var gridSize = CGSize(width: 80, height: 40)
 
     public init(model: Binding<PianoRollModel>) {
         _model = model
