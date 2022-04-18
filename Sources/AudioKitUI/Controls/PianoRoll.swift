@@ -156,6 +156,7 @@ struct PianoRollTileView: View {
 public struct PianoRoll: View {
 
     @Binding var model: PianoRollModel
+    var gridSize = CGSize(width: 40, height: 20)
 
     public init(model: Binding<PianoRollModel>) {
         _model = model
@@ -163,9 +164,7 @@ public struct PianoRoll: View {
 
     public var body: some View {
         ZStack {
-            GeometryReader { proxy in
-                let gridSize = CGSize(width: proxy.size.width / CGFloat(model.length),
-                                      height: proxy.size.height / CGFloat(model.height))
+            GeometryReader { _ in
                 ForEach(0..<model.length, id: \.self) { step in
                     ForEach(0..<model.height, id: \.self) { pitch in
                         PianoRollTileView(model: $model,
