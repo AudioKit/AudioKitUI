@@ -89,6 +89,17 @@ struct PianoRollNoteView: View {
                         offset = CGSize.zero
                     }
                 })
+        HStack() {
+            Spacer()
+            Rectangle()
+                .foregroundColor(.white.opacity(0.6))
+                .frame(width: gridSize.width * 0.2, height: gridSize.height)
+        }
+        .frame(width: gridSize.width * CGFloat(note.length),
+               height: gridSize.height)
+        .offset(x: gridSize.width * CGFloat(note.start) + offset.width,
+                y: gridSize.height * CGFloat(note.pitch) + offset.height)
+
     }
 }
 
