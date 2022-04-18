@@ -203,7 +203,9 @@ public struct PianoRollTestView: View {
     ], length: 128, height: 16)
 
     public var body: some View {
-        PianoRoll(model: $model)
+        ScrollView(.horizontal, showsIndicators: true) {
+            PianoRoll(model: $model)
+        }
     }
 }
 
