@@ -78,6 +78,8 @@ struct PianoRollNoteView: View {
     }
 
     var body: some View {
+
+        // While dragging, show where the note will go.
         if offset != CGSize.zero {
             Rectangle()
                 .foregroundColor(.black.opacity(0.2))
