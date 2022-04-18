@@ -60,6 +60,8 @@ struct PianoRollNoteView: View {
             n.start = 0
         }
         n.pitch += Int(offset.height / CGFloat(gridSize.height) + sign(offset.height) * 0.5)
+        n.pitch = max(0, n.pitch)
+        n.pitch = min(sequenceHeight-1, n.pitch)
         n.length += Int(lengthOffset / gridSize.width + sign(lengthOffset) * 0.5 )
         if n.length < 1 {
             n.length = 1
