@@ -157,16 +157,14 @@ public struct PianoRoll: View {
     let gridColor = Color(red: 15.0/255.0, green: 17.0/255.0, blue: 16.0/255.0)
 
     func drawGrid(cx: GraphicsContext, size: CGSize) {
-        var x: CGFloat = 0
-        for _ in 0 ... model.length {
+        for i in 0 ... model.length {
+            let x = CGFloat(i) * gridSize.width
 
             var path = Path()
             path.move(to: CGPoint(x: x, y: 0))
             path.addLine(to: CGPoint(x: x, y: size.height))
 
-            cx.stroke(path, with: .color(gridColor), lineWidth: 0.5)
-
-            x += gridSize.width
+            cx.stroke(path, with: .color(gridColor), lineWidth: i % 8 == 0 ? 2.0 : 0.5)
         }
 
         var y: CGFloat = 0
