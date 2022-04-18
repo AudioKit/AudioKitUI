@@ -111,6 +111,7 @@ struct PianoRollNoteView: View {
                 }
             }
 
+        // Main note body.
         ZStack(alignment: .trailing) {
             Rectangle()
                 .foregroundColor(.cyan.opacity( (hovering || offset != .zero || lengthOffset != 0) ? 1.0 : 0.8))
@@ -126,6 +127,8 @@ struct PianoRollNoteView: View {
             .offset(x: gridSize.width * CGFloat(note.start) + offset.width,
                     y: gridSize.height * CGFloat(note.pitch) + offset.height)
             .gesture(noteDragGesture)
+
+        // Length tab at the end of the note.
         HStack() {
             Spacer()
             Rectangle()
