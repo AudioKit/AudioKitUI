@@ -57,15 +57,14 @@ struct PianoRollNoteView: View {
         var n = note
         n.start += Int(offset.width / CGFloat(gridSize.width) + sign(offset.width) * 0.5)
         n.start = max(0, n.start)
+        n.start = min(sequenceLength - 1, n.start)
         n.pitch += Int(offset.height / CGFloat(gridSize.height) + sign(offset.height) * 0.5)
         n.pitch = max(0, n.pitch)
-        n.pitch = min(sequenceHeight-1, n.pitch)
+        n.pitch = min(sequenceHeight - 1, n.pitch)
         n.length += Int(lengthOffset / gridSize.width + sign(lengthOffset) * 0.5 )
         n.length = max(1, n.length)
         n.length = min(sequenceLength, n.length)
-        if n.start + n.length > sequenceLength {
-            n.start = sequenceLength - n.length
-        }
+        n.length = min(sequenceLength - n.start, n.length)
         return n
     }
 
