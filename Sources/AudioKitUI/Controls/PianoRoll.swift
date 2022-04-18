@@ -72,9 +72,9 @@ struct PianoRollNoteView: View {
         return n
     }
 
-    func noteOffset(note: PianoRollNote) -> CGSize {
-        CGSize(width: gridSize.width * CGFloat(note.start),
-               height: gridSize.height * CGFloat(note.pitch))
+    func noteOffset(note: PianoRollNote, dragOffset: CGSize = .zero) -> CGSize {
+        CGSize(width: gridSize.width * CGFloat(note.start) + dragOffset.width,
+               height: gridSize.height * CGFloat(note.pitch) + dragOffset.height)
     }
 
     var body: some View {
@@ -124,8 +124,7 @@ struct PianoRollNoteView: View {
             .padding(1) // so we can see consecutive notes
             .frame(width: max(gridSize.width, gridSize.width * CGFloat(note.length) + lengthOffset),
                    height: gridSize.height)
-            .offset(x: gridSize.width * CGFloat(note.start) + offset.width,
-                    y: gridSize.height * CGFloat(note.pitch) + offset.height)
+            .offset(noteOffset(note: note, dragOffset: offset))
             .gesture(noteDragGesture)
 
         // Length tab at the end of the note.
@@ -138,8 +137,7 @@ struct PianoRollNoteView: View {
         }
         .frame(width: gridSize.width * CGFloat(note.length),
                height: gridSize.height)
-        .offset(x: gridSize.width * CGFloat(note.start) + offset.width,
-                y: gridSize.height * CGFloat(note.pitch) + offset.height)
+        .offset(noteOffset(note: note, dragOffset: offset))
 
     }
 }
