@@ -82,6 +82,33 @@ struct PianoRollNoteView: View {
                 .offset(noteOffset(note: snap()))
                 .zIndex(-1)
         }
+
+        // Set the minimum distance so a note drag will override
+        // the drag of a containing ScrollView.
+        let minimumDistance = 2
+
+        let noteDragGesture = DragGesture(minimumDistance: 2)
+            .onChanged{ value in
+                offset = value.translation
+            }
+            .onEnded{ value in
+                withAnimation(.easeOut) {
+                    note = snap()
+                    offset = CGSize.zero
+                }
+            }
+
+        let lengthDragGesture = DragGesture(minimumDistance: 2)
+            .onChanged{ value in
+                lengthOffset = value.translation.width
+            }
+            .onEnded{ value in
+                withAnimation(.easeOut) {
+                    note = snap()
+                    lengthOffset = 0
+                }
+            }
+
         ZStack(alignment: .trailing) {
             Rectangle()
                 .foregroundColor(.cyan.opacity( (hovering || offset != .zero || lengthOffset != 0) ? 1.0 : 0.8))
@@ -96,31 +123,13 @@ struct PianoRollNoteView: View {
                    height: gridSize.height)
             .offset(x: gridSize.width * CGFloat(note.start) + offset.width,
                     y: gridSize.height * CGFloat(note.pitch) + offset.height)
-            .gesture(DragGesture()
-                .onChanged{ value in
-                    offset = value.translation
-                }
-                .onEnded{ value in
-                    withAnimation(.easeOut) {
-                        note = snap()
-                        offset = CGSize.zero
-                    }
-                })
+            .gesture(noteDragGesture)
         HStack() {
             Spacer()
             Rectangle()
                 .foregroundColor(.white.opacity(0.001))
-                .frame(width: gridSize.width * 0.2, height: gridSize.height)
-                .gesture(DragGesture()
-                    .onChanged{ value in
-                        lengthOffset = value.translation.width
-                    }
-                    .onEnded{ value in
-                        withAnimation(.easeOut) {
-                            note = snap()
-                            lengthOffset = 0
-                        }
-                    })
+                .frame(width: gridSize.width * 0.5, height: gridSize.height)
+                .gesture(lengthDragGesture)
         }
         .frame(width: gridSize.width * CGFloat(note.length),
                height: gridSize.height)
