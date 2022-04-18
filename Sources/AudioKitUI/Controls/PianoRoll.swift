@@ -53,11 +53,15 @@ struct PianoRollNoteView: View {
     @GestureState var offset = CGSize.zero
 
     @State var hovering = false
-    @State var lengthOffset: CGFloat = 0
+
+    // Note: using @GestureState instead of @State here fixes a bug where the
+    //       lengthOffset could get stuck when inside a ScrollView.
+    @GestureState var lengthOffset: CGFloat = 0
+
     var sequenceLength: Int
     var sequenceHeight: Int
 
-    func snap(offset: CGSize) -> PianoRollNote {
+    func snap(offset: CGSize, lengthOffset: CGFloat = 0.0) -> PianoRollNote {
         var n = note
         n.start += Int(offset.width / CGFloat(gridSize.width) + sign(offset.width) * 0.5)
         n.start = max(0, n.start)
@@ -103,14 +107,11 @@ struct PianoRollNoteView: View {
             }
 
         let lengthDragGesture = DragGesture(minimumDistance: minimumDistance)
-            .onChanged{ value in
-                lengthOffset = value.translation.width
+            .updating($lengthOffset) { value, state, _ in
+                state = value.translation.width
             }
             .onEnded{ value in
-                withAnimation(.easeOut) {
-                    note = snap(offset: CGSize.zero)
-                    lengthOffset = 0
-                }
+                note = snap(offset: CGSize.zero, lengthOffset: value.translation.width)
             }
 
         // Main note body.
