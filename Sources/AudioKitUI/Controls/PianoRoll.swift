@@ -49,11 +49,13 @@ struct PianoRollNoteView: View {
     var gridSize: CGSize
     @State var offset = CGSize.zero
     @State var hovering = false
+    @State var lengthOffset: CGFloat = 0
 
     func snap() -> PianoRollNote {
         var n = note
         n.start += Int(offset.width / CGFloat(gridSize.width) + sign(offset.width) * 0.5)
         n.pitch += Int(offset.height / CGFloat(gridSize.height) + sign(offset.height) * 0.5)
+        n.length += Int(lengthOffset / gridSize.width + sign(lengthOffset) * 0.5 )
         return n
     }
 
@@ -75,7 +77,7 @@ struct PianoRollNoteView: View {
             .foregroundColor(.cyan.opacity(hovering ? 1.0 : 0.8))
             .onHover { over in hovering = over }
             .padding(1) // so we can see consecutive notes
-            .frame(width: gridSize.width * CGFloat(note.length),
+            .frame(width: gridSize.width * CGFloat(note.length) + lengthOffset,
                    height: gridSize.height)
             .offset(x: gridSize.width * CGFloat(note.start) + offset.width,
                     y: gridSize.height * CGFloat(note.pitch) + offset.height)
@@ -92,8 +94,19 @@ struct PianoRollNoteView: View {
         HStack() {
             Spacer()
             Rectangle()
-                .foregroundColor(.white.opacity(0.6))
+                .foregroundColor(.white.opacity(0.01))
                 .frame(width: gridSize.width * 0.2, height: gridSize.height)
+                .gesture(DragGesture()
+                    .onChanged{ value in
+                        lengthOffset = value.translation.width
+                        print(lengthOffset)
+                    }
+                    .onEnded{ value in
+                        withAnimation(.easeOut) {
+                            note = snap()
+                            lengthOffset = 0
+                        }
+                    })
         }
         .frame(width: gridSize.width * CGFloat(note.length),
                height: gridSize.height)
