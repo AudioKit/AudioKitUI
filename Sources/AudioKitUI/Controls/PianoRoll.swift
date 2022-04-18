@@ -99,7 +99,6 @@ struct PianoRollNoteView: View {
                 .gesture(DragGesture()
                     .onChanged{ value in
                         lengthOffset = value.translation.width
-                        print(lengthOffset)
                     }
                     .onEnded{ value in
                         withAnimation(.easeOut) {
