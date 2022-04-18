@@ -130,29 +130,6 @@ struct PianoRollNoteView: View {
     }
 }
 
-struct PianoRollTileView: View {
-
-    @Binding var model: PianoRollModel
-    var gridSize: CGSize
-    var step: Int
-    var pitch: Int
-
-    let gridColor = Color(red: 15.0/255.0, green: 17.0/255.0, blue: 16.0/255.0)
-
-    var body: some View {
-        Rectangle()
-            .foregroundColor(Color(white: 0, opacity: 0.001))
-            .border(gridColor, width: 0.5)
-            .frame(width: gridSize.width,
-                   height: gridSize.height)
-            .offset(x: gridSize.width * CGFloat(step),
-                    y: gridSize.height * CGFloat(pitch))
-            .onTapGesture {
-                model.notes.append(PianoRollNote(start: step, length: 1, pitch: pitch))
-            }
-    }
-}
-
 public struct PianoRoll: View {
 
     @Binding var model: PianoRollModel
@@ -162,17 +139,45 @@ public struct PianoRoll: View {
         _model = model
     }
 
+    let gridColor = Color(red: 15.0/255.0, green: 17.0/255.0, blue: 16.0/255.0)
+
+    func drawGrid(cx: GraphicsContext, size: CGSize) {
+        var x: CGFloat = 0
+        for _ in 0 ... model.length {
+
+            var path = Path()
+            path.move(to: CGPoint(x: x, y: 0))
+            path.addLine(to: CGPoint(x: x, y: size.height))
+
+            cx.stroke(path, with: .color(gridColor), lineWidth: 1)
+
+            x += gridSize.width
+        }
+
+        var y: CGFloat = 0
+        for _ in 0 ... model.height {
+
+            var path = Path()
+            path.move(to: CGPoint(x: 0, y: y))
+            path.addLine(to: CGPoint(x: size.width, y: y))
+
+            cx.stroke(path, with: .color(gridColor), lineWidth: 1)
+
+            y += gridSize.height
+        }
+    }
+
     public var body: some View {
         ZStack {
             GeometryReader { _ in
-                ForEach(0..<model.length, id: \.self) { step in
-                    ForEach(0..<model.height, id: \.self) { pitch in
-                        PianoRollTileView(model: $model,
-                                          gridSize: gridSize,
-                                          step: step,
-                                          pitch: pitch)
-                    }
-                }
+                Canvas { cx, size in
+                    drawGrid(cx: cx, size: size)
+                }.gesture(SimultaneousGesture(TapGesture(), DragGesture(minimumDistance: 0)).onEnded({ value in
+                    guard let location = value.second?.location else { return }
+                    let step = Int(location.x / gridSize.width)
+                    let pitch = Int(location.y / gridSize.height)
+                    model.notes.append(PianoRollNote(start: step, length: 1, pitch: pitch))
+                }))
                 ForEach(model.notes) { note in
                     PianoRollNoteView(
                         note: $model.notes[model.notes.firstIndex(of: note)!],
