@@ -56,16 +56,13 @@ struct PianoRollNoteView: View {
     func snap() -> PianoRollNote {
         var n = note
         n.start += Int(offset.width / CGFloat(gridSize.width) + sign(offset.width) * 0.5)
-        if n.start < 0 {
-            n.start = 0
-        }
+        n.start = max(0, n.start)
         n.pitch += Int(offset.height / CGFloat(gridSize.height) + sign(offset.height) * 0.5)
         n.pitch = max(0, n.pitch)
         n.pitch = min(sequenceHeight-1, n.pitch)
         n.length += Int(lengthOffset / gridSize.width + sign(lengthOffset) * 0.5 )
-        if n.length < 1 {
-            n.length = 1
-        }
+        n.length = max(1, n.length)
+        n.length = min(sequenceLength, n.length)
         if n.start + n.length > sequenceLength {
             n.start = sequenceLength - n.length
         }
