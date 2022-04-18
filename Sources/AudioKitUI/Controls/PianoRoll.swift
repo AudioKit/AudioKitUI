@@ -188,7 +188,8 @@ public struct PianoRoll: View {
                     model.notes.removeAll(where: { $0 == note })
                 }
             }
-        }
+        }.frame(width: CGFloat(model.length) * gridSize.width,
+                height: CGFloat(model.height) * gridSize.height)
     }
 }
 
@@ -208,6 +209,6 @@ public struct PianoRollTestView: View {
 
 struct PianoRoll_Previews: PreviewProvider {
     static var previews: some View {
-        PianoRollTestView().frame(width: 1024, height: 768)
+        PianoRollTestView()
     }
 }
