@@ -56,6 +56,9 @@ struct PianoRollNoteView: View {
         n.start += Int(offset.width / CGFloat(gridSize.width) + sign(offset.width) * 0.5)
         n.pitch += Int(offset.height / CGFloat(gridSize.height) + sign(offset.height) * 0.5)
         n.length += Int(lengthOffset / gridSize.width + sign(lengthOffset) * 0.5 )
+        if n.length < 1 {
+            n.length = 1
+        }
         return n
     }
 
@@ -83,7 +86,7 @@ struct PianoRollNoteView: View {
         }
             .onHover { over in hovering = over }
             .padding(1) // so we can see consecutive notes
-            .frame(width: gridSize.width * CGFloat(note.length) + lengthOffset,
+            .frame(width: max(gridSize.width, gridSize.width * CGFloat(note.length) + lengthOffset),
                    height: gridSize.height)
             .offset(x: gridSize.width * CGFloat(note.start) + offset.width,
                     y: gridSize.height * CGFloat(note.pitch) + offset.height)
