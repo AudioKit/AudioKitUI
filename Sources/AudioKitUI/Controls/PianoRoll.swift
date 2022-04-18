@@ -50,14 +50,22 @@ struct PianoRollNoteView: View {
     @State var offset = CGSize.zero
     @State var hovering = false
     @State var lengthOffset: CGFloat = 0
+    var sequenceLength: Int
+    var sequenceHeight: Int
 
     func snap() -> PianoRollNote {
         var n = note
         n.start += Int(offset.width / CGFloat(gridSize.width) + sign(offset.width) * 0.5)
+        if n.start < 0 {
+            n.start = 0
+        }
         n.pitch += Int(offset.height / CGFloat(gridSize.height) + sign(offset.height) * 0.5)
         n.length += Int(lengthOffset / gridSize.width + sign(lengthOffset) * 0.5 )
         if n.length < 1 {
             n.length = 1
+        }
+        if n.start + n.length > sequenceLength {
+            n.start = sequenceLength - n.length
         }
         return n
     }
@@ -171,7 +179,9 @@ public struct PianoRoll: View {
                 ForEach(model.notes) { note in
                     PianoRollNoteView(
                         note: $model.notes[model.notes.firstIndex(of: note)!],
-                        gridSize: gridSize)
+                        gridSize: gridSize,
+                        sequenceLength: model.length,
+                        sequenceHeight: model.height)
                     .onTapGesture {
                         model.notes.removeAll(where: { $0 == note })
                     }
