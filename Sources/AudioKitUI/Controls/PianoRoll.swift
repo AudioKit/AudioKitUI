@@ -103,12 +103,15 @@ struct PianoRollTileView: View {
 
     var body: some View {
         Rectangle()
-            .foregroundColor(.clear)
+            .foregroundColor(Color(white: 0, opacity: 0.001))
             .border(gridColor, width: 0.5)
             .frame(width: gridSize.width,
                    height: gridSize.height)
             .offset(x: gridSize.width * CGFloat(step),
                     y: gridSize.height * CGFloat(pitch))
+            .onTapGesture {
+                model.notes.append(PianoRollNote(start: step, length: 1, pitch: pitch))
+            }
     }
 }
 
@@ -137,6 +140,9 @@ public struct PianoRoll: View {
                     PianoRollNoteView(
                         note: $model.notes[model.notes.firstIndex(of: note)!],
                         gridSize: gridSize)
+                    .onTapGesture {
+                        model.notes.removeAll(where: { $0 == note })
+                    }
                 }
             }
         }
