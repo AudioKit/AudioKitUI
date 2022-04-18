@@ -166,8 +166,8 @@ public struct PianoRoll: View {
             GeometryReader { proxy in
                 let gridSize = CGSize(width: proxy.size.width / CGFloat(model.length),
                                       height: proxy.size.height / CGFloat(model.height))
-                ForEach(0..<model.length) { step in
-                    ForEach(0..<model.height) { pitch in
+                ForEach(0..<model.length, id: \.self) { step in
+                    ForEach(0..<model.height, id: \.self) { pitch in
                         PianoRollTileView(model: $model,
                                           gridSize: gridSize,
                                           step: step,
