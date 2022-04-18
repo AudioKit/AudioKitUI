@@ -111,7 +111,7 @@ public struct PianoRoll: View {
                     ForEach(0..<model.height) { j in
                         Rectangle()
                             .foregroundColor(.clear)
-                            .border(Color.black, width: 0.5)
+                            .border(gridColor, width: 0.5)
                             .frame(width: gridSize.width,
                                    height: gridSize.height)
                             .offset(x: gridSize.width * CGFloat(i),
