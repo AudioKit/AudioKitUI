@@ -149,7 +149,7 @@ public struct PianoRoll: View {
             path.move(to: CGPoint(x: x, y: 0))
             path.addLine(to: CGPoint(x: x, y: size.height))
 
-            cx.stroke(path, with: .color(gridColor), lineWidth: 1)
+            cx.stroke(path, with: .color(gridColor), lineWidth: 0.5)
 
             x += gridSize.width
         }
@@ -161,7 +161,7 @@ public struct PianoRoll: View {
             path.move(to: CGPoint(x: 0, y: y))
             path.addLine(to: CGPoint(x: size.width, y: y))
 
-            cx.stroke(path, with: .color(gridColor), lineWidth: 1)
+            cx.stroke(path, with: .color(gridColor), lineWidth: 0.5)
 
             y += gridSize.height
         }
