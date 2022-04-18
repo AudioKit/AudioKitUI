@@ -195,10 +195,10 @@ public struct PianoRollTestView: View {
     @State var model = PianoRollModel(notes: [
         PianoRollNote(start: 1, length: 2, pitch: 3),
         PianoRollNote(start: 5, length: 1, pitch: 4)
-    ], length: 16, height: 16)
+    ], length: 128, height: 16)
 
     public var body: some View {
-        PianoRoll(model: $model).padding()
+        PianoRoll(model: $model)
     }
 }
 
