@@ -94,7 +94,7 @@ struct PianoRollNoteView: View {
         HStack() {
             Spacer()
             Rectangle()
-                .foregroundColor(.white.opacity(0.01))
+                .foregroundColor(.white.opacity(0.001))
                 .frame(width: gridSize.width * 0.2, height: gridSize.height)
                 .gesture(DragGesture()
                     .onChanged{ value in
