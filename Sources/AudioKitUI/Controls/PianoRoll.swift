@@ -85,9 +85,9 @@ struct PianoRollNoteView: View {
 
         // Set the minimum distance so a note drag will override
         // the drag of a containing ScrollView.
-        let minimumDistance = 2
+        let minimumDistance: CGFloat = 2
 
-        let noteDragGesture = DragGesture(minimumDistance: 2)
+        let noteDragGesture = DragGesture(minimumDistance: minimumDistance)
             .onChanged{ value in
                 offset = value.translation
             }
@@ -98,7 +98,7 @@ struct PianoRollNoteView: View {
                 }
             }
 
-        let lengthDragGesture = DragGesture(minimumDistance: 2)
+        let lengthDragGesture = DragGesture(minimumDistance: minimumDistance)
             .onChanged{ value in
                 lengthOffset = value.translation.width
             }
