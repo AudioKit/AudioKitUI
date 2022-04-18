@@ -52,6 +52,7 @@ struct PianoRollNoteView: View {
     // Note: using @GestureState instead of @State here fixes a bug where the
     //       offset could get stuck when inside a ScrollView.
     @GestureState var offset = CGSize.zero
+    @GestureState var startNote: PianoRollNote?
 
     @State var hovering = false
 
@@ -62,7 +63,7 @@ struct PianoRollNoteView: View {
     var sequenceLength: Int
     var sequenceHeight: Int
 
-    func snap(offset: CGSize, lengthOffset: CGFloat = 0.0) -> PianoRollNote {
+    func snap(note: PianoRollNote, offset: CGSize, lengthOffset: CGFloat = 0.0) -> PianoRollNote {
         var n = note
         n.start += Int(offset.width / CGFloat(gridSize.width) + sign(offset.width) * 0.5)
         n.start = max(0, n.start)
@@ -88,9 +89,9 @@ struct PianoRollNoteView: View {
         if offset != CGSize.zero {
             Rectangle()
                 .foregroundColor(.black.opacity(0.2))
-                .frame(width: gridSize.width * CGFloat(snap(offset: offset).length),
+                .frame(width: gridSize.width * CGFloat(note.length),
                        height: gridSize.height)
-                .offset(noteOffset(note: snap(offset: offset)))
+                .offset(noteOffset(note: note))
                 .zIndex(-1)
         }
 
@@ -102,9 +103,15 @@ struct PianoRollNoteView: View {
             .updating($offset) { value, state, _ in
                 state = value.translation
             }
-            .onEnded{ value in
-                // XXX: unfortunately, animation doesn't work here
-                note = snap(offset: value.translation)
+            .updating($startNote){ value, state, _ in
+                if state == nil {
+                    state = note
+                }
+            }
+            .onChanged{ value in
+                if let startNote = startNote {
+                    note = snap(note: startNote, offset: value.translation)
+                }
             }
 
         let lengthDragGesture = DragGesture(minimumDistance: minimumDistance)
@@ -112,7 +119,7 @@ struct PianoRollNoteView: View {
                 state = value.translation.width
             }
             .onEnded{ value in
-                note = snap(offset: CGSize.zero, lengthOffset: value.translation.width)
+                note = snap(note: note, offset: CGSize.zero, lengthOffset: value.translation.width)
             }
 
         // Main note body.
@@ -128,7 +135,7 @@ struct PianoRollNoteView: View {
             .padding(1) // so we can see consecutive notes
             .frame(width: max(gridSize.width, gridSize.width * CGFloat(note.length) + lengthOffset),
                    height: gridSize.height)
-            .offset(noteOffset(note: note, dragOffset: offset))
+            .offset( noteOffset(note: startNote ?? note, dragOffset: offset))
             .gesture(noteDragGesture)
 
         // Length tab at the end of the note.
