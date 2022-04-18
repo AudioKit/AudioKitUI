@@ -205,7 +205,7 @@ public struct PianoRollTestView: View {
     public var body: some View {
         ScrollView(.horizontal, showsIndicators: true) {
             PianoRoll(model: $model)
-        }
+        }.background(Color(white: 0.1))
     }
 }
 
