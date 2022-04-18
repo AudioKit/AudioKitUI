@@ -73,8 +73,14 @@ struct PianoRollNoteView: View {
                 .offset(noteOffset(note: snap()))
                 .zIndex(-1)
         }
-        Rectangle()
-            .foregroundColor(.cyan.opacity( (hovering || offset != .zero || lengthOffset != 0) ? 1.0 : 0.8))
+        ZStack(alignment: .trailing) {
+            Rectangle()
+                .foregroundColor(.cyan.opacity( (hovering || offset != .zero || lengthOffset != 0) ? 1.0 : 0.8))
+            Rectangle()
+                .foregroundColor(.black)
+                .padding(4)
+                .frame(width: 10)
+        }
             .onHover { over in hovering = over }
             .padding(1) // so we can see consecutive notes
             .frame(width: gridSize.width * CGFloat(note.length) + lengthOffset,
