@@ -170,14 +170,15 @@ public struct PianoRoll: View {
     public var body: some View {
         ZStack {
             GeometryReader { _ in
-                Canvas { cx, size in
-                    drawGrid(cx: cx, size: size)
-                }.gesture(SimultaneousGesture(TapGesture(), DragGesture(minimumDistance: 0)).onEnded({ value in
-                    guard let location = value.second?.location else { return }
+                let dragGesture = DragGesture(minimumDistance: 0).onEnded({ value in
+                    let location = value.location
                     let step = Int(location.x / gridSize.width)
                     let pitch = Int(location.y / gridSize.height)
                     model.notes.append(PianoRollNote(start: step, length: 1, pitch: pitch))
-                }))
+                })
+                Canvas { cx, size in
+                    drawGrid(cx: cx, size: size)
+                }.gesture(TapGesture().sequenced(before: dragGesture))
                 ForEach(model.notes) { note in
                     PianoRollNoteView(
                         note: $model.notes[model.notes.firstIndex(of: note)!],
