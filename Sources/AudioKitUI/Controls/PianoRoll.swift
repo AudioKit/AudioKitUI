@@ -47,6 +47,7 @@ func sign(_ x: CGFloat) -> CGFloat {
 struct PianoRollNoteView: View {
     @Binding var note: PianoRollNote
     var gridSize: CGSize
+    var color: Color
 
     // Note: using @GestureState instead of @State here fixes a bug where the
     //       offset could get stuck when inside a ScrollView.
@@ -117,7 +118,7 @@ struct PianoRollNoteView: View {
         // Main note body.
         ZStack(alignment: .trailing) {
             Rectangle()
-                .foregroundColor(.cyan.opacity( (hovering || offset != .zero || lengthOffset != 0) ? 1.0 : 0.8))
+                .foregroundColor(color.opacity( (hovering || offset != .zero || lengthOffset != 0) ? 1.0 : 0.8))
             Rectangle()
                 .foregroundColor(.black)
                 .padding(4)
@@ -149,9 +150,15 @@ public struct PianoRoll: View {
 
     @Binding var model: PianoRollModel
     var gridSize = CGSize(width: 80, height: 40)
+    var _noteColor = Color.accentColor
 
     public init(model: Binding<PianoRollModel>) {
         _model = model
+    }
+
+    init(model: Binding<PianoRollModel>, noteColor: Color) {
+        _model = model
+        _noteColor = noteColor
     }
 
     let gridColor = Color(red: 15.0/255.0, green: 17.0/255.0, blue: 16.0/255.0)
@@ -195,6 +202,7 @@ public struct PianoRoll: View {
                 PianoRollNoteView(
                     note: $model.notes[model.notes.firstIndex(of: note)!],
                     gridSize: gridSize,
+                    color: _noteColor,
                     sequenceLength: model.length,
                     sequenceHeight: model.height)
                 .onTapGesture {
@@ -203,6 +211,10 @@ public struct PianoRoll: View {
             }
         }.frame(width: CGFloat(model.length) * gridSize.width,
                 height: CGFloat(model.height) * gridSize.height)
+    }
+
+    public func noteColor(_ color: Color) -> Self {
+        PianoRoll(model: _model, noteColor: color)
     }
 }
 
@@ -217,7 +229,7 @@ public struct PianoRollTestView: View {
 
     public var body: some View {
         ScrollView(.horizontal, showsIndicators: true) {
-            PianoRoll(model: $model)
+            PianoRoll(model: $model).noteColor(.cyan)
         }.background(Color(white: 0.1))
     }
 }
