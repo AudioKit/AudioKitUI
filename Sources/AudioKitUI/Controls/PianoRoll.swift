@@ -102,43 +102,26 @@ public struct PianoRoll: View {
 
     let gridColor = Color(red: 15.0/255.0, green: 17.0/255.0, blue: 16.0/255.0)
 
-    func drawGrid(cx: GraphicsContext, size: CGSize) {
-        var x: CGFloat = 0
-        for _ in 0 ... model.length {
-
-            var path = Path()
-            path.move(to: CGPoint(x: x, y: 0))
-            path.addLine(to: CGPoint(x: x, y: size.height))
-
-            cx.stroke(path, with: .color(gridColor), lineWidth: 1)
-
-            x += size.width / CGFloat(model.length)
-        }
-
-        var y: CGFloat = 0
-        for _ in 0 ... model.height {
-
-            var path = Path()
-            path.move(to: CGPoint(x: 0, y: y))
-            path.addLine(to: CGPoint(x: size.width, y: y))
-
-            cx.stroke(path, with: .color(gridColor), lineWidth: 1)
-
-            y += size.height / CGFloat(model.height)
-        }
-    }
-
     public var body: some View {
         ZStack {
-            Canvas { cx, size in
-                drawGrid(cx: cx, size: size)
-            }
             GeometryReader { proxy in
+                let gridSize = CGSize(width: proxy.size.width / CGFloat(model.length),
+                                      height: proxy.size.height / CGFloat(model.height))
+                ForEach(0..<model.length) { i in
+                    ForEach(0..<model.height) { j in
+                        Rectangle()
+                            .foregroundColor(.clear)
+                            .border(Color.black, width: 0.5)
+                            .frame(width: gridSize.width,
+                                   height: gridSize.height)
+                            .offset(x: gridSize.width * CGFloat(i),
+                                    y: gridSize.height * CGFloat(j))
+                    }
+                }
                 ForEach(model.notes) { note in
                     PianoRollNoteView(
                         note: $model.notes[model.notes.firstIndex(of: note)!],
-                        gridSize: CGSize(width: proxy.size.width / CGFloat(model.length),
-                                         height: proxy.size.height / CGFloat(model.height)))
+                        gridSize: gridSize)
                 }
             }
         }
