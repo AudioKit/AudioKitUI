@@ -47,13 +47,17 @@ func sign(_ x: CGFloat) -> CGFloat {
 struct PianoRollNoteView: View {
     @Binding var note: PianoRollNote
     var gridSize: CGSize
-    @State var offset = CGSize.zero
+
+    // Note: using @GestureState instead of @State here fixes a bug where the
+    //       offset could get stuck when inside a ScrollView.
+    @GestureState var offset = CGSize.zero
+
     @State var hovering = false
     @State var lengthOffset: CGFloat = 0
     var sequenceLength: Int
     var sequenceHeight: Int
 
-    func snap() -> PianoRollNote {
+    func snap(offset: CGSize) -> PianoRollNote {
         var n = note
         n.start += Int(offset.width / CGFloat(gridSize.width) + sign(offset.width) * 0.5)
         n.start = max(0, n.start)
@@ -77,9 +81,9 @@ struct PianoRollNoteView: View {
         if offset != CGSize.zero {
             Rectangle()
                 .foregroundColor(.black.opacity(0.2))
-                .frame(width: gridSize.width * CGFloat(snap().length),
+                .frame(width: gridSize.width * CGFloat(snap(offset: offset).length),
                        height: gridSize.height)
-                .offset(noteOffset(note: snap()))
+                .offset(noteOffset(note: snap(offset: offset)))
                 .zIndex(-1)
         }
 
@@ -88,14 +92,12 @@ struct PianoRollNoteView: View {
         let minimumDistance: CGFloat = 2
 
         let noteDragGesture = DragGesture(minimumDistance: minimumDistance)
-            .onChanged{ value in
-                offset = value.translation
+            .updating($offset) { value, state, _ in
+                state = value.translation
             }
             .onEnded{ value in
-                withAnimation(.easeOut) {
-                    note = snap()
-                    offset = CGSize.zero
-                }
+                // XXX: unfortunately, animation doesn't work here
+                note = snap(offset: value.translation)
             }
 
         let lengthDragGesture = DragGesture(minimumDistance: minimumDistance)
@@ -104,7 +106,7 @@ struct PianoRollNoteView: View {
             }
             .onEnded{ value in
                 withAnimation(.easeOut) {
-                    note = snap()
+                    note = snap(offset: CGSize.zero)
                     lengthOffset = 0
                 }
             }
