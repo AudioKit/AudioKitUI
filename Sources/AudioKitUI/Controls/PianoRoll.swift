@@ -92,6 +92,26 @@ struct PianoRollNoteView: View {
     }
 }
 
+struct PianoRollTileView: View {
+
+    @Binding var model: PianoRollModel
+    var gridSize: CGSize
+    var step: Int
+    var pitch: Int
+
+    let gridColor = Color(red: 15.0/255.0, green: 17.0/255.0, blue: 16.0/255.0)
+
+    var body: some View {
+        Rectangle()
+            .foregroundColor(.clear)
+            .border(gridColor, width: 0.5)
+            .frame(width: gridSize.width,
+                   height: gridSize.height)
+            .offset(x: gridSize.width * CGFloat(step),
+                    y: gridSize.height * CGFloat(pitch))
+    }
+}
+
 public struct PianoRoll: View {
 
     @Binding var model: PianoRollModel
@@ -100,22 +120,17 @@ public struct PianoRoll: View {
         _model = model
     }
 
-    let gridColor = Color(red: 15.0/255.0, green: 17.0/255.0, blue: 16.0/255.0)
-
     public var body: some View {
         ZStack {
             GeometryReader { proxy in
                 let gridSize = CGSize(width: proxy.size.width / CGFloat(model.length),
                                       height: proxy.size.height / CGFloat(model.height))
-                ForEach(0..<model.length) { i in
-                    ForEach(0..<model.height) { j in
-                        Rectangle()
-                            .foregroundColor(.clear)
-                            .border(gridColor, width: 0.5)
-                            .frame(width: gridSize.width,
-                                   height: gridSize.height)
-                            .offset(x: gridSize.width * CGFloat(i),
-                                    y: gridSize.height * CGFloat(j))
+                ForEach(0..<model.length) { step in
+                    ForEach(0..<model.height) { pitch in
+                        PianoRollTileView(model: $model,
+                                          gridSize: gridSize,
+                                          step: step,
+                                          pitch: pitch)
                     }
                 }
                 ForEach(model.notes) { note in
