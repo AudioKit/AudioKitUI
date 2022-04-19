@@ -3,7 +3,7 @@
 import SwiftUI
 
 public struct PianoRollNote: Equatable, Identifiable {
-    public init(start: Int, length: Int, pitch: Int) {
+    public init(start: Int, length: Double, pitch: Int) {
         self.start = start
         self.length = length
         self.pitch = pitch
@@ -15,7 +15,7 @@ public struct PianoRollNote: Equatable, Identifiable {
     var start: Int
 
     /// How many steps long?
-    var length: Int
+    var length: Double
 
     /// Abstract pitch, not MIDI notes.
     var pitch: Int
@@ -74,10 +74,11 @@ struct PianoRollNoteView: View {
         n.pitch -= Int(offset.height / CGFloat(gridSize.height) + sign(offset.height) * 0.5)
         n.pitch = max(0, n.pitch)
         n.pitch = min(sequenceHeight - 1, n.pitch)
-        n.length += Int(lengthOffset / gridSize.width + sign(lengthOffset) * 0.5 )
+        n.length += Double(Int(lengthOffset / gridSize.width + sign(lengthOffset) * 0.5 ))
+        // n.length += lengthOffset / gridSize.width
         n.length = max(1, n.length)
-        n.length = min(sequenceLength, n.length)
-        n.length = min(sequenceLength - n.start, n.length)
+        n.length = min(Double(sequenceLength), n.length)
+        n.length = min(Double(sequenceLength - n.start), n.length)
         return n
     }
 
