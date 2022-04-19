@@ -44,6 +44,9 @@ func sign(_ x: CGFloat) -> CGFloat {
     x > 0 ? 1 : -1
 }
 
+/// Touch-oriented piano roll.
+///
+/// Note: Requires macOS 12 / iOS 15 due to SwiftUI bug (crashes in SwiftUI when deleting notes).
 struct PianoRollNoteView: View {
     @Binding var note: PianoRollNote
     var gridSize: CGSize
@@ -240,7 +243,7 @@ public struct PianoRollTestView: View {
 
     public var body: some View {
         ScrollView([.horizontal, .vertical], showsIndicators: true) {
-            PianoRoll(model: $model)
+            PianoRoll(model: $model).noteColor(.cyan)
         }.background(Color(white: 0.1))
     }
 }

@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "AudioKitUI",
-    platforms: [ .macOS(.v11), .iOS(.v14)],
+    platforms: [ .macOS(.v12), .iOS(.v15)],
     products: [.library(name: "AudioKitUI", targets: ["AudioKitUI"])],
     dependencies: [.package(url: "https://github.com/AudioKit/AudioKit.git", from: "5.3.0")],
     targets: [
