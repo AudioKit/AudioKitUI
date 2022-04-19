@@ -68,7 +68,7 @@ struct PianoRollNoteView: View {
         n.start += Int(offset.width / CGFloat(gridSize.width) + sign(offset.width) * 0.5)
         n.start = max(0, n.start)
         n.start = min(sequenceLength - 1, n.start)
-        n.pitch += Int(offset.height / CGFloat(gridSize.height) + sign(offset.height) * 0.5)
+        n.pitch -= Int(offset.height / CGFloat(gridSize.height) + sign(offset.height) * 0.5)
         n.pitch = max(0, n.pitch)
         n.pitch = min(sequenceHeight - 1, n.pitch)
         n.length += Int(lengthOffset / gridSize.width + sign(lengthOffset) * 0.5 )
@@ -80,7 +80,7 @@ struct PianoRollNoteView: View {
 
     func noteOffset(note: PianoRollNote, dragOffset: CGSize = .zero) -> CGSize {
         CGSize(width: gridSize.width * CGFloat(note.start) + dragOffset.width,
-               height: gridSize.height * CGFloat(note.pitch) + dragOffset.height)
+               height: gridSize.height * CGFloat(sequenceHeight - note.pitch) + dragOffset.height)
     }
 
     var body: some View {
@@ -201,7 +201,7 @@ public struct PianoRoll: View {
             let dragGesture = DragGesture(minimumDistance: 0).onEnded({ value in
                 let location = value.location
                 let step = Int(location.x / gridSize.width)
-                let pitch = Int(location.y / gridSize.height)
+                let pitch = model.height - Int(location.y / gridSize.height)
                 model.notes.append(PianoRollNote(start: step, length: 1, pitch: pitch))
             })
             PianoRollGrid(gridSize: gridSize, length: model.length, height: model.height)
