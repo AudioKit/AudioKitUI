@@ -240,7 +240,7 @@ public struct PianoRollTestView: View {
 
     public var body: some View {
         ScrollView([.horizontal, .vertical], showsIndicators: true) {
-            PianoRoll(model: $model).noteColor(.cyan)
+            PianoRoll(model: $model)
         }.background(Color(white: 0.1))
     }
 }
