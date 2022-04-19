@@ -3,7 +3,7 @@
 import SwiftUI
 
 public struct PianoRollNote: Equatable, Identifiable {
-    public init(start: Int, length: Double, pitch: Int) {
+    public init(start: Double, length: Double, pitch: Int) {
         self.start = start
         self.length = length
         self.pitch = pitch
@@ -12,7 +12,7 @@ public struct PianoRollNote: Equatable, Identifiable {
     public var id = UUID()
 
     /// The start step.
-    var start: Int
+    var start: Double
 
     /// How many steps long?
     var length: Double
@@ -65,20 +65,28 @@ struct PianoRollNoteView: View {
 
     var sequenceLength: Int
     var sequenceHeight: Int
+    var isContinuous = false
 
     func snap(note: PianoRollNote, offset: CGSize, lengthOffset: CGFloat = 0.0) -> PianoRollNote {
         var n = note
-        n.start += Int(offset.width / CGFloat(gridSize.width) + sign(offset.width) * 0.5)
+        if isContinuous {
+            n.start += offset.width / gridSize.width
+        } else {
+            n.start += Double(Int(offset.width / CGFloat(gridSize.width) + sign(offset.width) * 0.5))
+        }
         n.start = max(0, n.start)
-        n.start = min(sequenceLength - 1, n.start)
+        n.start = min(Double(sequenceLength - 1), n.start)
         n.pitch -= Int(offset.height / CGFloat(gridSize.height) + sign(offset.height) * 0.5)
         n.pitch = max(0, n.pitch)
         n.pitch = min(sequenceHeight - 1, n.pitch)
-        n.length += Double(Int(lengthOffset / gridSize.width + sign(lengthOffset) * 0.5 ))
-        // n.length += lengthOffset / gridSize.width
+        if isContinuous {
+            n.length += lengthOffset / gridSize.width
+        } else {
+            n.length += Double(Int(lengthOffset / gridSize.width + sign(lengthOffset) * 0.5 ))
+        }
         n.length = max(1, n.length)
         n.length = min(Double(sequenceLength), n.length)
-        n.length = min(Double(sequenceLength - n.start), n.length)
+        n.length = min(Double(sequenceLength) - n.start, n.length)
         return n
     }
 
@@ -204,7 +212,7 @@ public struct PianoRoll: View {
         ZStack(alignment: .topLeading) {
             let dragGesture = DragGesture(minimumDistance: 0).onEnded({ value in
                 let location = value.location
-                let step = Int(location.x / gridSize.width)
+                let step = Double(Int(location.x / gridSize.width))
                 let pitch = model.height - Int(location.y / gridSize.height)
                 model.notes.append(PianoRollNote(start: step, length: 1, pitch: pitch))
             })
@@ -219,7 +227,8 @@ public struct PianoRoll: View {
                     gridSize: gridSize,
                     color: _noteColor,
                     sequenceLength: model.length,
-                    sequenceHeight: model.height)
+                    sequenceHeight: model.height,
+                    isContinuous: true)
                 .onTapGesture {
                     model.notes.removeAll(where: { $0 == note })
                 }
