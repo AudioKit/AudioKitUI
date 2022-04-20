@@ -191,15 +191,11 @@ public struct PianoRoll: View {
 
     @Binding var model: PianoRollModel
     var gridSize = CGSize(width: 80, height: 40)
-    var _noteColor = Color.accentColor
+    var noteColor = Color.accentColor
 
-    public init(model: Binding<PianoRollModel>) {
+    public init(model: Binding<PianoRollModel>, noteColor: Color = .accentColor) {
         _model = model
-    }
-
-    init(model: Binding<PianoRollModel>, noteColor: Color) {
-        _model = model
-        _noteColor = noteColor
+        self.noteColor = noteColor
     }
 
     let gridColor = Color(red: 15.0/255.0, green: 17.0/255.0, blue: 16.0/255.0)
@@ -221,7 +217,7 @@ public struct PianoRoll: View {
                 PianoRollNoteView(
                     note: $model.notes[model.notes.firstIndex(of: note)!],
                     gridSize: gridSize,
-                    color: _noteColor,
+                    color: noteColor,
                     sequenceLength: model.length,
                     sequenceHeight: model.height,
                     isContinuous: true)
@@ -231,10 +227,6 @@ public struct PianoRoll: View {
             }
         }.frame(width: CGFloat(model.length) * gridSize.width,
                 height: CGFloat(model.height) * gridSize.height)
-    }
-
-    public func noteColor(_ color: Color) -> Self {
-        PianoRoll(model: _model, noteColor: color)
     }
 }
 
@@ -249,7 +241,7 @@ public struct PianoRollTestView: View {
 
     public var body: some View {
         ScrollView([.horizontal, .vertical], showsIndicators: true) {
-            PianoRoll(model: $model).noteColor(.cyan)
+            PianoRoll(model: $model, noteColor: .cyan)
         }.background(Color(white: 0.1))
     }
 }
