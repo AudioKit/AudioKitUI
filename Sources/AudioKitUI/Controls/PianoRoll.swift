@@ -72,17 +72,17 @@ struct PianoRollNoteView: View {
         if isContinuous {
             n.start += offset.width / gridSize.width
         } else {
-            n.start += Double(Int(offset.width / CGFloat(gridSize.width) + sign(offset.width) * 0.5))
+            n.start += round(offset.width / CGFloat(gridSize.width))
         }
         n.start = max(0, n.start)
         n.start = min(Double(sequenceLength - 1), n.start)
-        n.pitch -= Int(offset.height / CGFloat(gridSize.height) + sign(offset.height) * 0.5)
+        n.pitch -= Int(round(offset.height / CGFloat(gridSize.height)))
         n.pitch = max(0, n.pitch)
         n.pitch = min(sequenceHeight - 1, n.pitch)
         if isContinuous {
             n.length += lengthOffset / gridSize.width
         } else {
-            n.length += Double(Int(lengthOffset / gridSize.width + sign(lengthOffset) * 0.5 ))
+            n.length += round(lengthOffset / gridSize.width)
         }
         n.length = max(1, n.length)
         n.length = min(Double(sequenceLength), n.length)
