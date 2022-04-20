@@ -40,10 +40,6 @@ public struct PianoRollModel: Equatable {
 
 }
 
-func sign(_ x: CGFloat) -> CGFloat {
-    x > 0 ? 1 : -1
-}
-
 /// Touch-oriented piano roll.
 ///
 /// Note: Requires macOS 12 / iOS 15 due to SwiftUI bug (crashes in SwiftUI when deleting notes).
