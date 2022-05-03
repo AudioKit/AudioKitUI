@@ -40,9 +40,7 @@ public struct PianoRollModel: Equatable {
 
 }
 
-/// Touch-oriented piano roll.
-///
-/// Note: Requires macOS 12 / iOS 15 due to SwiftUI bug (crashes in SwiftUI when deleting notes).
+
 struct PianoRollNoteView: View {
     @Binding var note: PianoRollNote
     var gridSize: CGSize
@@ -187,6 +185,9 @@ struct PianoRollGrid: Shape {
     }
 }
 
+/// Touch-oriented piano roll.
+///
+/// Note: Requires macOS 12 / iOS 15 due to SwiftUI bug (crashes in SwiftUI when deleting notes).
 public struct PianoRoll: View {
 
     @Binding var model: PianoRollModel
