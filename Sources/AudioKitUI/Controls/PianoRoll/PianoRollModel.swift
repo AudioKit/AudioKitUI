@@ -30,7 +30,7 @@ public struct PianoRollModel: Equatable {
     }
 
     /// The sequence being edited.
-    var notes:[PianoRollNote]
+    var notes: [PianoRollNote]
 
     /// How many steps in the piano roll.
     var length: Int
