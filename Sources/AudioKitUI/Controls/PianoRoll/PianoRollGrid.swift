@@ -12,14 +12,14 @@ struct PianoRollGrid: Shape {
 
         let size = rect.size
         var path = Path()
-        for i in 0 ... length {
-            let x = CGFloat(i) * gridSize.width
+        for column in 0 ... length {
+            let x = CGFloat(column) * gridSize.width
             path.move(to: CGPoint(x: x, y: 0))
             path.addLine(to: CGPoint(x: x, y: size.height))
         }
 
-        for i in 0 ... height {
-            let y = CGFloat(i) * gridSize.height
+        for row in 0 ... height {
+            let y = CGFloat(row) * gridSize.height
             path.move(to: CGPoint(x: 0, y: y))
             path.addLine(to: CGPoint(x: size.width, y: y))
         }
