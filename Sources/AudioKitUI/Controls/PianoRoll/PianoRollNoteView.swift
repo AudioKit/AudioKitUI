@@ -2,6 +2,12 @@
 
 import SwiftUI
 
+/// A single note in the piano roll.
+///
+/// A note has half a grid column at the end for changing the length.
+///
+/// With each note as a separate view this might not be suitable for very large sequences, but
+/// it makes it easier to implement.
 struct PianoRollNoteView: View {
     @Binding var note: PianoRollNote
     var gridSize: CGSize
