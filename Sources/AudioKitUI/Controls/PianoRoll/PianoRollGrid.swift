@@ -2,6 +2,10 @@
 
 import SwiftUI
 
+/// Background grid for the piano roll.
+///
+/// We tried using Canvas but because a piano roll grid can be very large when inside a scroll
+/// view, Canvas allocates too big of a texture for rendering.
 struct PianoRollGrid: Shape {
 
     var gridSize: CGSize
