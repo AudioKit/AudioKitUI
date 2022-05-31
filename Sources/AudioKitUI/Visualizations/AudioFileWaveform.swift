@@ -40,6 +40,7 @@ public struct AudioFileWaveform: View {
 struct AudioFileWaveform_Previews: PreviewProvider {
     static var previews: some View {
         AudioFileWaveform(url: TestAudioURLs.drumloop.url())
+        AudioFileWaveform(url: TestAudioURLs.drumloop.url(), color: .red)
         AudioFileWaveform(url: TestAudioURLs.short.url(), rmsSamplesPerWindow: 1)
         AudioFileWaveform(url: TestAudioURLs.short.url())
     }
