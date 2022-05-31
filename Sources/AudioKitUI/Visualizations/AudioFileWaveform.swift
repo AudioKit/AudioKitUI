@@ -1,8 +1,8 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 
-import SwiftUI
-import AudioKit
 import Accelerate
+import AudioKit
+import SwiftUI
 
 class AudioFileWaveformViewModel: ObservableObject {
     @Published var rmsValues = [Float]()
@@ -18,19 +18,21 @@ class AudioFileWaveformViewModel: ObservableObject {
 
 public struct AudioFileWaveform: View {
     @ObservedObject var viewModel: AudioFileWaveformViewModel
+    let color: Color
 
-    public init(url: URL, rmsSamplesPerWindow: Int = 256) {
+    public init(url: URL, rmsSamplesPerWindow: Int = 256, color: Color = Color.gray) {
         viewModel = AudioFileWaveformViewModel(url: url,
                                                rmsSamplesPerWindow: rmsSamplesPerWindow)
+        self.color = color
     }
 
     public var body: some View {
         if viewModel.rmsValues.count > 2 {
             AudioWaveform(rmsVals: viewModel.rmsValues)
-                .fill(Color.gray)
+                .fill(color)
         } else {
             AudioWaveform(rmsVals: viewModel.rmsValues)
-                .stroke(Color.gray)
+                .stroke(color)
         }
     }
 }
