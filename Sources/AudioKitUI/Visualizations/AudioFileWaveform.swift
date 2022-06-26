@@ -7,32 +7,42 @@ import SwiftUI
 class AudioFileWaveformViewModel: ObservableObject {
     @Published var rmsValues = [Float]()
 
-    init(url: URL, rmsFramesPerSecond: Double) {
-        rmsValues = AudioHelpers.getRMSValues(url: url, rmsFramesPerSecond: rmsFramesPerSecond)
-    }
+    var url = URL(string: "")
+    var windowSize = 0
 
-    init(url: URL, rmsSamplesPerWindow: Int) {
-        rmsValues = AudioHelpers.getRMSValues(url: url, windowSize: rmsSamplesPerWindow)
+    init() { }
+
+    func update(url: URL, rmsSamplesPerWindow: Int) {
+        if url != self.url || rmsSamplesPerWindow != windowSize {
+            rmsValues = AudioHelpers.getRMSValues(url: url, windowSize: rmsSamplesPerWindow)
+        }
     }
 }
 
 public struct AudioFileWaveform: View {
-    @ObservedObject var viewModel: AudioFileWaveformViewModel
-    let color: Color
+    @StateObject private var viewModel = AudioFileWaveformViewModel()
+
+    var url: URL
+    var rmsSamplesPerWindow: Int
+    var color: Color
 
     public init(url: URL, rmsSamplesPerWindow: Int = 256, color: Color = Color.gray) {
-        viewModel = AudioFileWaveformViewModel(url: url,
-                                               rmsSamplesPerWindow: rmsSamplesPerWindow)
+        self.url = url
+        self.rmsSamplesPerWindow = rmsSamplesPerWindow
         self.color = color
     }
 
     public var body: some View {
-        if viewModel.rmsValues.count > 2 {
-            AudioWaveform(rmsVals: viewModel.rmsValues)
-                .fill(color)
-        } else {
-            AudioWaveform(rmsVals: viewModel.rmsValues)
-                .stroke(color)
+        Group {
+            if viewModel.rmsValues.count > 2 {
+                AudioWaveform(rmsVals: viewModel.rmsValues)
+                    .fill(color)
+            } else {
+                AudioWaveform(rmsVals: viewModel.rmsValues)
+                    .stroke(color)
+            }
+        }.onAppear {
+            viewModel.update(url: url, rmsSamplesPerWindow: rmsSamplesPerWindow)
         }
     }
 }
