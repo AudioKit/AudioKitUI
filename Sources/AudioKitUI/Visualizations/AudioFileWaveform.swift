@@ -15,6 +15,8 @@ class AudioFileWaveformViewModel: ObservableObject {
     func update(url: URL, rmsSamplesPerWindow: Int) {
         if url != self.url || rmsSamplesPerWindow != windowSize {
             rmsValues = AudioHelpers.getRMSValues(url: url, windowSize: rmsSamplesPerWindow)
+            self.url = url
+            self.windowSize = rmsSamplesPerWindow
         }
     }
 }
