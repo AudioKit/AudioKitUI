@@ -15,7 +15,7 @@ Waveform plots and controls that can be used to jump start your AudioKit-powered
 
 ## Documentation
 
-* [AudioKit.io Section about AudioKitUI](https://audiokit.io/Packages/AudioKitUI)
+* [AudioKit.io Section about AudioKitUI](https://audiokit.io/documentation/audiokit/audiokitui)
 * [API Reference Docs](https://github.com/AudioKit/AudioKitUI/wiki)
 
 ## Requirements
