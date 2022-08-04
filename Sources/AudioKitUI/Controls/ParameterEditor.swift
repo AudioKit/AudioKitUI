@@ -6,6 +6,21 @@ import AudioKit
 /// Hack to get SwiftUI to poll and refresh our UI.
 class Refresher: ObservableObject {
     @Published var version = 0
+    var param: NodeParameter?
+    private var previousValue: AUValue = 0.0
+    private var timer = Timer()
+
+    init() {
+        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true, block: { [weak self] _ in
+            guard let self = self else { return }
+            guard let param = self.param else { return }
+            let value = param.value
+            if value != self.previousValue {
+                self.version += 1
+                self.previousValue = value
+            }
+        })
+    }
 }
 
 public struct ParameterEditor: View {
@@ -60,6 +75,8 @@ public struct ParameterEditor: View {
                        minimumValueLabel: { Text(String(format: "%.2f", param.range.lowerBound)) },
                        maximumValueLabel: { Text(String(format: "%.2f", param.range.upperBound)) })
             }
+        }.onAppear {
+            refresher.param = param
         }
     }
 }
