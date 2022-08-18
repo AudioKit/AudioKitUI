@@ -38,4 +38,4 @@ Because some user interfaces are quite complex, and don't really have AudioKit a
 
 [https://github.com/AudioKit/PianoRoll](https://github.com/AudioKit/PianoRoll)
 
-<img src="https://raw.githubusercontent.com/AudioKit/PianoRoll/main/screenshot.png" alt="piano roll screenshot" style="width:75%;">
+<img src="https://raw.githubusercontent.com/AudioKit/PianoRoll/main/Sources/PianoRoll/PianoRoll.docc/Resources/screenshot.png" alt="piano roll screenshot" style="width:75%;">
