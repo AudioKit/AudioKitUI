@@ -1,14 +1,13 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 
-import SwiftUI
 import AudioKit
 import AudioUnit
+import SwiftUI
 
 class ParameterEditorModel: ObservableObject {
-
     @Published var value: AUValue = 0 {
         didSet {
-            if let param = self.param {
+            if let param = param {
                 param.value = value
             }
         }
@@ -41,8 +40,8 @@ public struct ParameterEditor: View {
         Binding(get: { Int(model.value) }, set: { model.value = AUValue($0) })
     }
 
-    func intValues() -> Array<Int> {
-        Array(Int(param.range.lowerBound)...Int(param.range.upperBound))
+    func intValues() -> [Int] {
+        Array(Int(param.range.lowerBound) ... Int(param.range.upperBound))
     }
 
     public var body: some View {
@@ -68,7 +67,7 @@ public struct ParameterEditor: View {
                            step: 1.0,
                            label: { Text(param.def.name).frame(width: 200, alignment: .leading) },
                            minimumValueLabel: { Text(String(format: "%.0f", param.range.lowerBound)) },
-                           maximumValueLabel: { Text(String(format: "%.0f", param.range.upperBound)) } )
+                           maximumValueLabel: { Text(String(format: "%.0f", param.range.upperBound)) })
                 }
             default:
                 Slider(value: $model.value,

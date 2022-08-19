@@ -8,11 +8,11 @@ class AmplitudeModel: ObservableObject {
     var nodeTap: AmplitudeTap!
     var node: Node?
     var stereoMode: StereoMode
-    
+
     init(stereoMode: StereoMode = .center) {
         self.stereoMode = stereoMode
     }
-    
+
     func updateNode(_ node: Node) {
         if node !== self.node {
             self.node = node
@@ -24,7 +24,7 @@ class AmplitudeModel: ObservableObject {
             nodeTap.start()
         }
     }
-    
+
     func pushData(_ amp: Float) {
         amplitude = Double(amp)
     }
@@ -35,33 +35,33 @@ public struct AmplitudeView: View {
     var node: Node
     @State var stereoMode: StereoMode = .center
     @State var numberOfSegments: Int
-    
+
     @State var fillType: FillType = .gradient(gradient: Gradient(colors: [.red, .yellow, .green]))
-    
+
     init(_ node: Node, stereoMode: StereoMode = .center, numberOfSegments: Int = 20) {
         self.node = node
-        self._stereoMode = State(initialValue: stereoMode)
-        self._numberOfSegments = State(initialValue: numberOfSegments)
+        _stereoMode = State(initialValue: stereoMode)
+        _numberOfSegments = State(initialValue: numberOfSegments)
     }
 
     init(_ node: Node, color: Color, stereoMode: StereoMode = .center, numberOfSegments: Int = 20) {
         self.node = node
-        self._stereoMode = State(initialValue: stereoMode)
-        self._fillType = State(initialValue: .solid(color: color))
-        self._numberOfSegments = State(initialValue: numberOfSegments)
+        _stereoMode = State(initialValue: stereoMode)
+        _fillType = State(initialValue: .solid(color: color))
+        _numberOfSegments = State(initialValue: numberOfSegments)
     }
 
     init(_ node: Node, colors: Gradient, stereoMode: StereoMode = .center, numberOfSegments: Int = 20) {
         self.node = node
-        self._stereoMode = State(initialValue: stereoMode)
-        self._fillType = State(initialValue: .gradient(gradient: colors))
-        self._numberOfSegments = State(initialValue: numberOfSegments)
+        _stereoMode = State(initialValue: stereoMode)
+        _fillType = State(initialValue: .gradient(gradient: colors))
+        _numberOfSegments = State(initialValue: numberOfSegments)
     }
-    
+
     public var body: some View {
         let isClipping = amplitudeModel.amplitude >= 1.0 ? true : false
         let numberOfBlackSegments = numberOfSegments - 1
-        
+
         GeometryReader { geometry in
             ZStack(alignment: .bottom) {
                 // colored rectangle in the back
@@ -93,15 +93,15 @@ public struct AmplitudeView: View {
         }
         .drawingGroup()
     }
-    
-    func addSegments(width: CGFloat, height: CGFloat, numberOfBlackSegments: Int) -> some View {
+
+    func addSegments(width _: CGFloat, height: CGFloat, numberOfBlackSegments: Int) -> some View {
         let splitHeight = height / CGFloat(numberOfBlackSegments + 1)
         let solidHeight = splitHeight * (2.0 / 3.0)
         let spaceHeight = splitHeight * (1.0 / 3.0) + splitHeight * (1.0 / 3.0) / CGFloat(numberOfBlackSegments)
-        
+
         return VStack(spacing: 0.0) {
             ForEach((1 ... numberOfBlackSegments + 1).reversed(), id: \.self) { index in
-                
+
                 if index != numberOfBlackSegments + 1 {
                     Rectangle()
                         .fill(Color.black)
@@ -111,11 +111,11 @@ public struct AmplitudeView: View {
             }
         }
     }
-    
+
     // these sit in front of the color rectangles and are either on or off (opacity used for animating)
     func addOpacityRectangle(height: CGFloat, index: Int, n: Int) -> some View {
         let opacity = amplitudeModel.amplitude > Double(index - 1) / Double(n + 1) ? 0.0 : 1.0
-        
+
         return Rectangle()
             .fill(Color.black)
             .frame(height: height)

@@ -9,7 +9,7 @@ class SpectrumModel: ObservableObject {
     @Environment(\.isPreview) var isPreview
     @Published var amplitudes: [CGFloat] = []
     @Published var frequencies: [CGFloat] = []
-    
+
     private var node: Node?
     private var sampleRate: double_t = 44100
     private var nodeTap: FFTTap!
@@ -25,26 +25,26 @@ class SpectrumModel: ObservableObject {
     var bottomAmp: CGFloat = -216.0
     private var ampDisplacement: CGFloat = 120.0 / 2.0
     private let maxSpan: CGFloat = 170
-    
+
     init() {
         if isPreview {
             createTestData()
         }
     }
-    
+
     func createTestData() {
         var fakeFrequencies: [CGFloat] = []
         var fakeAmplitudes: [CGFloat] = []
-        for i in 0..<255 {
+        for i in 0 ..< 255 {
             let frequency = CGFloat(sampleRate * 0.5) * CGFloat(i * 2) / CGFloat(512 * 2)
-            let amplitude = CGFloat.random(in: -175...(-70))
+            let amplitude = CGFloat.random(in: -175 ... -70)
             fakeFrequencies.append(frequency)
             fakeAmplitudes.append(amplitude)
         }
         frequencies = fakeFrequencies
         amplitudes = fakeAmplitudes
     }
-    
+
     func updateNode(_ node: Node) {
         if node !== self.node {
             self.node = node
@@ -58,44 +58,44 @@ class SpectrumModel: ObservableObject {
             nodeTap.start()
         }
     }
-    
+
     func pushData(_ fftFloats: [Float]) {
         // validate data
         // extra array necessary?
         var fftData = fftFloats
-        for index in 0..<fftData.count {
+        for index in 0 ..< fftData.count {
             if fftData[index].isNaN { fftData[index] = 0.0 }
         }
-        
+
         captureAmplitudeFrequencyData(fftData)
         determineAmplitudeBounds()
     }
-    
+
     /// Returns frequency, amplitude pairs after removing unwanted data points (there are simply too many in the high frequencies)
     func captureAmplitudeFrequencyData(_ fftFloats: [Float]) {
         // I don't love making these extra arrays
         let real = fftFloats.indices.compactMap { $0 % 2 == 0 ? fftFloats[$0] : nil }
         let imaginary = fftFloats.indices.compactMap { $0 % 2 != 0 ? fftFloats[$0] : nil }
-        
+
         var maxSquared: CGFloat = 0.0
         var frequencyChosen: CGFloat = 0.0
-        
+
         var tempAmplitudes: [CGFloat] = []
         var tempFrequencies: [CGFloat] = []
-        
+
         var minAmplitude: CGFloat = -1.0
         var maxAmplitude: CGFloat = -1000.0
-        
-        for i in 0..<real.count {
+
+        for i in 0 ..< real.count {
             // I don't love doing this for every element
             let frequencyForBin = CGFloat(sampleRate) * 0.5 * CGFloat(i * 2) / CGFloat(real.count * 2)
-            
+
             var squared = CGFloat(real[i] * real[i] + imaginary[i] * imaginary[i])
-            
+
             if frequencyForBin > maxFreq {
                 continue
             }
-            
+
             if frequencyForBin > 10000 {
                 if squared > maxSquared {
                     maxSquared = squared
@@ -123,7 +123,7 @@ class SpectrumModel: ObservableObject {
             } else {
                 frequencyChosen = frequencyForBin
             }
-            
+
             let amplitude = CGFloat(10 * log10(4 * squared / (CGFloat(FFT_SIZE) * CGFloat(FFT_SIZE))))
 
             if amplitude > maxAmplitude {
@@ -131,17 +131,17 @@ class SpectrumModel: ObservableObject {
             } else if amplitude < minAmplitude {
                 minAmplitude = amplitude
             }
-            
+
             tempAmplitudes.append(amplitude)
             tempFrequencies.append(frequencyChosen)
         }
-        
+
         amplitudes = tempAmplitudes
         frequencies = tempFrequencies
         minAmp = minAmplitude
         maxAmp = maxAmplitude
     }
-    
+
     /// Figures out what we should use for the maximum and minimum amplitudes displayed
     /// Also sets a "mid" amp which the dead band lies around
     func determineAmplitudeBounds() {
@@ -188,7 +188,7 @@ public struct SpectrumView: View {
     private var shouldAnalyzeTouch: Bool
     private var cursorColor: Color
     private var shouldDisplayAxisLabels: Bool
-    
+
     public init(_ node: Node,
                 backgroundColor: Color = Color.black,
                 shouldPlotPoints: Bool = false,
@@ -213,7 +213,7 @@ public struct SpectrumView: View {
         self.cursorColor = cursorColor
         self.shouldDisplayAxisLabels = shouldDisplayAxisLabels
     }
-    
+
     public var body: some View {
         GeometryReader { geometry in
             createGraphView(width: geometry.size.width, height: geometry.size.height)
@@ -232,16 +232,16 @@ public struct SpectrumView: View {
                             if value.location.y > 0.0, value.location.y < geometry.size.height {
                                 y = value.location.y
                             }
-                            
+
                             cursorX = x
                             cursorY = y
-                            
+
                             popupX = x > geometry.size.width / 4 ? x - geometry.size.width / 8 : x + geometry.size.width / 8
                             popupY = y > geometry.size.height / 4 ? y - geometry.size.height / 8 : y + geometry.size.height / 8
 
-                            frequencyDisplayed = x.mappedExp(from: 0...geometry.size.width, to: spectrum.minFreq...spectrum.maxFreq)
-                            amplitudeDisplayed = y.mappedInverted(from: 0...geometry.size.height, to: spectrum.bottomAmp...spectrum.topAmp)
-                            
+                            frequencyDisplayed = x.mappedExp(from: 0 ... geometry.size.width, to: spectrum.minFreq ... spectrum.maxFreq)
+                            amplitudeDisplayed = y.mappedInverted(from: 0 ... geometry.size.height, to: spectrum.bottomAmp ... spectrum.topAmp)
+
                             cursorDisplayed = true
                             popupOpacity = 1.0
                         }
@@ -249,15 +249,15 @@ public struct SpectrumView: View {
                             popupOpacity = 0.0
                         }
                 )
-            
+
             if cursorDisplayed && shouldAnalyzeTouch {
                 ZStack {
                     createCrossLines(width: geometry.size.width, height: geometry.size.height)
-                    
+
                     CircleCursorView(cursorColor: cursorColor)
                         .frame(width: geometry.size.width / 30, height: geometry.size.height / 30)
                         .position(x: cursorX, y: cursorY)
-                    
+
                     SpectrumPopupView(frequency: $frequencyDisplayed, amplitude: $amplitudeDisplayed, colorForeground: cursorColor)
                         .position(x: popupX, y: popupY)
                 }
@@ -267,12 +267,12 @@ public struct SpectrumView: View {
             }
         }
     }
-    
+
     private func createCrossLines(width: CGFloat, height: CGFloat) -> some View {
         var horizontalPoints: [CGPoint] = []
         horizontalPoints.append(CGPoint(x: 0.0, y: cursorY))
         horizontalPoints.append(CGPoint(x: width, y: cursorY))
-        
+
         var verticalPoints: [CGPoint] = []
         verticalPoints.append(CGPoint(x: cursorX, y: 0.0))
         verticalPoints.append(CGPoint(x: cursorX, y: height))
@@ -287,7 +287,7 @@ public struct SpectrumView: View {
             .stroke(strokeColor, lineWidth: 2).opacity(0.7)
         }
     }
-    
+
     private func createGraphView(width: CGFloat, height: CGFloat) -> some View {
         return ZStack {
             backgroundColor
@@ -295,28 +295,28 @@ public struct SpectrumView: View {
             if shouldPlotPoints {
                 createSpectrumCircles(width: width, height: height)
             }
-            
+
             if shouldStroke || shouldFill {
                 createSpectrumShape(width: width, height: height)
             }
-            
+
             HorizontalAxis(minX: spectrum.minFreq, maxX: spectrum.maxFreq, isLogarithmicScale: true, shouldDisplayAxisLabel: shouldDisplayAxisLabels)
             VerticalAxis(minY: $spectrum.bottomAmp, maxY: $spectrum.topAmp, shouldDisplayAxisLabel: shouldDisplayAxisLabels)
         }
     }
-    
+
     func createSpectrumCircles(width: CGFloat, height: CGFloat) -> some View {
         var mappedPoints: [CGPoint] = []
-        
+
         // I imagine this is not good computationally
-        for i in 0..<spectrum.amplitudes.count {
-            let mappedAmplitude = spectrum.amplitudes[i].mappedInverted(from: spectrum.bottomAmp...spectrum.topAmp)
-            let mappedFrequency = spectrum.frequencies[i].mappedLog10(from: spectrum.minFreq...spectrum.maxFreq)
+        for i in 0 ..< spectrum.amplitudes.count {
+            let mappedAmplitude = spectrum.amplitudes[i].mappedInverted(from: spectrum.bottomAmp ... spectrum.topAmp)
+            let mappedFrequency = spectrum.frequencies[i].mappedLog10(from: spectrum.minFreq ... spectrum.maxFreq)
             mappedPoints.append(CGPoint(x: mappedFrequency, y: mappedAmplitude))
         }
-        
+
         return ZStack {
-            ForEach(1..<mappedPoints.count, id: \.self) {
+            ForEach(1 ..< mappedPoints.count, id: \.self) {
                 if mappedPoints[$0].x > 0.00001 {
                     Circle()
                         .fill(plotPointColor)
@@ -327,35 +327,35 @@ public struct SpectrumView: View {
             }
         }
     }
-    
-    func createSpectrumShape(width: CGFloat, height: CGFloat) -> some View {
+
+    func createSpectrumShape(width _: CGFloat, height _: CGFloat) -> some View {
         var mappedIndexedDoubles: [Double] = []
-        
+
         // I imagine this is not good computationally
-        for i in 0..<spectrum.amplitudes.count {
-            let mappedAmplitude = spectrum.amplitudes[i].mappedInverted(from: spectrum.bottomAmp...spectrum.topAmp)
-            var mappedFrequency = spectrum.frequencies[i].mappedLog10(from: spectrum.minFreq...spectrum.maxFreq)
-            
+        for i in 0 ..< spectrum.amplitudes.count {
+            let mappedAmplitude = spectrum.amplitudes[i].mappedInverted(from: spectrum.bottomAmp ... spectrum.topAmp)
+            var mappedFrequency = spectrum.frequencies[i].mappedLog10(from: spectrum.minFreq ... spectrum.maxFreq)
+
             if mappedFrequency < 0.0 || mappedFrequency > 1.0 {
                 mappedFrequency = 0.0
             }
             mappedIndexedDoubles.append(Double(mappedFrequency))
             mappedIndexedDoubles.append(Double(mappedAmplitude))
         }
-        
+
         // just some stuff that gets us the fill
         mappedIndexedDoubles.append(1.0)
         mappedIndexedDoubles.append(1.0)
         mappedIndexedDoubles.append(0.0)
         mappedIndexedDoubles.append(1.0)
-        
+
         return ZStack {
             if shouldStroke {
                 MorphableShape(controlPoints: AnimatableVector(with: mappedIndexedDoubles))
                     .stroke(strokeColor, style: StrokeStyle(lineWidth: 1, lineCap: .round, lineJoin: .round))
                     .animation(.easeInOut(duration: 0.1))
             }
-            
+
             if shouldFill {
                 MorphableShape(controlPoints: AnimatableVector(with: mappedIndexedDoubles))
                     .fill(fillColor)
@@ -372,26 +372,26 @@ struct HorizontalAxis: View {
     @State var maxX: CGFloat = 20000
     @State var isLogarithmicScale: Bool = true
     @State var shouldDisplayAxisLabel: Bool = true
-    
+
     public var body: some View {
         let verticalLineXLocations: [CGFloat] = [100.0, 1000.0, 10000.0]
         let verticalLineLabels = ["100", "1k", "10k"]
-        
+
         var verticalLineXLocationsMapped: [CGFloat] = Array(repeating: 0.0, count: verticalLineXLocations.count)
-        
+
         if isLogarithmicScale {
-            for i in 0..<verticalLineXLocations.count {
-                verticalLineXLocationsMapped[i] = verticalLineXLocations[i].mappedLog10(from: minX...maxX)
+            for i in 0 ..< verticalLineXLocations.count {
+                verticalLineXLocationsMapped[i] = verticalLineXLocations[i].mappedLog10(from: minX ... maxX)
             }
         } else {
-            for i in 0..<verticalLineXLocations.count {
-                verticalLineXLocationsMapped[i] = verticalLineXLocations[i].mapped(from: minX...maxX)
+            for i in 0 ..< verticalLineXLocations.count {
+                verticalLineXLocationsMapped[i] = verticalLineXLocations[i].mapped(from: minX ... maxX)
             }
         }
-        
+
         return ZStack {
             GeometryReader { geo in
-                ForEach(0..<verticalLineXLocationsMapped.count, id: \.self) { i in
+                ForEach(0 ..< verticalLineXLocationsMapped.count, id: \.self) { i in
                     Path { path in
                         path.move(to: CGPoint(x: verticalLineXLocationsMapped[i] * geo.size.width, y: 0.0))
                         path.addLine(to: CGPoint(x: verticalLineXLocationsMapped[i] * geo.size.width, y: geo.size.height))
@@ -416,32 +416,32 @@ struct VerticalAxis: View {
     @Binding var minY: CGFloat
     @Binding var maxY: CGFloat
     @State var shouldDisplayAxisLabel: Bool = true
-    
+
     public var body: some View {
         var horizontalLineYLocations: [CGFloat] = []
-        for i in 1...20 {
+        for i in 1 ... 20 {
             let amp = CGFloat(i) * -12.0
             if i % 2 != 0 {
                 horizontalLineYLocations.append(amp)
             }
         }
-        
+
         var horizontalLineYLocationsMapped: [CGFloat] = Array(repeating: 0.0, count: horizontalLineYLocations.count)
         var locationData: [HorizontalLineData] = []
-        
-        for i in 0..<horizontalLineYLocations.count {
-            horizontalLineYLocationsMapped[i] = horizontalLineYLocations[i].mappedInverted(from: minY...maxY)
+
+        for i in 0 ..< horizontalLineYLocations.count {
+            horizontalLineYLocationsMapped[i] = horizontalLineYLocations[i].mappedInverted(from: minY ... maxY)
             locationData.append(HorizontalLineData(yLoc: Double(horizontalLineYLocationsMapped[i])))
         }
-        
+
         return ZStack {
             GeometryReader { geo in
-                ForEach(0..<horizontalLineYLocationsMapped.count, id: \.self) { i in
+                ForEach(0 ..< horizontalLineYLocationsMapped.count, id: \.self) { i in
                     if horizontalLineYLocationsMapped[i] > 0.0 && horizontalLineYLocationsMapped[i] < 1.0 {
                         MorphableShape(controlPoints: AnimatableVector(with: locationData[i].locationData))
                             .stroke(Color(red: 1.0, green: 1.0, blue: 1.0, opacity: 0.4))
                             .animation(.easeInOut(duration: 0.2))
-                        
+
                         if shouldDisplayAxisLabel {
                             let labelString = String(Int(horizontalLineYLocations[i]))
                             Text(labelString)
@@ -455,11 +455,11 @@ struct VerticalAxis: View {
             }
         }
     }
-    
+
     // This packages the y locations in a convenient way for the MorphableShape struct
     struct HorizontalLineData {
         let locationData: [Double]
-        
+
         init(yLoc: Double) {
             locationData = [0.0, yLoc, 1.0, yLoc]
         }

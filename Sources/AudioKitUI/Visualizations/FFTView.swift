@@ -89,7 +89,7 @@ public struct FFTView: View {
         self.includeCaps = includeCaps
         self.maxAmplitude = maxAmplitude
         self.minAmplitude = minAmplitude
-        self.fftValidBinCount = validBinCount
+        fftValidBinCount = validBinCount
         self.backgroundColor = backgroundColor
 
         if maxAmplitude < minAmplitude {
@@ -153,7 +153,7 @@ struct AmplitudeBar: View {
     var linearGradient: LinearGradient
     var paddingFraction: CGFloat = 0.2
     var includeCaps: Bool = true
-    var backgroundColor: Color = Color.black
+    var backgroundColor: Color = .black
 
     var body: some View {
         GeometryReader { geometry in

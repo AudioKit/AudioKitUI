@@ -1,5 +1,5 @@
-import XCTest
 @testable import AudioKitUI
+import XCTest
 
 final class AudioKitUITests: XCTestCase {
     func testExample() {

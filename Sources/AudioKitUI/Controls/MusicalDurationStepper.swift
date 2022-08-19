@@ -30,6 +30,5 @@ public struct MusicalDurationStepper: View {
                 Text("\(musicalDuration.description) (\(String(format: "%.3f", time))s)").font(font)
             }
         }
-
     }
 }

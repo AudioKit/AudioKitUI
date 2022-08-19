@@ -57,12 +57,13 @@ public class WaveformLayer: CAShapeLayer {
     ///   - opacity: Opacity
     ///   - isMirrored: Whether or not to display mirrored
     public convenience init(table: [Float],
-                            size: CGSize? = nil,
+                            size _: CGSize? = nil,
                             fillColor: CGColor? = nil,
                             strokeColor: CGColor? = nil,
                             backgroundColor: CGColor? = nil,
                             opacity: Float = 1,
-                            isMirrored: Bool = false) {
+                            isMirrored: Bool = false)
+    {
         self.init()
         self.table = table
         self.isMirrored = isMirrored
@@ -129,8 +130,9 @@ public class WaveformLayer: CAShapeLayer {
 
     private func createPath(at size: CGSize) -> CGPath? {
         guard let table = table,
-            table.isNotEmpty,
-            size != CGSize.zero else {
+              table.isNotEmpty,
+              size != CGSize.zero
+        else {
             return nil
         }
 

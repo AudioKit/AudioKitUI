@@ -1,7 +1,7 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 
-import AudioKit
 import Accelerate
+import AudioKit
 import AVFoundation
 import SwiftUI
 

@@ -1,7 +1,7 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 
-import AudioKit
 import Accelerate
+import AudioKit
 import AVFoundation
 import SwiftUI
 
@@ -33,7 +33,7 @@ public struct NodeFFTView: ViewRepresentable {
         """
 
         let plot = FloatPlot(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024), fragment: metalFragmentOrig) {
-            return nodeTap.fftData
+            nodeTap.fftData
         }
 
         plot.setParameter(address: 0, value: 1)

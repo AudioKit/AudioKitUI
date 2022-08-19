@@ -12,8 +12,8 @@ class RawOutputModel: ObservableObject {
 
     init() {
         if isPreview {
-            for _ in 0...100 {
-                data.append(CGFloat.random(in: -1.0...1.0))
+            for _ in 0 ... 100 {
+                data.append(CGFloat.random(in: -1.0 ... 1.0))
             }
         }
     }
@@ -48,12 +48,13 @@ public struct RawOutputView: View {
                 bufferSize: Int = 1024,
                 strokeColor: Binding<Color> = .constant(Color.black),
                 isNormalized: Binding<Bool> = .constant(false),
-                scaleFactor: Binding<CGFloat> = .constant(1.0)) {
+                scaleFactor: Binding<CGFloat> = .constant(1.0))
+    {
         self.node = node
         self.bufferSize = bufferSize
-        self._strokeColor = strokeColor
-        self._isNormalized = isNormalized
-        self._scaleFactor = scaleFactor
+        _strokeColor = strokeColor
+        _isNormalized = isNormalized
+        _scaleFactor = scaleFactor
     }
 
     public var body: some View {
@@ -87,8 +88,8 @@ struct RawAudioPlot: Shape {
         }
 
         for index in 0 ..< data.count {
-            let x = index.mapped(from: 0...data.count, to: rect.minX...rect.maxX)
-            let y = data[index].mappedInverted(from: -rangeValue...rangeValue, to: rect.minY...rect.maxY)
+            let x = index.mapped(from: 0 ... data.count, to: rect.minX ... rect.maxX)
+            let y = data[index].mappedInverted(from: -rangeValue ... rangeValue, to: rect.minY ... rect.maxY)
 
             coordinates.append(CGPoint(x: x, y: y))
         }

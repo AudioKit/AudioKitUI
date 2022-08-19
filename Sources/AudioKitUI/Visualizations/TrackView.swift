@@ -1,8 +1,8 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 
-import SwiftUI
 import AudioKit
 import AVFoundation
+import SwiftUI
 
 public struct TrackView<Segment: ViewableSegment>: View {
     var segments: [Segment]
@@ -34,16 +34,16 @@ struct SegmentView<Segment: ViewableSegment>: View {
 
     var rmsValuesForRange: [Float] {
         let startingIndex = Int(segment.fileStartTime * rmsFramesPerSecond)
-        let endingIndex = Int(segment.fileEndTime * rmsFramesPerSecond)-1
-        return Array(segment.rmsValues[startingIndex...endingIndex])
+        let endingIndex = Int(segment.fileEndTime * rmsFramesPerSecond) - 1
+        return Array(segment.rmsValues[startingIndex ... endingIndex])
     }
 
     var body: some View {
-            AudioWaveform(rmsVals: rmsValuesForRange)
-                .fill(Color.black)
-                .background(Color.gray.opacity(0.1))
-                .frame(width: pixelsPerRMS * Double(rmsValuesForRange.count))
-                .offset(x: segment.playbackStartTime * rmsFramesPerSecond * pixelsPerRMS)
+        AudioWaveform(rmsVals: rmsValuesForRange)
+            .fill(Color.black)
+            .background(Color.gray.opacity(0.1))
+            .frame(width: pixelsPerRMS * Double(rmsValuesForRange.count))
+            .offset(x: segment.playbackStartTime * rmsFramesPerSecond * pixelsPerRMS)
     }
 }
 

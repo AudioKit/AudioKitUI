@@ -19,17 +19,17 @@ public struct TempoDraggableStepper: View {
                 Text("◀").font(font).onTapGesture { tempo -= 1 }
                 Text("\(Int(tempo))").font(font).frame(width: geo.size.height * 1.3)
                     .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .global)
-                                .onChanged({ touch in
-                        if let initialTouchPoint = initialTouchPoint {
-                            tempo = max(1, initialTempo + Float(touch.location.x - initialTouchPoint.x + (initialTouchPoint.y - touch.location.y)) * sensitivity / 30.0)
-                        } else {
-                            initialTouchPoint = touch.location
-                            initialTempo = tempo
-                        }
-                    }).onEnded({ _ in
-                        initialTouchPoint = nil
-                        initialTempo = 0.0
-                    }) )
+                        .onChanged { touch in
+                            if let initialTouchPoint = initialTouchPoint {
+                                tempo = max(1, initialTempo + Float(touch.location.x - initialTouchPoint.x + (initialTouchPoint.y - touch.location.y)) * sensitivity / 30.0)
+                            } else {
+                                initialTouchPoint = touch.location
+                                initialTempo = tempo
+                            }
+                        }.onEnded { _ in
+                            initialTouchPoint = nil
+                            initialTempo = 0.0
+                        })
 
                 Text("▶").font(font).onTapGesture { tempo += 1 }
             }.frame(width: geo.size.width, height: geo.size.height)

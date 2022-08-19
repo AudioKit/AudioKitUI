@@ -6,7 +6,7 @@ enum TestAudioURLs: String {
     case drumloop = "drumloop.wav", short = "short.aif"
 
     func url() -> URL {
-        let path = Bundle.module.path(forResource: self.rawValue, ofType: nil)!
+        let path = Bundle.module.path(forResource: rawValue, ofType: nil)!
         return URL(fileURLWithPath: path)
     }
 }

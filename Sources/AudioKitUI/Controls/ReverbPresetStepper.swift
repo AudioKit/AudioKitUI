@@ -9,7 +9,7 @@ public struct ReverbPresetStepper: View {
     public init(preset: Binding<AVAudioUnitReverbPreset>) {
         _preset = preset
     }
-    
+
     public var body: some View {
         GeometryReader { geo in
             let font = Font.system(size: geo.size.height * 0.45, weight: .light)
@@ -28,6 +28,5 @@ public struct ReverbPresetStepper: View {
                 Text(preset.name.uppercased()).font(font)
             }
         }
-
     }
 }
