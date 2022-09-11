@@ -7,6 +7,12 @@ public struct DryWetMixView: View {
     var wet: Node
     var mix: Node
 
+    public init(dry: Node, wet: Node, mix: Node) {
+        self.dry = dry
+        self.wet = wet
+        self.mix = mix
+    }
+
     var height: CGFloat = 100
 
     func plot(_ node: Node, label: String, color: Color) -> some View {
