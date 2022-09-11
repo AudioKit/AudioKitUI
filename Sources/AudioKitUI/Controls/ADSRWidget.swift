@@ -2,17 +2,17 @@ import AudioKit
 import AVFoundation
 import SwiftUI
 
-struct ADSRWidget: UIViewRepresentable {
-    typealias UIViewType = ADSRView
+public struct ADSRWidget: UIViewRepresentable {
+    public typealias UIViewType = ADSRView
     var callback: (AUValue, AUValue, AUValue, AUValue) -> Void
 
-    func makeUIView(context _: Context) -> ADSRView {
+    public func makeUIView(context _: Context) -> ADSRView {
         let view = ADSRView(callback: callback)
         view.bgColor = .systemBackground
         return view
     }
 
-    func updateUIView(_: ADSRView, context _: Context) {
+    public func updateUIView(_: ADSRView, context _: Context) {
         //
     }
 }

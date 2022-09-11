@@ -2,7 +2,7 @@ import AudioKit
 import AVFoundation
 import SwiftUI
 
-struct DryWetMixView: View {
+public struct DryWetMixView: View {
     var dry: Node
     var wet: Node
     var mix: Node
@@ -21,7 +21,7 @@ struct DryWetMixView: View {
         }
     }
 
-    var body: some View {
+    public var body: some View {
         VStack(spacing: 30) {
             plot(dry, label: "Input", color: .red)
             plot(wet, label: "Processed Signal", color: .blue)

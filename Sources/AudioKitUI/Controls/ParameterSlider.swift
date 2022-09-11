@@ -2,14 +2,14 @@ import AVFoundation
 import Controls
 import SwiftUI
 
-struct ParameterSlider: View {
+public struct ParameterSlider: View {
     var text: String
     @Binding var parameter: AUValue
     var range: ClosedRange<AUValue>
     var format: String = "%0.2f"
     var units: String = ""
 
-    var body: some View {
+    public var body: some View {
         VStack {
             Text(text)
             if units == "" || units == "Generic" {
