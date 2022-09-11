@@ -67,7 +67,7 @@ public struct AmplitudeView: View {
                 // colored rectangle in the back
                 if !isClipping {
                     Rectangle()
-                        .flexableFill(fillType: fillType)
+                        .flexibleFill(type: fillType)
                 } else {
                     Rectangle()
                         .fill(Color.red)

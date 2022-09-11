@@ -28,8 +28,8 @@ extension View {
 
 extension Shape {
     @ViewBuilder
-    func flexableFill(fillType: FillType) -> some View {
-        switch fillType {
+    func flexibleFill(type: FillType) -> some View {
+        switch type {
         case let .solid(color):
             fill(color)
         case let .gradient(gradient):
