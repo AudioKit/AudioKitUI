@@ -12,7 +12,7 @@ public struct ParameterSlider: View {
     public init(text: String,
                 parameter: Binding<Float>,
                 range: ClosedRange<AUValue>,
-                units: String) {
+                units: String = "") {
         _parameter = parameter
         self.text = text
         self.range = range
