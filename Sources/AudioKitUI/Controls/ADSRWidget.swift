@@ -1,3 +1,4 @@
+#if !os(macOS) || targetEnvironment(macCatalyst)
 import AudioKit
 import AVFoundation
 import SwiftUI
@@ -16,3 +17,4 @@ public struct ADSRWidget: UIViewRepresentable {
         //
     }
 }
+#endif
