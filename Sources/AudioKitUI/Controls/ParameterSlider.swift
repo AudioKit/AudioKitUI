@@ -9,6 +9,16 @@ public struct ParameterSlider: View {
     var format: String = "%0.2f"
     var units: String = ""
 
+    public init(text: String,
+                parameter: Binding<Float>,
+                range: ClosedRange<AUValue>,
+                units: String) {
+        _parameter = parameter
+        self.text = text
+        self.range = range
+        self.units = units
+    }
+
     public var body: some View {
         VStack {
             Text(text)
