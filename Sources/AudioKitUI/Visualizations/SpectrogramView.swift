@@ -176,7 +176,9 @@ public struct SpectrogramView: View {
     @Binding var backgroundColor: Color
 
     public init(node: Node,
-                linearGradient: LinearGradient = LinearGradient(gradient: Gradient(colors: [.blue, .green, .yellow, .red]), startPoint: .bottom, endPoint: .top),
+                linearGradient: LinearGradient = LinearGradient(gradient: .init(colors: [.blue, .green, .yellow, .red]),
+                                                                startPoint: .bottom,
+                                                                endPoint: .top),
                 strokeColor: Binding<Color> = .constant(Color.white.opacity(0.8)),
                 fillColor: Binding<Color> = .constant(Color.green.opacity(1.0)),
                 bottomColor: Binding<Color> = .constant(Color.white.opacity(0.5)),
