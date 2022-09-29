@@ -41,7 +41,7 @@ public class FloatPlot: MTKView, MTKViewDelegate {
     texture1d<float, access::sample> waveform, device float* parameters, device float4* colorParameters) {
     """
 
-    init(frame frameRect: CGRect, fragment: String? = nil, dataCallback: @escaping () -> [Float]) {
+    public init(frame frameRect: CGRect, fragment: String? = nil, dataCallback: @escaping () -> [Float]) {
         self.dataCallback = dataCallback
         bufferSampleCount = Int(frameRect.width)
 
