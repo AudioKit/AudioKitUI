@@ -6,18 +6,27 @@ import AVFoundation
 import SwiftUI
 
 public class RollingViewData {
-    let bufferSampleCount = 128
-    var history = [Float](repeating: 0.0, count: 1024)
-    var framesToRMS = 128
+    let bufferSampleCount: UInt
+    let framesToRMS: UInt
 
-    func calculate(_ nodeTap: RawDataTap) -> [Float] {
+    private var history: [Float]
+
+    public init(bufferSampleCount: UInt = 128,
+                bufferSize: UInt,
+                framesToRMS: UInt = 128) {
+        self.bufferSampleCount = bufferSampleCount
+        self.framesToRMS = framesToRMS
+        history = [Float](repeating: 0.0, count: 1024)
+    }
+
+    public func calculate(_ nodeTap: RawDataTap) -> [Float] {
         var framesToTransform = [Float]()
 
         let signal = nodeTap.data
 
         for j in 0 ..< bufferSampleCount / framesToRMS {
             for i in 0 ..< framesToRMS {
-                framesToTransform.append(signal[i + j * framesToRMS])
+                framesToTransform.append(signal[Int(i + j * framesToRMS)])
             }
 
             var rms: Float = 0.0
@@ -32,14 +41,22 @@ public class RollingViewData {
 }
 
 public struct NodeRollingView: ViewRepresentable {
-    var nodeTap: RawDataTap
-    var metalFragment: FragmentBuilder
-    var rollingData = RollingViewData()
+    private let nodeTap: RawDataTap
+    private let metalFragment: FragmentBuilder
+    private let rollingData: RollingViewData
 
-    public init(_ node: Node, color: Color = .gray, bufferSize: Int = 1024) {
-
-        metalFragment = FragmentBuilder(foregroundColor: color.cg, isCentered: false, isFilled: false)
+    public init(_ node: Node,
+                color: Color = .gray,
+                backgroundColor: Color = .clear,
+                isCentered: Bool = false,
+                isFilled: Bool = false,
+                bufferSize: Int = 1024) {
+        metalFragment = FragmentBuilder(foregroundColor: color.cg,
+                                        backgroundColor: backgroundColor.cg,
+                                        isCentered: isCentered,
+                                        isFilled: isFilled)
         nodeTap = RawDataTap(node, bufferSize: UInt32(bufferSize))
+        rollingData = RollingViewData(bufferSize: UInt(bufferSize))
     }
 
     var plot: FloatPlot {

@@ -168,12 +168,30 @@ public struct SpectrogramView: View {
     @StateObject var spectrogram = SpectrogramModel()
     var node: Node
 
-    var linearGradient = LinearGradient(gradient: Gradient(colors: [.blue, .green, .yellow, .red]), startPoint: .bottom, endPoint: .top)
-    @State var strokeColor = Color.white.opacity(0.8)
-    @State var fillColor = Color.green.opacity(1.0)
-    @State var bottomColor = Color.white.opacity(0.5)
-    @State var sideColor = Color.white.opacity(0.2)
-    @State var backgroundColor = Color.black
+    var linearGradient: LinearGradient
+    @Binding var strokeColor: Color
+    @Binding var fillColor: Color
+    @Binding var bottomColor: Color
+    @Binding var sideColor: Color
+    @Binding var backgroundColor: Color
+
+    public init(node: Node,
+                linearGradient: LinearGradient = LinearGradient(gradient: .init(colors: [.blue, .green, .yellow, .red]),
+                                                                startPoint: .bottom,
+                                                                endPoint: .top),
+                strokeColor: Binding<Color> = .constant(Color.white.opacity(0.8)),
+                fillColor: Binding<Color> = .constant(Color.green.opacity(1.0)),
+                bottomColor: Binding<Color> = .constant(Color.white.opacity(0.5)),
+                sideColor: Binding<Color> = .constant(Color.white.opacity(0.2)),
+                backgroundColor: Binding<Color> = .constant(Color.black)) {
+        self.node = node
+        self.linearGradient = linearGradient
+        _strokeColor = strokeColor
+        _fillColor = fillColor
+        _bottomColor = bottomColor
+        _sideColor = sideColor
+        _backgroundColor = backgroundColor
+    }
 
     public var body: some View {
         let xOffset = CGFloat(0.22) / CGFloat(spectrogram.fftDataReadings.maxItems)
