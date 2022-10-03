@@ -12,11 +12,11 @@ public class RollingViewData {
     private var history: [Float]
 
     public init(bufferSampleCount: UInt = 128,
-                bufferSize: UInt,
+                bufferSize: UInt32,
                 framesToRMS: UInt = 128) {
         self.bufferSampleCount = bufferSampleCount
         self.framesToRMS = framesToRMS
-        history = [Float](repeating: 0.0, count: 1024)
+        history = [Float](repeating: 0.0, count: Int(bufferSize))
     }
 
     public func calculate(_ nodeTap: RawDataTap) -> [Float] {
@@ -50,13 +50,13 @@ public struct NodeRollingView: ViewRepresentable {
                 backgroundColor: Color = .clear,
                 isCentered: Bool = false,
                 isFilled: Bool = false,
-                bufferSize: Int = 1024) {
+                bufferSize: UInt32 = 1024) {
         metalFragment = FragmentBuilder(foregroundColor: color.cg,
                                         backgroundColor: backgroundColor.cg,
                                         isCentered: isCentered,
                                         isFilled: isFilled)
-        nodeTap = RawDataTap(node, bufferSize: UInt32(bufferSize))
-        rollingData = RollingViewData(bufferSize: UInt(bufferSize))
+        nodeTap = RawDataTap(node, bufferSize: bufferSize)
+        rollingData = RollingViewData(bufferSize: bufferSize)
     }
 
     var plot: FloatPlot {
