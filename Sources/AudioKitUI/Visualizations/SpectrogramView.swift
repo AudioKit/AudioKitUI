@@ -166,31 +166,30 @@ class SpectrogramModel: ObservableObject {
 
 public struct SpectrogramView: View {
     @StateObject var spectrogram = SpectrogramModel()
-    var node: Node
-
-    var linearGradient: LinearGradient
-    @Binding var strokeColor: Color
-    @Binding var fillColor: Color
-    @Binding var bottomColor: Color
-    @Binding var sideColor: Color
-    @Binding var backgroundColor: Color
+    let node: Node
+    let linearGradient: LinearGradient
+    let strokeColor: Color
+    let fillColor: Color
+    let bottomColor: Color
+    let sideColor: Color
+    let backgroundColor: Color
 
     public init(node: Node,
                 linearGradient: LinearGradient = LinearGradient(gradient: .init(colors: [.blue, .green, .yellow, .red]),
                                                                 startPoint: .bottom,
                                                                 endPoint: .top),
-                strokeColor: Binding<Color> = .constant(Color.white.opacity(0.8)),
-                fillColor: Binding<Color> = .constant(Color.green.opacity(1.0)),
-                bottomColor: Binding<Color> = .constant(Color.white.opacity(0.5)),
-                sideColor: Binding<Color> = .constant(Color.white.opacity(0.2)),
-                backgroundColor: Binding<Color> = .constant(Color.black)) {
+                strokeColor: Color = Color.white.opacity(0.8),
+                fillColor: Color = Color.green.opacity(1.0),
+                bottomColor: Color = Color.white.opacity(0.5),
+                sideColor: Color = Color.white.opacity(0.2),
+                backgroundColor: Color = Color.black) {
         self.node = node
         self.linearGradient = linearGradient
-        _strokeColor = strokeColor
-        _fillColor = fillColor
-        _bottomColor = bottomColor
-        _sideColor = sideColor
-        _backgroundColor = backgroundColor
+        self.strokeColor = strokeColor
+        self.fillColor = fillColor
+        self.bottomColor = bottomColor
+        self.sideColor = sideColor
+        self.backgroundColor = backgroundColor
     }
 
     public var body: some View {
