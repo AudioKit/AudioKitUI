@@ -7,12 +7,10 @@ class AmplitudeModel: ObservableObject {
     @Published var amplitude: Double = 0.0
     var nodeTap: AmplitudeTap!
     var node: Node?
-    var stereoMode: StereoMode
+    var stereoMode: StereoMode = .center
     @Environment(\.isPreview) var isPreview
 
-    init(stereoMode: StereoMode = .center) {
-        self.stereoMode = stereoMode
-
+    init() {
         if isPreview {
             mockAmplitudeChange()
         }
@@ -45,30 +43,30 @@ class AmplitudeModel: ObservableObject {
 
 public struct AmplitudeView: View {
     @StateObject var amplitudeModel = AmplitudeModel()
-    var node: Node
-    @State var stereoMode: StereoMode = .center
-    @State var numberOfSegments: Int
-
-    @State var fillType: FillType = .gradient(gradient: Gradient(colors: [.red, .yellow, .green]))
+    let node: Node
+    let stereoMode: StereoMode
+    let numberOfSegments: Int
+    let fillType: FillType
 
     init(_ node: Node, stereoMode: StereoMode = .center, numberOfSegments: Int = 20) {
         self.node = node
-        _stereoMode = State(initialValue: stereoMode)
-        _numberOfSegments = State(initialValue: numberOfSegments)
+        self.stereoMode = stereoMode
+        self.fillType = .gradient(gradient: Gradient(colors: [.red, .yellow, .green]))
+        self.numberOfSegments = numberOfSegments
     }
 
     init(_ node: Node, color: Color, stereoMode: StereoMode = .center, numberOfSegments: Int = 20) {
         self.node = node
-        _stereoMode = State(initialValue: stereoMode)
-        _fillType = State(initialValue: .solid(color: color))
-        _numberOfSegments = State(initialValue: numberOfSegments)
+        self.stereoMode = stereoMode
+        self.fillType = .solid(color: color)
+        self.numberOfSegments = numberOfSegments
     }
 
     init(_ node: Node, colors: Gradient, stereoMode: StereoMode = .center, numberOfSegments: Int = 20) {
         self.node = node
-        _stereoMode = State(initialValue: stereoMode)
-        _fillType = State(initialValue: .gradient(gradient: colors))
-        _numberOfSegments = State(initialValue: numberOfSegments)
+        self.stereoMode = stereoMode
+        self.fillType = .gradient(gradient: colors)
+        self.numberOfSegments = numberOfSegments
     }
 
     public var body: some View {
@@ -144,6 +142,9 @@ struct AmplitudeView_Previews: PreviewProvider {
             .previewLayout(.fixed(width: 40, height: 500))
 
         AmplitudeView(Mixer(), numberOfSegments: 20)
+            .previewLayout(.fixed(width: 40, height: 500))
+        
+        AmplitudeView(Mixer(), color: .blue, numberOfSegments: 20)
             .previewLayout(.fixed(width: 40, height: 500))
     }
 }
