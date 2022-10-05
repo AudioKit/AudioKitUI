@@ -12,7 +12,7 @@ class AmplitudeModel: ObservableObject {
 
     init(stereoMode: StereoMode = .center) {
         self.stereoMode = stereoMode
-        
+
         if isPreview {
             mockAmplitudeChange()
         }
