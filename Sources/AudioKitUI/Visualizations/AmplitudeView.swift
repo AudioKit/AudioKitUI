@@ -31,7 +31,7 @@ class AmplitudeModel: ObservableObject {
     func pushData(_ amp: Float) {
         amplitude = Double(amp)
     }
-    
+
     func mockAmplitudeChange() {
         amplitude = Double.random(in: 0...1.0)
         let waitTime: TimeInterval = 0.1
@@ -143,7 +143,7 @@ struct AmplitudeView_Previews: PreviewProvider {
 
         AmplitudeView(Mixer(), numberOfSegments: 20)
             .previewLayout(.fixed(width: 40, height: 500))
-        
+
         AmplitudeView(Mixer(), color: .blue, numberOfSegments: 20)
             .previewLayout(.fixed(width: 40, height: 500))
     }
