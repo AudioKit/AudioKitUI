@@ -8,9 +8,14 @@ class AmplitudeModel: ObservableObject {
     var nodeTap: AmplitudeTap!
     var node: Node?
     var stereoMode: StereoMode
+    @Environment(\.isPreview) var isPreview
 
     init(stereoMode: StereoMode = .center) {
         self.stereoMode = stereoMode
+        
+        if isPreview {
+            mockAmplitudeChange()
+        }
     }
 
     func updateNode(_ node: Node) {
@@ -27,6 +32,14 @@ class AmplitudeModel: ObservableObject {
 
     func pushData(_ amp: Float) {
         amplitude = Double(amp)
+    }
+    
+    func mockAmplitudeChange() {
+        amplitude = Double.random(in: 0...1.0)
+        let waitTime: TimeInterval = 0.1
+        DispatchQueue.main.asyncAfter(deadline: .now() + waitTime) {
+            self.mockAmplitudeChange()
+        }
     }
 }
 
@@ -83,7 +96,7 @@ public struct AmplitudeView: View {
                     Rectangle()
                         .fill(Color.black)
                         .mask(Rectangle().padding(.bottom, geometry.size.height * CGFloat(amplitudeModel.amplitude)))
-                        .animation(.linear(duration: 0.05))
+                        .animation(.linear(duration: 0.05), value: amplitudeModel.amplitude)
                 }
             }
             .onAppear {
@@ -108,6 +121,7 @@ public struct AmplitudeView: View {
                         .frame(height: spaceHeight)
                 }
                 addOpacityRectangle(height: solidHeight, index: index, n: numberOfBlackSegments)
+                    .animation(.linear(duration: 0.05), value: amplitudeModel.amplitude)
             }
         }
     }
@@ -120,13 +134,16 @@ public struct AmplitudeView: View {
             .fill(Color.black)
             .frame(height: height)
             .opacity(opacity)
-            .animation(.linear(duration: 0.05))
+            .animation(.linear(duration: 0.05), value: amplitudeModel.amplitude)
     }
 }
 
 struct AmplitudeView_Previews: PreviewProvider {
     static var previews: some View {
-        AmplitudeView(Mixer())
+        AmplitudeView(Mixer(), numberOfSegments: 1)
+            .previewLayout(.fixed(width: 40, height: 500))
+
+        AmplitudeView(Mixer(), numberOfSegments: 20)
             .previewLayout(.fixed(width: 40, height: 500))
     }
 }
