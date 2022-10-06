@@ -68,8 +68,14 @@ public extension CGRect {
 }
 
 // TODO: refactor these to extensions where possible
-enum AudioHelpers {
-    static func getRMSValues(url: URL, windowSize: Int) -> [Float] {
+public enum AudioHelpers {
+
+    /// Get the RMS values from an audio file URL
+    /// - Parameters:
+    ///   - url: Audio file URL
+    ///   - windowSize: Number of samples per window
+    /// - Returns: An array of RMS values (float)
+    public static func getRMSValues(url: URL, windowSize: Int) -> [Float] {
         if let audioInformation = loadAudioSignal(audioURL: url) {
             let signal = audioInformation.signal
 
@@ -80,7 +86,12 @@ enum AudioHelpers {
         return []
     }
 
-    static func getRMSValues(url: URL, rmsFramesPerSecond: Double) -> [Float] {
+    /// Get the RMS values from an audio file URL
+    /// - Parameters:
+    ///   - url: Audio file URL
+    ///   - rmsFramesPerSecond: number of rms frames per seconds
+    /// - Returns: An array of RMS values (float)
+    public static func getRMSValues(url: URL, rmsFramesPerSecond: Double) -> [Float] {
         if let audioInformation = loadAudioSignal(audioURL: url) {
             let signal = audioInformation.signal
             let windowSize = Int(audioInformation.rate / rmsFramesPerSecond)
@@ -92,7 +103,7 @@ enum AudioHelpers {
         return []
     }
 
-    static func createRMSAnalysisArray(signal: [Float], windowSize: Int) -> [Float] {
+    private static func createRMSAnalysisArray(signal: [Float], windowSize: Int) -> [Float] {
         let numberOfSamples = signal.count
         let numberOfOutputArrays = numberOfSamples / windowSize
         var outputArray: [Float] = []
@@ -105,11 +116,5 @@ enum AudioHelpers {
             outputArray.append(rms)
         }
         return outputArray
-    }
-
-    static func getFileEndTime(_ audioFile: AVAudioFile) -> TimeInterval {
-        let sampleRate = audioFile.processingFormat.sampleRate
-        let numberOfSamples = audioFile.length
-        return Double(numberOfSamples) / sampleRate
     }
 }
