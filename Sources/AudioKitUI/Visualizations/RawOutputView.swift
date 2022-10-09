@@ -39,7 +39,7 @@ class RawOutputModel: ObservableObject {
             newData.append(CGFloat.random(in: -1.0 ... 1.0))
         }
         updateData(newData)
-        
+
         let waitTime: TimeInterval = 0.1
         DispatchQueue.main.asyncAfter(deadline: .now() + waitTime) {
             self.mockAudioInput()
