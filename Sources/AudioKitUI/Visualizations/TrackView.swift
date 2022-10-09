@@ -92,7 +92,7 @@ public struct MockSegment: ViewableSegment, StreamableAudioSegment {
             self.rmsFramesPerSecond = rmsFramesPerSecond
             audioFile = try AVAudioFile(forReading: audioFileURL)
             rmsValues = AudioHelpers.getRMSValues(url: audioFileURL, rmsFramesPerSecond: rmsFramesPerSecond)
-            fileEndTime = AudioHelpers.getFileEndTime(audioFile)
+            fileEndTime = audioFile.duration
         } catch {
             throw error
         }
