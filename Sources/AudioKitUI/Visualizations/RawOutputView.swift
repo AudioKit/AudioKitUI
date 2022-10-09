@@ -32,7 +32,7 @@ class RawOutputModel: ObservableObject {
     func updateData(_ data: [CGFloat]) {
         self.data = data
     }
-    
+
     func mockAudioInput() {
         var newData = [CGFloat]()
         for _ in 0 ... 100 {
