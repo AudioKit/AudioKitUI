@@ -48,21 +48,21 @@ public struct AmplitudeView: View {
     let numberOfSegments: Int
     let fillType: FillType
 
-    init(_ node: Node, stereoMode: StereoMode = .center, numberOfSegments: Int = 20) {
+    public init(_ node: Node, stereoMode: StereoMode = .center, numberOfSegments: Int = 20) {
         self.node = node
         self.stereoMode = stereoMode
         self.fillType = .gradient(gradient: Gradient(colors: [.red, .yellow, .green]))
         self.numberOfSegments = numberOfSegments
     }
 
-    init(_ node: Node, color: Color, stereoMode: StereoMode = .center, numberOfSegments: Int = 20) {
+    public init(_ node: Node, color: Color, stereoMode: StereoMode = .center, numberOfSegments: Int = 20) {
         self.node = node
         self.stereoMode = stereoMode
         self.fillType = .solid(color: color)
         self.numberOfSegments = numberOfSegments
     }
 
-    init(_ node: Node, colors: Gradient, stereoMode: StereoMode = .center, numberOfSegments: Int = 20) {
+    public init(_ node: Node, colors: Gradient, stereoMode: StereoMode = .center, numberOfSegments: Int = 20) {
         self.node = node
         self.stereoMode = stereoMode
         self.fillType = .gradient(gradient: colors)
