@@ -86,10 +86,8 @@ class SpectrogramModel: ObservableObject {
     func updateNode(_ node: Node) {
         if node !== self.node {
             self.node = node
-            nodeTap = FFTTap(node, bufferSize: UInt32(FFT_SIZE * 2)) { fftData in
-                DispatchQueue.main.async {
-                    self.pushData(fftData)
-                }
+            nodeTap = FFTTap(node, bufferSize: UInt32(FFT_SIZE * 2), callbackQueue: .main) { fftData in
+                self.pushData(fftData)
             }
             nodeTap.isNormalized = false
             nodeTap.zeroPaddingFactor = 1

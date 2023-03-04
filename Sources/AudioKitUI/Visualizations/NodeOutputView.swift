@@ -14,7 +14,7 @@ public struct NodeOutputView: ViewRepresentable {
                                         backgroundColor: backgroundColor.cg,
                                         isCentered: true,
                                         isFilled: false)
-        nodeTap = RawDataTap(node, bufferSize: UInt32(bufferSize))
+        nodeTap = RawDataTap(node, bufferSize: UInt32(bufferSize), callbackQueue: .main)
     }
 
     var plot: FloatPlot {
