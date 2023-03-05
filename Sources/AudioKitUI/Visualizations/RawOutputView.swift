@@ -20,10 +20,8 @@ class RawOutputModel: ObservableObject {
         if node !== self.node {
             self.node = node
             self.bufferSize = bufferSize
-            nodeTap = RawDataTap(node, bufferSize: UInt32(bufferSize)) { rawAudioData in
-                DispatchQueue.main.async {
-                    self.updateData(rawAudioData.map { CGFloat($0) })
-                }
+            nodeTap = RawDataTap(node, bufferSize: UInt32(bufferSize), callbackQueue: .main) { rawAudioData in
+                self.updateData(rawAudioData.map { CGFloat($0) })
             }
             nodeTap.start()
         }

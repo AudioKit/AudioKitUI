@@ -23,10 +23,8 @@ class FFTModel: ObservableObject {
     func updateNode(_ node: Node, fftValidBinCount: FFTValidBinCount? = nil) {
         if node !== self.node {
             self.node = node
-            nodeTap = FFTTap(node, fftValidBinCount: fftValidBinCount) { fftData in
-                DispatchQueue.main.async {
-                    self.updateAmplitudes(fftData)
-                }
+            nodeTap = FFTTap(node, fftValidBinCount: fftValidBinCount, callbackQueue: .main) { fftData in
+                self.updateAmplitudes(fftData)
             }
             nodeTap.isNormalized = false
             nodeTap.start()

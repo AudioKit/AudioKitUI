@@ -55,7 +55,7 @@ public struct NodeRollingView: ViewRepresentable {
                                         backgroundColor: backgroundColor.cg,
                                         isCentered: isCentered,
                                         isFilled: isFilled)
-        nodeTap = RawDataTap(node, bufferSize: bufferSize)
+        nodeTap = RawDataTap(node, bufferSize: bufferSize, callbackQueue: .main)
         rollingData = RollingViewData(bufferSize: bufferSize)
     }
 

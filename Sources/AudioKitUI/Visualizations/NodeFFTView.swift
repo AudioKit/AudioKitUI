@@ -13,7 +13,7 @@ public struct NodeFFTView: ViewRepresentable {
     let backgroundColorAddress = 1
 
     public init(_ node: Node) {
-        nodeTap = FFTTap(node, bufferSize: UInt32(bufferSampleCount)) { _ in }
+        nodeTap = FFTTap(node, bufferSize: UInt32(bufferSampleCount), callbackQueue: .main) { _ in }
     }
 
     internal var plot: FloatPlot {
