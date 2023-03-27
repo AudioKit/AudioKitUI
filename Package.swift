@@ -8,7 +8,7 @@ let package = Package(
     platforms: [.macOS(.v12), .iOS(.v15)],
     products: [.library(name: "AudioKitUI", targets: ["AudioKitUI"])],
     dependencies: [
-        .package(url: "https://github.com/AudioKit/AudioKit.git", from: "5.3.0"),
+        .package(url: "https://github.com/AudioKit/AudioKit.git", from: "5.6.1"),
         .package(url: "https://github.com/AudioKit/Controls.git", from: "1.1.0"),
     ],
     targets: [
