@@ -63,7 +63,7 @@ public struct TapCountingDrumPadGrid: View {
             let padHeight = gp.size.height / CGFloat(rows)
             let columns = Array(repeating: GridItem(.fixed(padWidth)), count: cols)
             LazyVGrid(columns: columns, spacing: 10) {
-                ForEach(0..<count) { idx in
+                ForEach(0..<count, id: \.self) { idx in
                     ZStack {
                         if #available(iOS 15.0, *) {
                             RoundedRectangle(cornerRadius: padWidth / 10)
