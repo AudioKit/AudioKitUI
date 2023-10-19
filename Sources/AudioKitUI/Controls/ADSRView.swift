@@ -99,6 +99,8 @@ import UIKit
         self.callback = callback
         super.init(frame: CGRect(x: 0, y: 0, width: 440, height: 150))
         backgroundColor = bgColor
+        contentMode = .scaleAspectFill
+        clipsToBounds = true
     }
 
     /// Initialization of the view from within interface builder
@@ -107,13 +109,6 @@ import UIKit
     }
 
     // MARK: - Storyboard Rendering
-
-    /// Perform necessary operation to allow the view to be rendered in interface builder
-    override public func prepareForInterfaceBuilder() {
-        super.prepareForInterfaceBuilder()
-        contentMode = .scaleAspectFill
-        clipsToBounds = true
-    }
 
     /// Size of the view
     override public var intrinsicContentSize: CGSize {
