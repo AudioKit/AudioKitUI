@@ -23,18 +23,20 @@ public class FragmentBuilder {
     var isFilled: Bool = true
     var isFFT: Bool = false
 
-    init(foregroundColor: CGColor = Color.white.cg,
-         isCentered: Bool = true,
-         isFilled: Bool = true,
-         isFFT: Bool = false)
+    public init(foregroundColor: CGColor = Color.white.cg,
+                backgroundColor: CGColor = Color.clear.cg,
+                isCentered: Bool = true,
+                isFilled: Bool = true,
+                isFFT: Bool = false)
     {
         self.foregroundColor = foregroundColor
+        self.backgroundColor = backgroundColor
         self.isCentered = isCentered
         self.isFilled = isFilled
         self.isFFT = isFFT
     }
 
-    var stringValue: String {
+    public var stringValue: String {
         return """
         float sample = waveform.sample(s, \(isFFT ? "(pow(10, in.t.x) - 1.0) / 9.0" : "in.t.x")).x;
 
@@ -43,7 +45,7 @@ public class FragmentBuilder {
 
         float y = (-in.t.y + \(isCentered ? 0.5 : 1));
         float d = \(isFilled ? "fmax(fabs(y) - fabs(sample), 0)" : "fabs(y - sample)");
-        float alpha = \(isFFT ? "fabs(1/(50 * d))" : "smoothstep(0.01, 0.04, d)");
+        float alpha = \(isFFT ? "fabs(1/(50 * d))" : "smoothstep(0.01, 0.02, d)");
         return { mix(foregroundColor, backgroundColor, alpha) };
         """
     }

@@ -41,7 +41,9 @@ public class FloatPlot: MTKView, MTKViewDelegate {
     texture1d<float, access::sample> waveform, device float* parameters, device float4* colorParameters) {
     """
 
-    init(frame frameRect: CGRect, fragment: String? = nil, dataCallback: @escaping () -> [Float]) {
+    public init(frame frameRect: CGRect,
+                fragment: String? = nil,
+                dataCallback: @escaping () -> [Float]) {
         self.dataCallback = dataCallback
         bufferSampleCount = Int(frameRect.width)
 
@@ -93,13 +95,13 @@ public class FloatPlot: MTKView, MTKViewDelegate {
 
         super.init(frame: frameRect, device: device)
 
-        self.clearColor = .init(red: 0.0, green: 0.0, blue: 0.0, alpha: 0)
+        clearColor = .init(red: 0.0, green: 0.0, blue: 0.0, alpha: 0)
 
         delegate = self
     }
 
     @available(*, unavailable)
-    required init(coder: NSCoder) {
+    required init(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -125,7 +127,7 @@ public class FloatPlot: MTKView, MTKViewDelegate {
         }
     }
 
-    public func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
+    public func mtkView(_: MTKView, drawableSizeWillChange _: CGSize) {
         // We may want to resize the texture.
     }
 

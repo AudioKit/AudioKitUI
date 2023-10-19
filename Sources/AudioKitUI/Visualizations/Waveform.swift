@@ -98,7 +98,8 @@ public class Waveform: CALayer {
     public convenience init(channels: Int = 2,
                             size: CGSize? = nil,
                             waveformColor: CGColor? = nil,
-                            backgroundColor: CGColor? = nil) {
+                            backgroundColor: CGColor? = nil)
+    {
         self.init()
         self.channels = channels
         self.backgroundColor = backgroundColor
@@ -199,12 +200,12 @@ public class Waveform: CALayer {
         // Log(data.count, "plotSize", plotSize)
 
         let plot = WaveformLayer(table: data,
-                                   size: plotSize,
-                                   fillColor: color,
-                                   strokeColor: nil,
-                                   backgroundColor: nil,
-                                   opacity: waveformOpacity,
-                                   isMirrored: isMirrored)
+                                 size: plotSize,
+                                 fillColor: color,
+                                 strokeColor: nil,
+                                 backgroundColor: nil,
+                                 opacity: waveformOpacity,
+                                 isMirrored: isMirrored)
         plot.allowActions = false
         return plot
     }
@@ -266,9 +267,9 @@ public class Waveform: CALayer {
     /// - Returns: New waveform
     public func duplicate() -> Waveform? {
         let waveform = Waveform(channels: channels,
-                                  size: plotSize,
-                                  waveformColor: waveformColor,
-                                  backgroundColor: backgroundColor)
+                                size: plotSize,
+                                waveformColor: waveformColor,
+                                backgroundColor: backgroundColor)
 
         var data = FloatChannelData(repeating: [], count: plots.count)
         if let value = plots.first?.table {

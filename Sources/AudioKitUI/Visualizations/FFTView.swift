@@ -1,24 +1,30 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 
+import Accelerate
 import AudioKit
 import SwiftUI
 
 class FFTModel: ObservableObject {
-    @Published var amplitudes: [Double?] = Array(repeating: nil, count: 50)
+    @Published var amplitudes: [Float?] = Array(repeating: nil, count: 50)
     var nodeTap: FFTTap!
-    private var FFT_SIZE = 2048
     var node: Node?
     var numberOfBars: Int = 50
-    var maxAmplitude: Double = -10.0
-    var minAmplitude: Double = -150.0
+    var maxAmplitude: Float = 0.0
+    var minAmplitude: Float = -70.0
+    var referenceValueForFFT: Float = 12.0
+    @Environment(\.isPreview) var isPreview
 
-    func updateNode(_ node: Node) {
+    init() {
+        if isPreview {
+            mockAudioInput()
+        }
+    }
+
+    func updateNode(_ node: Node, fftValidBinCount: FFTValidBinCount? = nil) {
         if node !== self.node {
             self.node = node
-            nodeTap = FFTTap(node) { fftData in
-                DispatchQueue.main.async {
-                    self.updateAmplitudes(fftData)
-                }
+            nodeTap = FFTTap(node, fftValidBinCount: fftValidBinCount, callbackQueue: .main) { fftData in
+                self.updateAmplitudes(fftData)
             }
             nodeTap.isNormalized = false
             nodeTap.start()
@@ -31,43 +37,40 @@ class FFTModel: ObservableObject {
             if fftData[index].isNaN { fftData[index] = 0.0 }
         }
 
-        var tempAmplitudes: [Double] = []
+        var one = Float(1.0)
+        var zero = Float(0.0)
+        var decibelNormalizationFactor = Float(1.0 / (maxAmplitude - minAmplitude))
+        var decibelNormalizationOffset = Float(-minAmplitude / (maxAmplitude - minAmplitude))
 
-        // loop by two through all the fft data
-        for i in stride(from: 0, to: FFT_SIZE - 1, by: 2) {
-            if i / 2 < numberOfBars {
-                // get the real and imaginary parts of the complex number
-                let real = fftData[i]
-                let imaginary = fftData[i + 1]
+        var decibels = [Float](repeating: 0, count: fftData.count)
+        vDSP_vdbcon(fftData, 1, &referenceValueForFFT, &decibels, 1, vDSP_Length(fftData.count), 0)
 
-                let normalizedBinMagnitude = 2.0 * sqrt(real * real + imaginary * imaginary) / Float(FFT_SIZE)
-                let amplitude = Double(20.0 * log10(normalizedBinMagnitude))
+        vDSP_vsmsa(decibels,
+                   1,
+                   &decibelNormalizationFactor,
+                   &decibelNormalizationOffset,
+                   &decibels,
+                   1,
+                   vDSP_Length(decibels.count))
 
-                // map amplitude array to visualizer
-                var mappedAmplitude = map(n: amplitude,
-                                          start1: minAmplitude,
-                                          stop1: maxAmplitude,
-                                          start2: 0.0,
-                                          stop2: 1.0)
-                if mappedAmplitude > 1.0 {
-                    mappedAmplitude = 1.0
-                }
-                if mappedAmplitude < 0.0 {
-                    mappedAmplitude = 0.0
-                }
+        vDSP_vclip(decibels, 1, &zero, &one, &decibels, 1, vDSP_Length(decibels.count))
 
-                tempAmplitudes.append(mappedAmplitude)
-            }
-        }
         // swap the amplitude array
         DispatchQueue.main.async {
-            self.amplitudes = tempAmplitudes
+            self.amplitudes = decibels
         }
     }
 
-    /// simple mapping function to scale a value to a different range
-    func map(n: Double, start1: Double, stop1: Double, start2: Double, stop2: Double) -> Double {
-        return ((n - start1) / (stop1 - start1)) * (stop2 - start2) + start2
+    func mockAudioInput() {
+        var mockFloats = [Float]()
+        for _ in 0...65 {
+            mockFloats.append(Float.random(in: 0...0.1))
+        }
+        updateAmplitudes(mockFloats)
+        let waitTime: TimeInterval = 0.1
+        DispatchQueue.main.asyncAfter(deadline: .now() + waitTime) {
+            self.mockAudioInput()
+        }
     }
 }
 
@@ -77,9 +80,12 @@ public struct FFTView: View {
     private var paddingFraction: CGFloat
     private var includeCaps: Bool
     private var node: Node
-    private var numberOfBars: Int
-    private var minAmplitude: Double
-    private var maxAmplitude: Double
+    private var barCount: Int
+    private var fftValidBinCount: FFTValidBinCount?
+    private var minAmplitude: Float
+    private var maxAmplitude: Float
+    private let defaultBarCount: Int = 64
+    private let maxBarCount: Int = 128
     private var backgroundColor: Color
 
     public init(_ node: Node,
@@ -88,18 +94,19 @@ public struct FFTView: View {
                                                                 endPoint: .center),
                 paddingFraction: CGFloat = 0.2,
                 includeCaps: Bool = true,
-                numberOfBars: Int = 50,
-                maxAmplitude: Double = -10.0,
-                minAmplitude: Double = -150.0,
+                validBinCount: FFTValidBinCount? = nil,
+                barCount: Int? = nil,
+                maxAmplitude: Float = -10.0,
+                minAmplitude: Float = -150.0,
                 backgroundColor: Color = Color.black)
     {
         self.node = node
         self.linearGradient = linearGradient
         self.paddingFraction = paddingFraction
         self.includeCaps = includeCaps
-        self.numberOfBars = numberOfBars
         self.maxAmplitude = maxAmplitude
         self.minAmplitude = minAmplitude
+        fftValidBinCount = validBinCount
         self.backgroundColor = backgroundColor
 
         if maxAmplitude < minAmplitude {
@@ -108,23 +115,44 @@ public struct FFTView: View {
         if minAmplitude > 0.0 || maxAmplitude > 0.0 {
             fatalError("Amplitude values must be less than zero")
         }
+
+        if let requestedBarCount = barCount {
+            self.barCount = requestedBarCount
+        } else {
+            if let fftBinCount = fftValidBinCount {
+                if Int(fftBinCount.rawValue) > maxBarCount - 1 {
+                    self.barCount = maxBarCount
+                } else {
+                    self.barCount = Int(fftBinCount.rawValue)
+                }
+            } else {
+                self.barCount = defaultBarCount
+            }
+        }
     }
 
     public var body: some View {
         HStack(spacing: 0.0) {
-            ForEach(fft.amplitudes.indices, id: \.self) { number in
-                if let amplitude = fft.amplitudes[number] {
-                    AmplitudeBar(amplitude: amplitude,
+            ForEach(0 ..< barCount, id: \.self) {
+                if $0 < fft.amplitudes.count {
+                    if let amplitude = fft.amplitudes[$0] {
+                        AmplitudeBar(amplitude: amplitude,
+                                     linearGradient: linearGradient,
+                                     paddingFraction: paddingFraction,
+                                     includeCaps: includeCaps)
+                    }
+                } else {
+                    AmplitudeBar(amplitude: 0.0,
                                  linearGradient: linearGradient,
                                  paddingFraction: paddingFraction,
-                                 includeCaps: includeCaps)
+                                 includeCaps: includeCaps,
+                                 backgroundColor: backgroundColor)
                 }
             }
         }.onAppear {
-            fft.updateNode(node)
-            fft.numberOfBars = numberOfBars
-            fft.maxAmplitude = maxAmplitude
-            fft.minAmplitude = minAmplitude
+            fft.updateNode(node, fftValidBinCount: self.fftValidBinCount)
+            fft.maxAmplitude = self.maxAmplitude
+            fft.minAmplitude = self.minAmplitude
         }
         .drawingGroup() // Metal powered rendering
         .background(backgroundColor)
@@ -138,10 +166,11 @@ struct FFTView_Previews: PreviewProvider {
 }
 
 struct AmplitudeBar: View {
-    var amplitude: Double
+    var amplitude: Float
     var linearGradient: LinearGradient
     var paddingFraction: CGFloat = 0.2
     var includeCaps: Bool = true
+    var backgroundColor: Color = .black
 
     var body: some View {
         GeometryReader { geometry in
@@ -152,9 +181,9 @@ struct AmplitudeBar: View {
 
                 // Dynamic black mask padded from bottom in relation to the amplitude
                 Rectangle()
-                    .fill(Color.black)
+                    .fill(backgroundColor)
                     .mask(Rectangle().padding(.bottom, geometry.size.height * CGFloat(amplitude)))
-                    .animation(.easeOut(duration: 0.15))
+                    .animation(.easeOut(duration: 0.15), value: amplitude)
 
                 // White bar with slower animation for floating effect
                 if includeCaps {
@@ -162,11 +191,11 @@ struct AmplitudeBar: View {
                 }
             }
             .padding(geometry.size.width * paddingFraction / 2)
-            .border(Color.black, width: geometry.size.width * paddingFraction / 2)
+            .border(backgroundColor, width: geometry.size.width * paddingFraction / 2)
         }
     }
 
-    // Creates the Cap View - seperate method allows variable definitions inside a GeometryReader
+    // Creates the Cap View - separate method allows variable definitions inside a GeometryReader
     func addCap(width: CGFloat, height: CGFloat) -> some View {
         let padding = width * paddingFraction / 2
         let capHeight = height * 0.005
@@ -177,7 +206,7 @@ struct AmplitudeBar: View {
         return Rectangle()
             .fill(Color.white)
             .frame(height: capHeight)
-            .offset(x: 0.0, y: -height > capOffset - capHeight ? capMaxOffset : capOffset) // prevents offset from pushing cap outside of it's frame
-            .animation(.easeOut(duration: 0.6))
+            .offset(x: 0.0, y: -height > capOffset - capHeight ? capMaxOffset : capOffset) // prevents offset from pushing cap outside of its frame
+            .animation(.easeOut(duration: 0.6), value: amplitude)
     }
 }

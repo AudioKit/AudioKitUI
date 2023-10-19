@@ -78,7 +78,7 @@ func calculateNote(_ pitch: CGFloat) -> String {
         frequency *= 2.0
     }
 
-    var minDistance: CGFloat = 10_000.0
+    var minDistance: CGFloat = 10000.0
     var index = 0
 
     for possibleIndex in 0 ..< noteFrequencies.count {

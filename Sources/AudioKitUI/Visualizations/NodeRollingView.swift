@@ -1,23 +1,32 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 
-import AudioKit
 import Accelerate
+import AudioKit
 import AVFoundation
 import SwiftUI
 
 public class RollingViewData {
-    let bufferSampleCount = 128
-    var history = [Float](repeating: 0.0, count: 1024)
-    var framesToRMS = 128
+    let bufferSampleCount: UInt
+    let framesToRMS: UInt
 
-    func calculate(_ nodeTap: RawDataTap) -> [Float] {
+    private var history: [Float]
+
+    public init(bufferSampleCount: UInt = 128,
+                bufferSize: UInt32,
+                framesToRMS: UInt = 128) {
+        self.bufferSampleCount = bufferSampleCount
+        self.framesToRMS = framesToRMS
+        history = [Float](repeating: 0.0, count: Int(bufferSize))
+    }
+
+    public func calculate(_ nodeTap: RawDataTap) -> [Float] {
         var framesToTransform = [Float]()
 
         let signal = nodeTap.data
 
         for j in 0 ..< bufferSampleCount / framesToRMS {
             for i in 0 ..< framesToRMS {
-                framesToTransform.append(signal[i + j * framesToRMS])
+                framesToTransform.append(signal[Int(i + j * framesToRMS)])
             }
 
             var rms: Float = 0.0
@@ -28,19 +37,26 @@ public class RollingViewData {
             history.append(rms)
         }
         return history
-
     }
 }
 
 public struct NodeRollingView: ViewRepresentable {
-    var nodeTap: RawDataTap
-    var metalFragment: FragmentBuilder
-    var rollingData = RollingViewData()
+    private let nodeTap: RawDataTap
+    private let metalFragment: FragmentBuilder
+    private let rollingData: RollingViewData
 
-    public init(_ node: Node, color: Color = .gray, bufferSize: Int = 1024) {
-
-        metalFragment = FragmentBuilder(foregroundColor: color.cg, isCentered: false, isFilled: false)
-        nodeTap = RawDataTap(node, bufferSize: UInt32(bufferSize))
+    public init(_ node: Node,
+                color: Color = .gray,
+                backgroundColor: Color = .clear,
+                isCentered: Bool = false,
+                isFilled: Bool = false,
+                bufferSize: UInt32 = 1024) {
+        metalFragment = FragmentBuilder(foregroundColor: color.cg,
+                                        backgroundColor: backgroundColor.cg,
+                                        isCentered: isCentered,
+                                        isFilled: isFilled)
+        nodeTap = RawDataTap(node, bufferSize: bufferSize, callbackQueue: .main)
+        rollingData = RollingViewData(bufferSize: bufferSize)
     }
 
     var plot: FloatPlot {

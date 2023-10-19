@@ -1,7 +1,7 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 
-import AudioKit
 import Accelerate
+import AudioKit
 import AVFoundation
 import SwiftUI
 
@@ -9,10 +9,12 @@ public struct NodeOutputView: ViewRepresentable {
     private var nodeTap: RawDataTap
     private var metalFragment: FragmentBuilder
 
-    public init(_ node: Node, color: Color = .gray, bufferSize: Int = 1024) {
-
-        metalFragment = FragmentBuilder(foregroundColor: color.cg, isCentered: true, isFilled: false)
-        nodeTap = RawDataTap(node, bufferSize: UInt32(bufferSize))
+    public init(_ node: Node, color: Color = .gray, backgroundColor: Color = .clear, bufferSize: Int = 1024) {
+        metalFragment = FragmentBuilder(foregroundColor: color.cg,
+                                        backgroundColor: backgroundColor.cg,
+                                        isCentered: true,
+                                        isFilled: false)
+        nodeTap = RawDataTap(node, bufferSize: UInt32(bufferSize), callbackQueue: .main)
     }
 
     var plot: FloatPlot {
