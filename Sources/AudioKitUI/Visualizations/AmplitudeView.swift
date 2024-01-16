@@ -20,7 +20,12 @@ class AmplitudeModel: ObservableObject {
     func updateNode(_ node: Node) {
         if node !== self.node {
             self.node = node
-            nodeTap = AmplitudeTap(node, stereoMode: stereoMode, analysisMode: analysisMode, callbackQueue: .main) { amp in
+            nodeTap = AmplitudeTap(
+              node,
+              stereoMode: stereoMode,
+              analysisMode: analysisMode,
+              callbackQueue: .main
+            ) { amp in
                 self.pushData(amp)
             }
             nodeTap.start()
@@ -48,7 +53,12 @@ public struct AmplitudeView: View {
     let numberOfSegments: Int
     let fillType: FillType
     
-    public init(_ node: Node, stereoMode: StereoMode = .center, analysisMode: AnalysisMode = .peak, numberOfSegments: Int = 20) {
+    public init(
+      _ node: Node,
+      stereoMode: StereoMode = .center,
+      analysisMode: AnalysisMode = .peak,
+      numberOfSegments: Int = 20
+    ) {
         self.node = node
         self.stereoMode = stereoMode
         self.analysisMode = analysisMode
@@ -56,7 +66,13 @@ public struct AmplitudeView: View {
         self.numberOfSegments = numberOfSegments
     }
     
-    public init(_ node: Node, color: Color, stereoMode: StereoMode = .center, analysisMode: AnalysisMode = .peak, numberOfSegments: Int = 20) {
+    public init(
+      _ node: Node,
+      color: Color,
+      stereoMode: StereoMode = .center,
+      analysisMode: AnalysisMode = .peak,
+      numberOfSegments: Int = 20
+    ) {
         self.node = node
         self.stereoMode = stereoMode
         self.analysisMode = analysisMode
@@ -64,7 +80,13 @@ public struct AmplitudeView: View {
         self.numberOfSegments = numberOfSegments
     }
     
-    public init(_ node: Node, colors: Gradient, stereoMode: StereoMode = .center, analysisMode: AnalysisMode = .peak, numberOfSegments: Int = 20) {
+    public init(
+      _ node: Node,
+      colors: Gradient,
+      stereoMode: StereoMode = .center,
+      analysisMode: AnalysisMode = .peak,
+      numberOfSegments: Int = 20
+    ) {
         self.node = node
         self.stereoMode = stereoMode
         self.analysisMode = analysisMode
@@ -102,6 +124,7 @@ public struct AmplitudeView: View {
             }
             .onAppear {
                 amplitudeModel.stereoMode = stereoMode
+                amplitudeModel.analysisMode = analysisMode
                 amplitudeModel.updateNode(node)
             }
         }
