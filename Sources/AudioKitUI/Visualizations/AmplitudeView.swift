@@ -52,16 +52,19 @@ public struct AmplitudeView: View {
     let analysisMode: AnalysisMode
     let numberOfSegments: Int
     let fillType: FillType
-    
+    let backgroundColor: Color
+
     public init(
       _ node: Node,
       stereoMode: StereoMode = .center,
       analysisMode: AnalysisMode = .peak,
+      backgroundColor: Color = .black,
       numberOfSegments: Int = 20
     ) {
         self.node = node
         self.stereoMode = stereoMode
         self.analysisMode = analysisMode
+        self.backgroundColor = backgroundColor
         self.fillType = .gradient(gradient: Gradient(colors: [.red, .yellow, .green]))
         self.numberOfSegments = numberOfSegments
     }
@@ -71,11 +74,13 @@ public struct AmplitudeView: View {
       color: Color,
       stereoMode: StereoMode = .center,
       analysisMode: AnalysisMode = .peak,
+      backgroundColor: Color = .black,
       numberOfSegments: Int = 20
     ) {
         self.node = node
         self.stereoMode = stereoMode
         self.analysisMode = analysisMode
+        self.backgroundColor = backgroundColor
         self.fillType = .solid(color: color)
         self.numberOfSegments = numberOfSegments
     }
@@ -85,11 +90,13 @@ public struct AmplitudeView: View {
       colors: Gradient,
       stereoMode: StereoMode = .center,
       analysisMode: AnalysisMode = .peak,
+      backgroundColor: Color = .black,
       numberOfSegments: Int = 20
     ) {
         self.node = node
         self.stereoMode = stereoMode
         self.analysisMode = analysisMode
+        self.backgroundColor = backgroundColor
         self.fillType = .gradient(gradient: colors)
         self.numberOfSegments = numberOfSegments
     }
@@ -115,9 +122,9 @@ public struct AmplitudeView: View {
                     // some are "on" or "off" - based on their opacity to create the colored regions
                     addSegments(width: geometry.size.width, height: geometry.size.height, numberOfBlackSegments: numberOfBlackSegments)
                 } else {
-                    // simply cover a certain amount of the colored rectangle with black from the top
+                    // simply cover a certain amount of the colored rectangle with the background color from the top
                     Rectangle()
-                        .fill(Color.black)
+                        .fill(self.backgroundColor)
                         .mask(Rectangle().padding(.bottom, geometry.size.height * CGFloat(amplitudeModel.amplitude)))
                         .animation(.linear(duration: 0.05), value: amplitudeModel.amplitude)
                 }
@@ -141,7 +148,7 @@ public struct AmplitudeView: View {
                 
                 if index != numberOfBlackSegments + 1 {
                     Rectangle()
-                        .fill(Color.black)
+                        .fill(self.backgroundColor)
                         .frame(height: spaceHeight)
                 }
                 addOpacityRectangle(height: solidHeight, index: index, n: numberOfBlackSegments)
@@ -155,7 +162,7 @@ public struct AmplitudeView: View {
         let opacity = amplitudeModel.amplitude > Double(index - 1) / Double(n + 1) ? 0.0 : 1.0
         
         return Rectangle()
-            .fill(Color.black)
+            .fill(self.backgroundColor)
             .frame(height: height)
             .opacity(opacity)
             .animation(.linear(duration: 0.05), value: amplitudeModel.amplitude)
