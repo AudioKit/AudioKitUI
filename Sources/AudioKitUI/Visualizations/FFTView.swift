@@ -139,7 +139,8 @@ public struct FFTView: View {
                         AmplitudeBar(amplitude: amplitude,
                                      linearGradient: linearGradient,
                                      paddingFraction: paddingFraction,
-                                     includeCaps: includeCaps)
+                                     includeCaps: includeCaps,
+                                     backgroundColor: backgroundColor)
                     }
                 } else {
                     AmplitudeBar(amplitude: 0.0,
