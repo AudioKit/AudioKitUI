@@ -19,26 +19,15 @@ public struct NodeFFTView: ViewRepresentable {
     internal var plot: FloatPlot {
         nodeTap.start()
 
-        let metalFragmentOrig = """
-        float sample = waveform.sample(s, (pow(10, in.t.x) - 1.0) / 9.0).x;
-
-        half4 backgroundColor = half4(colorParameters[1]);
-        half4 foregroundColor = half4(colorParameters[0]);
-
-        float y = (in.t.y - 1);
-        bool isFilled = parameters[0] != 0;
-        float d = isFilled ? fmax(fabs(y) - fabs(sample), 0) : fabs(y - sample);
-        float alpha = fabs(1/(50 * d));
-        return { mix(foregroundColor, backgroundColor, alpha) };
-        """
-
+        let metalFragmentOrig = FragmentBuilder(foregroundColor: Color.yellow.cg,
+                                                backgroundColor: Color.black.cg,
+                                                isCentered: false,
+                                                isFilled: true,
+                                                isFFT: true).stringValue
+        
         let plot = FloatPlot(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024), fragment: metalFragmentOrig) {
             nodeTap.fftData
         }
-
-        plot.setParameter(address: 0, value: 1)
-        plot.setColorParameter(address: foregroundColorAddress, value: SIMD4<Float>(1, 1, 0, 1))
-        plot.setColorParameter(address: backgroundColorAddress, value: SIMD4<Float>(0, 0, 0, 1))
 
         return plot
     }
