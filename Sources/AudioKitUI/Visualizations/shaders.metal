@@ -51,11 +51,11 @@ fragment half4 mirrorFragment(VertexOut in [[ stage_in ]],
 }
 
 struct FragmentConstants {
+    float4 foregroundColor;
+    float4 backgroundColor;
     bool isFFT;
     bool isCentered;
     bool isFilled;
-    float4 backgroundColor;
-    float4 foregroundColor;
 };
 
 fragment half4 genericFragment(VertexOut in [[ stage_in ]],
