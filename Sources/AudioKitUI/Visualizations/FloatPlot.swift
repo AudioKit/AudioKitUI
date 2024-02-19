@@ -40,7 +40,7 @@ public class FloatPlot: MTKView, MTKViewDelegate {
     """
 
     public init(frame frameRect: CGRect,
-                fragment: String? = nil,
+                fragment: String,
                 dataCallback: @escaping () -> [Float]) {
         self.dataCallback = dataCallback
         bufferSampleCount = Int(frameRect.width)
@@ -56,15 +56,7 @@ public class FloatPlot: MTKView, MTKViewDelegate {
         waveformTexture = device?.makeTexture(descriptor: desc)
         commandQueue = device!.makeCommandQueue()
 
-        let defaultFragment = """
-        float sample = waveform.sample(s, in.t.x).x;
-        float y = (in.t.y - .5);
-        float d = fabs(y - sample);
-        float alpha = fabs(1/(50 * d));
-        return alpha;
-        """
-
-        let metal = metalHeader + (fragment ?? defaultFragment) + "}"
+        let metal = metalHeader + fragment + "}"
 //        let library = device!.makeDefaultLibrary()!
         let library = try! device?.makeLibrary(source: metal, options: nil)
 
