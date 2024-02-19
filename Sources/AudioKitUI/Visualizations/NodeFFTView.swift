@@ -9,9 +9,6 @@ public struct NodeFFTView: ViewRepresentable {
     var nodeTap: FFTTap
     let bufferSampleCount = 128
 
-    let foregroundColorAddress = 0
-    let backgroundColorAddress = 1
-
     public init(_ node: Node) {
         nodeTap = FFTTap(node, bufferSize: UInt32(bufferSampleCount), callbackQueue: .main) { _ in }
     }
@@ -19,13 +16,13 @@ public struct NodeFFTView: ViewRepresentable {
     internal var plot: FloatPlot {
         nodeTap.start()
 
-        let metalFragmentOrig = FragmentBuilder(foregroundColor: Color.yellow.cg,
-                                                backgroundColor: Color.black.cg,
-                                                isCentered: false,
-                                                isFilled: true,
-                                                isFFT: true).stringValue
-        
-        let plot = FloatPlot(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024), fragment: metalFragmentOrig) {
+        let constants = FragmentConstants(foregroundColor: Color.yellow.simd,
+                                          backgroundColor: Color.black.simd,
+                                          isFFT: true,
+                                          isCentered: false,
+                                          isFilled: true)
+
+        let plot = FloatPlot(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024), constants: constants) {
             nodeTap.fftData
         }
 

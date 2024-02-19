@@ -50,6 +50,7 @@ fragment half4 mirrorFragment(VertexOut in [[ stage_in ]],
     return { mix(foregroundColor, backgroundColor, alpha) };
 }
 
+// This must be in sync with the definition in FloatPlot.swift
 struct FragmentConstants {
     float4 foregroundColor;
     float4 backgroundColor;

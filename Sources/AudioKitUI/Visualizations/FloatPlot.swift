@@ -4,45 +4,32 @@ import AudioKit
 import Metal
 import MetalKit
 
+// This must be in sync with the definition in shaders.metal
+public struct FragmentConstants {
+    public var foregroundColor: SIMD4<Float>
+    public var backgroundColor: SIMD4<Float>
+    public var isFFT: Bool
+    public var isCentered: Bool
+    public var isFilled: Bool
+
+    // Padding is required because swift doesn't pad to alignment
+    // like MSL does.
+    public var padding: Int = 0
+}
+
 public class FloatPlot: MTKView, MTKViewDelegate {
     let waveformTexture: MTLTexture!
     let commandQueue: MTLCommandQueue!
     let pipelineState: MTLRenderPipelineState!
     let bufferSampleCount: Int
     var dataCallback: () -> [Float]
-
-    let metalHeader = """
-    #include <metal_stdlib>
-    using namespace metal;
-
-    struct VertexOut {
-    float4 position  [[ position ]];
-    float2 t;
-    };
-
-    constant float2 verts[4] = { float2(-1, -1), float2(1, -1), float2(-1, 1), float2(1, 1) };
-
-    vertex VertexOut textureVertex(uint vid [[ vertex_id ]]) {
-
-    VertexOut out;
-    out.position = float4(verts[vid], 0.0, 1.0);
-    out.t = (verts[vid] + float2(1)) * .5;
-    out.t.y = 1.0 - out.t.y;
-    return out;
-
-    }
-
-    constexpr sampler s(coord::normalized,
-    filter::linear);
-
-    fragment half4 textureFragment(VertexOut in [[ stage_in ]],
-    texture1d<float, access::sample> waveform) {
-    """
+    var constants: FragmentConstants
 
     public init(frame frameRect: CGRect,
-                fragment: String,
+                constants: FragmentConstants,
                 dataCallback: @escaping () -> [Float]) {
         self.dataCallback = dataCallback
+        self.constants = constants
         bufferSampleCount = Int(frameRect.width)
 
         let desc = MTLTextureDescriptor()
@@ -56,12 +43,10 @@ public class FloatPlot: MTKView, MTKViewDelegate {
         waveformTexture = device?.makeTexture(descriptor: desc)
         commandQueue = device!.makeCommandQueue()
 
-        let metal = metalHeader + fragment + "}"
-//        let library = device!.makeDefaultLibrary()!
-        let library = try! device?.makeLibrary(source: metal, options: nil)
+        let library = try! device?.makeDefaultLibrary(bundle: Bundle.module)
 
-        let fragmentProgram = library!.makeFunction(name: "textureFragment")!
-        let vertexProgram = library!.makeFunction(name: "textureVertex")!
+        let fragmentProgram = library!.makeFunction(name: "genericFragment")!
+        let vertexProgram = library!.makeFunction(name: "waveformVertex")!
 
         let pipelineStateDescriptor = MTLRenderPipelineDescriptor()
         pipelineStateDescriptor.vertexFunction = vertexProgram
@@ -125,6 +110,8 @@ public class FloatPlot: MTKView, MTKViewDelegate {
 
                 encoder.setRenderPipelineState(pipelineState)
                 encoder.setFragmentTexture(waveformTexture, index: 0)
+                assert(MemoryLayout<FragmentConstants>.size == 48)
+                encoder.setFragmentBytes(&constants, length: MemoryLayout<FragmentConstants>.size, index: 0)
                 encoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
                 encoder.endEncoding()
 
