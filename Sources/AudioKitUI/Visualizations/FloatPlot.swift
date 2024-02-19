@@ -9,8 +9,6 @@ public class FloatPlot: MTKView, MTKViewDelegate {
     let commandQueue: MTLCommandQueue!
     let pipelineState: MTLRenderPipelineState!
     let bufferSampleCount: Int
-    let parameterBuffer: MTLBuffer!
-    let colorParameterBuffer: MTLBuffer!
     var dataCallback: () -> [Float]
 
     let metalHeader = """
@@ -38,7 +36,7 @@ public class FloatPlot: MTKView, MTKViewDelegate {
     filter::linear);
 
     fragment half4 textureFragment(VertexOut in [[ stage_in ]],
-    texture1d<float, access::sample> waveform, device float* parameters, device float4* colorParameters) {
+    texture1d<float, access::sample> waveform) {
     """
 
     public init(frame frameRect: CGRect,
@@ -88,11 +86,6 @@ public class FloatPlot: MTKView, MTKViewDelegate {
 
         pipelineState = try! device!.makeRenderPipelineState(descriptor: pipelineStateDescriptor)
 
-        parameterBuffer = device!.makeBuffer(length: 128 * MemoryLayout<Float>.size,
-                                             options: .storageModeShared)
-        colorParameterBuffer = device!.makeBuffer(length: 128 * MemoryLayout<SIMD4<Float>>.size,
-                                                  options: .storageModeShared)
-
         super.init(frame: frameRect, device: device)
 
         clearColor = .init(red: 0.0, green: 0.0, blue: 0.0, alpha: 0)
@@ -140,8 +133,6 @@ public class FloatPlot: MTKView, MTKViewDelegate {
 
                 encoder.setRenderPipelineState(pipelineState)
                 encoder.setFragmentTexture(waveformTexture, index: 0)
-                encoder.setFragmentBuffer(parameterBuffer, offset: 0, index: 0)
-                encoder.setFragmentBuffer(colorParameterBuffer, offset: 0, index: 1)
                 encoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
                 encoder.endEncoding()
 
@@ -152,18 +143,6 @@ public class FloatPlot: MTKView, MTKViewDelegate {
 
             commandBuffer.commit()
             commandBuffer.waitUntilCompleted()
-        }
-    }
-
-    func setParameter(address: Int, value: Float) {
-        if address >= 0, address < 128 {
-            parameterBuffer.contents().assumingMemoryBound(to: Float.self)[address] = value
-        }
-    }
-
-    func setColorParameter(address: Int, value: SIMD4<Float>) {
-        if address >= 0, address < 128 {
-            colorParameterBuffer.contents().assumingMemoryBound(to: SIMD4<Float>.self)[address] = value
         }
     }
 }
