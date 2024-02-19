@@ -2,20 +2,6 @@ import Foundation
 import MetalKit
 import SwiftUI
 
-public enum MetalFragment: String {
-    case mirror = """
-    float sample = waveform.sample(s, in.t.x).x;
-
-    half4 backgroundColor{0,0,0,1};
-    half4 foregroundColor{1,0.2,0.2,1};
-
-    float y = (in.t.y - .5);
-    float d = fmax(fabs(y) - fabs(sample), 0);
-    float alpha = smoothstep(0.01, 0.04, d);
-    return { mix(foregroundColor, backgroundColor, alpha) };
-    """
-}
-
 public class FragmentBuilder {
     var foregroundColor: CGColor = Color.gray.cg
     var backgroundColor: CGColor = Color.clear.cg
