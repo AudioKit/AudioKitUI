@@ -22,34 +22,6 @@ vertex VertexOut waveformVertex(uint vid [[ vertex_id ]]) {
 constexpr sampler s(coord::normalized,
                     filter::linear);
 
-fragment half4 waveformFragment(VertexOut in [[ stage_in ]],
-                               texture1d<float, access::sample> waveform,
-                                device float* parameters,
-                                device float4* colorParameters) {
-
-    float sample = waveform.sample(s, in.t.x).x;
-    float y = (in.t.y - .5);
-    float d = fabs(y - sample);
-    float alpha = fabs(1/(50 * d));
-    return alpha;
-}
-
-fragment half4 mirrorFragment(VertexOut in [[ stage_in ]],
-                              texture1d<float, access::sample> waveform,
-                               device float* parameters,
-                              device float4* colorParameters) {
-
-    float sample = waveform.sample(s, in.t.x).x;
-
-    half4 backgroundColor{0,0,0,1};
-    half4 foregroundColor{1,0.2,0.2,1};
-
-    float y = (in.t.y - .5);
-    float d = fmax(fabs(y) - fabs(sample), 0);
-    float alpha = smoothstep(0.01, 0.04, d);
-    return { mix(foregroundColor, backgroundColor, alpha) };
-}
-
 // This must be in sync with the definition in FloatPlot.swift
 struct FragmentConstants {
     float4 foregroundColor;
