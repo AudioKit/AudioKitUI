@@ -4,47 +4,32 @@ import AudioKit
 import Metal
 import MetalKit
 
+// This must be in sync with the definition in shaders.metal
+public struct FragmentConstants {
+    public var foregroundColor: SIMD4<Float>
+    public var backgroundColor: SIMD4<Float>
+    public var isFFT: Bool
+    public var isCentered: Bool
+    public var isFilled: Bool
+
+    // Padding is required because swift doesn't pad to alignment
+    // like MSL does.
+    public var padding: Int = 0
+}
+
 public class FloatPlot: MTKView, MTKViewDelegate {
     let waveformTexture: MTLTexture!
     let commandQueue: MTLCommandQueue!
     let pipelineState: MTLRenderPipelineState!
     let bufferSampleCount: Int
-    let parameterBuffer: MTLBuffer!
-    let colorParameterBuffer: MTLBuffer!
     var dataCallback: () -> [Float]
-
-    let metalHeader = """
-    #include <metal_stdlib>
-    using namespace metal;
-
-    struct VertexOut {
-    float4 position  [[ position ]];
-    float2 t;
-    };
-
-    constant float2 verts[4] = { float2(-1, -1), float2(1, -1), float2(-1, 1), float2(1, 1) };
-
-    vertex VertexOut textureVertex(uint vid [[ vertex_id ]]) {
-
-    VertexOut out;
-    out.position = float4(verts[vid], 0.0, 1.0);
-    out.t = (verts[vid] + float2(1)) * .5;
-    out.t.y = 1.0 - out.t.y;
-    return out;
-
-    }
-
-    constexpr sampler s(coord::normalized,
-    filter::linear);
-
-    fragment half4 textureFragment(VertexOut in [[ stage_in ]],
-    texture1d<float, access::sample> waveform, device float* parameters, device float4* colorParameters) {
-    """
+    var constants: FragmentConstants
 
     public init(frame frameRect: CGRect,
-                fragment: String? = nil,
+                constants: FragmentConstants,
                 dataCallback: @escaping () -> [Float]) {
         self.dataCallback = dataCallback
+        self.constants = constants
         bufferSampleCount = Int(frameRect.width)
 
         let desc = MTLTextureDescriptor()
@@ -58,20 +43,10 @@ public class FloatPlot: MTKView, MTKViewDelegate {
         waveformTexture = device?.makeTexture(descriptor: desc)
         commandQueue = device!.makeCommandQueue()
 
-        let defaultFragment = """
-        float sample = waveform.sample(s, in.t.x).x;
-        float y = (in.t.y - .5);
-        float d = fabs(y - sample);
-        float alpha = fabs(1/(50 * d));
-        return alpha;
-        """
+        let library = try! device?.makeDefaultLibrary(bundle: Bundle.module)
 
-        let metal = metalHeader + (fragment ?? defaultFragment) + "}"
-//        let library = device!.makeDefaultLibrary()!
-        let library = try! device?.makeLibrary(source: metal, options: nil)
-
-        let fragmentProgram = library!.makeFunction(name: "textureFragment")!
-        let vertexProgram = library!.makeFunction(name: "textureVertex")!
+        let fragmentProgram = library!.makeFunction(name: "genericFragment")!
+        let vertexProgram = library!.makeFunction(name: "waveformVertex")!
 
         let pipelineStateDescriptor = MTLRenderPipelineDescriptor()
         pipelineStateDescriptor.vertexFunction = vertexProgram
@@ -87,11 +62,6 @@ public class FloatPlot: MTKView, MTKViewDelegate {
         colorAttachment.destinationAlphaBlendFactor = .oneMinusSourceAlpha
 
         pipelineState = try! device!.makeRenderPipelineState(descriptor: pipelineStateDescriptor)
-
-        parameterBuffer = device!.makeBuffer(length: 128 * MemoryLayout<Float>.size,
-                                             options: .storageModeShared)
-        colorParameterBuffer = device!.makeBuffer(length: 128 * MemoryLayout<SIMD4<Float>>.size,
-                                                  options: .storageModeShared)
 
         super.init(frame: frameRect, device: device)
 
@@ -140,8 +110,8 @@ public class FloatPlot: MTKView, MTKViewDelegate {
 
                 encoder.setRenderPipelineState(pipelineState)
                 encoder.setFragmentTexture(waveformTexture, index: 0)
-                encoder.setFragmentBuffer(parameterBuffer, offset: 0, index: 0)
-                encoder.setFragmentBuffer(colorParameterBuffer, offset: 0, index: 1)
+                assert(MemoryLayout<FragmentConstants>.size == 48)
+                encoder.setFragmentBytes(&constants, length: MemoryLayout<FragmentConstants>.size, index: 0)
                 encoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
                 encoder.endEncoding()
 
@@ -152,18 +122,6 @@ public class FloatPlot: MTKView, MTKViewDelegate {
 
             commandBuffer.commit()
             commandBuffer.waitUntilCompleted()
-        }
-    }
-
-    func setParameter(address: Int, value: Float) {
-        if address >= 0, address < 128 {
-            parameterBuffer.contents().assumingMemoryBound(to: Float.self)[address] = value
-        }
-    }
-
-    func setColorParameter(address: Int, value: SIMD4<Float>) {
-        if address >= 0, address < 128 {
-            colorParameterBuffer.contents().assumingMemoryBound(to: SIMD4<Float>.self)[address] = value
         }
     }
 }

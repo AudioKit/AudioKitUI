@@ -42,8 +42,8 @@ public class RollingViewData {
 
 public struct NodeRollingView: ViewRepresentable {
     private let nodeTap: RawDataTap
-    private let metalFragment: FragmentBuilder
     private let rollingData: RollingViewData
+    private let constants: FragmentConstants
 
     public init(_ node: Node,
                 color: Color = .gray,
@@ -51,10 +51,11 @@ public struct NodeRollingView: ViewRepresentable {
                 isCentered: Bool = false,
                 isFilled: Bool = false,
                 bufferSize: UInt32 = 1024) {
-        metalFragment = FragmentBuilder(foregroundColor: color.cg,
-                                        backgroundColor: backgroundColor.cg,
-                                        isCentered: isCentered,
-                                        isFilled: isFilled)
+        constants = FragmentConstants(foregroundColor: color.simd,
+                                      backgroundColor: backgroundColor.simd,
+                                      isFFT: false,
+                                      isCentered: isCentered,
+                                      isFilled: isFilled)
         nodeTap = RawDataTap(node, bufferSize: bufferSize, callbackQueue: .main)
         rollingData = RollingViewData(bufferSize: bufferSize)
     }
@@ -62,7 +63,7 @@ public struct NodeRollingView: ViewRepresentable {
     var plot: FloatPlot {
         nodeTap.start()
 
-        return FloatPlot(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024), fragment: metalFragment.stringValue) {
+        return FloatPlot(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024), constants: constants) {
             rollingData.calculate(nodeTap)
         }
     }

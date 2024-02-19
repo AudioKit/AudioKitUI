@@ -7,20 +7,21 @@ import SwiftUI
 
 public struct NodeOutputView: ViewRepresentable {
     private var nodeTap: RawDataTap
-    private var metalFragment: FragmentBuilder
+    private let constants: FragmentConstants
 
     public init(_ node: Node, color: Color = .gray, backgroundColor: Color = .clear, bufferSize: Int = 1024) {
-        metalFragment = FragmentBuilder(foregroundColor: color.cg,
-                                        backgroundColor: backgroundColor.cg,
-                                        isCentered: true,
-                                        isFilled: false)
+        constants = FragmentConstants(foregroundColor: color.simd,
+                                      backgroundColor: backgroundColor.simd,
+                                      isFFT: false,
+                                      isCentered: true,
+                                      isFilled: false)
         nodeTap = RawDataTap(node, bufferSize: UInt32(bufferSize), callbackQueue: .main)
     }
 
     var plot: FloatPlot {
         nodeTap.start()
 
-        return FloatPlot(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024), fragment: metalFragment.stringValue) {
+        return FloatPlot(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024), constants: constants) {
             return nodeTap.data
         }
     }
