@@ -137,7 +137,7 @@ public class FloatPlot: MTKView {
 
 #if !os(visionOS)
 extension FloatPlot: MTKViewDelegate {
-    public func mtkView(_ view: MTKView, drawableSizeWillChange _: CGSize) {
+    public func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
         // We may want to resize the texture.
 
         if view.frame.width == 0 {
@@ -146,13 +146,13 @@ extension FloatPlot: MTKViewDelegate {
 
         let desc = MTLTextureDescriptor()
         desc.textureType = .type1D
-        desc.width = Int(view.frame.width)
+        desc.width = Int(size.width)
         desc.pixelFormat = .r32Float
         assert(desc.height == 1)
         assert(desc.depth == 1)
 
         waveformTexture = device?.makeTexture(descriptor: desc)
-        bufferSampleCount = Int(view.frame.width)
+        bufferSampleCount = Int(size.width)
     }
 
     public func draw(in view: MTKView) {
