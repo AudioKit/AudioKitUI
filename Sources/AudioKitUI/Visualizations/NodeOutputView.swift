@@ -21,9 +21,13 @@ public struct NodeOutputView: ViewRepresentable {
     var plot: FloatPlot {
         nodeTap.start()
 
-        return FloatPlot(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024), constants: constants) {
+        let plot = FloatPlot(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024), constants: constants) {
             return nodeTap.data
         }
+
+        plot.clearColor = .init(red: 0.0, green: 0.0, blue: 0.0, alpha: 0)
+
+        return plot
     }
 
     #if os(macOS)
