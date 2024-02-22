@@ -18,10 +18,10 @@ public struct FragmentConstants {
 }
 
 public class FloatPlot: MTKView {
-    let waveformTexture: MTLTexture!
+    var waveformTexture: MTLTexture?
     let commandQueue: MTLCommandQueue!
     let pipelineState: MTLRenderPipelineState!
-    let bufferSampleCount: Int
+    var bufferSampleCount: Int
     var dataCallback: () -> [Float]
     var constants: FragmentConstants
     let layerRenderPassDescriptor: MTLRenderPassDescriptor
@@ -33,15 +33,7 @@ public class FloatPlot: MTKView {
         self.constants = constants
         bufferSampleCount = Int(frameRect.width)
 
-        let desc = MTLTextureDescriptor()
-        desc.textureType = .type1D
-        desc.width = Int(frameRect.width)
-        desc.pixelFormat = .r32Float
-        assert(desc.height == 1)
-        assert(desc.depth == 1)
-
         let device = MTLCreateSystemDefaultDevice()
-        waveformTexture = device?.makeTexture(descriptor: desc)
         commandQueue = device!.makeCommandQueue()
 
         let library = try! device?.makeDefaultLibrary(bundle: Bundle.module)
@@ -85,6 +77,8 @@ public class FloatPlot: MTKView {
         if samples.count == 0 {
             return
         }
+
+        guard let waveformTexture else { return }
 
         var resampled = [Float](repeating: 0, count: bufferSampleCount)
 
@@ -143,8 +137,22 @@ public class FloatPlot: MTKView {
 
 #if !os(visionOS)
 extension FloatPlot: MTKViewDelegate {
-    public func mtkView(_: MTKView, drawableSizeWillChange _: CGSize) {
+    public func mtkView(_ view: MTKView, drawableSizeWillChange _: CGSize) {
         // We may want to resize the texture.
+
+        if view.frame.width == 0 {
+            return
+        }
+
+        let desc = MTLTextureDescriptor()
+        desc.textureType = .type1D
+        desc.width = Int(view.frame.width)
+        desc.pixelFormat = .r32Float
+        assert(desc.height == 1)
+        assert(desc.depth == 1)
+
+        waveformTexture = device?.makeTexture(descriptor: desc)
+        bufferSampleCount = Int(view.frame.width)
     }
 
     public func draw(in view: MTKView) {
