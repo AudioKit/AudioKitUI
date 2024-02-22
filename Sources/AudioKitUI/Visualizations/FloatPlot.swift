@@ -98,6 +98,7 @@ public class FloatPlot: MTKView {
     }
 }
 
+#if !os(visionOS)
 extension FloatPlot: MTKViewDelegate {
     public func mtkView(_: MTKView, drawableSizeWillChange _: CGSize) {
         // We may want to resize the texture.
@@ -127,3 +128,4 @@ extension FloatPlot: MTKViewDelegate {
         }
     }
 }
+#endif
