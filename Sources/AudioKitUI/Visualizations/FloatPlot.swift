@@ -17,7 +17,7 @@ public struct FragmentConstants {
     public var padding: Int = 0
 }
 
-public class FloatPlot: MTKView, MTKViewDelegate {
+public class FloatPlot: MTKView {
     let waveformTexture: MTLTexture!
     let commandQueue: MTLCommandQueue!
     let pipelineState: MTLRenderPipelineState!
@@ -96,7 +96,9 @@ public class FloatPlot: MTKView, MTKViewDelegate {
                                     bytesPerRow: 0)
         }
     }
+}
 
+extension FloatPlot: MTKViewDelegate {
     public func mtkView(_: MTKView, drawableSizeWillChange _: CGSize) {
         // We may want to resize the texture.
     }
