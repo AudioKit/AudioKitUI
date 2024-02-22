@@ -24,6 +24,7 @@ public class FloatPlot: MTKView {
     let bufferSampleCount: Int
     var dataCallback: () -> [Float]
     var constants: FragmentConstants
+    let layerRenderPassDescriptor: MTLRenderPassDescriptor
 
     public init(frame frameRect: CGRect,
                 constants: FragmentConstants,
@@ -63,6 +64,11 @@ public class FloatPlot: MTKView {
 
         pipelineState = try! device!.makeRenderPipelineState(descriptor: pipelineStateDescriptor)
 
+        layerRenderPassDescriptor = MTLRenderPassDescriptor()
+        layerRenderPassDescriptor.colorAttachments[0].loadAction = .clear
+        layerRenderPassDescriptor.colorAttachments[0].storeAction = .store
+        layerRenderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(1, 1, 1, 1);
+
         super.init(frame: frameRect, device: device)
 
         clearColor = .init(red: 0.0, green: 0.0, blue: 0.0, alpha: 0)
@@ -96,6 +102,43 @@ public class FloatPlot: MTKView {
                                     bytesPerRow: 0)
         }
     }
+
+    func encode(to commandBuffer: MTLCommandBuffer, pass: MTLRenderPassDescriptor) {
+        guard let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: pass) else { return }
+
+        encoder.setRenderPipelineState(pipelineState)
+        encoder.setFragmentTexture(waveformTexture, index: 0)
+        assert(MemoryLayout<FragmentConstants>.size == 48)
+        encoder.setFragmentBytes(&constants, length: MemoryLayout<FragmentConstants>.size, index: 0)
+        encoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
+        encoder.endEncoding()
+    }
+
+    func draw(in layer: CAMetalLayer) {
+
+        let size = layer.drawableSize
+        let w = Float(size.width)
+        let h = Float(size.height)
+        // let scale = Float(view.contentScaleFactor)
+
+        if w == 0 || h == 0 {
+            return
+        }
+
+        guard let commandBuffer = commandQueue.makeCommandBuffer() else {
+            return
+        }
+
+        if let currentDrawable = layer.nextDrawable() {
+
+            layerRenderPassDescriptor.colorAttachments[0].texture = currentDrawable.texture
+
+            encode(to: commandBuffer, pass: layerRenderPassDescriptor)
+
+            commandBuffer.present(currentDrawable)
+        }
+        commandBuffer.commit()
+    }
 }
 
 #if !os(visionOS)
@@ -109,15 +152,7 @@ extension FloatPlot: MTKViewDelegate {
 
         if let commandBuffer = commandQueue.makeCommandBuffer() {
             if let renderPassDescriptor = currentRenderPassDescriptor {
-                guard let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else { return }
-
-                encoder.setRenderPipelineState(pipelineState)
-                encoder.setFragmentTexture(waveformTexture, index: 0)
-                assert(MemoryLayout<FragmentConstants>.size == 48)
-                encoder.setFragmentBytes(&constants, length: MemoryLayout<FragmentConstants>.size, index: 0)
-                encoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
-                encoder.endEncoding()
-
+                encode(to: commandBuffer, pass: renderPassDescriptor)
                 if let drawable = view.currentDrawable {
                     commandBuffer.present(drawable)
                 }
