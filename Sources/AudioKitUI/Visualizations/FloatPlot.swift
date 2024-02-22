@@ -17,7 +17,7 @@ public struct FragmentConstants {
     public var padding: Int = 0
 }
 
-public class FloatPlot: MTKView {
+public class FloatPlot: NSObject {
     var waveformTexture: MTLTexture?
     let commandQueue: MTLCommandQueue!
     let pipelineState: MTLRenderPipelineState!
@@ -25,6 +25,7 @@ public class FloatPlot: MTKView {
     var dataCallback: () -> [Float]
     var constants: FragmentConstants
     let layerRenderPassDescriptor: MTLRenderPassDescriptor
+    let device = MTLCreateSystemDefaultDevice()
 
     public init(frame frameRect: CGRect,
                 constants: FragmentConstants,
@@ -33,7 +34,6 @@ public class FloatPlot: MTKView {
         self.constants = constants
         bufferSampleCount = Int(frameRect.width)
 
-        let device = MTLCreateSystemDefaultDevice()
         commandQueue = device!.makeCommandQueue()
 
         let library = try! device?.makeDefaultLibrary(bundle: Bundle.module)
@@ -60,12 +60,6 @@ public class FloatPlot: MTKView {
         layerRenderPassDescriptor.colorAttachments[0].loadAction = .clear
         layerRenderPassDescriptor.colorAttachments[0].storeAction = .store
         layerRenderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(1, 1, 1, 1);
-
-        super.init(frame: frameRect, device: device)
-
-        
-
-        delegate = self
     }
 
     @available(*, unavailable)
@@ -159,7 +153,7 @@ extension FloatPlot: MTKViewDelegate {
         updateWaveform(samples: dataCallback())
 
         if let commandBuffer = commandQueue.makeCommandBuffer() {
-            if let renderPassDescriptor = currentRenderPassDescriptor {
+            if let renderPassDescriptor = view.currentRenderPassDescriptor {
                 encode(to: commandBuffer, pass: renderPassDescriptor)
                 if let drawable = view.currentDrawable {
                     commandBuffer.present(drawable)
@@ -169,6 +163,21 @@ extension FloatPlot: MTKViewDelegate {
             commandBuffer.commit()
             commandBuffer.waitUntilCompleted()
         }
+    }
+}
+
+public class FloatPlotCoordinator {
+    var renderer: FloatPlot
+
+    init(renderer: FloatPlot) {
+        self.renderer = renderer
+    }
+
+    var view: MTKView {
+        let view = MTKView(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024), device: renderer.device)
+        view.clearColor = .init(red: 0.0, green: 0.0, blue: 0.0, alpha: 0)
+        view.delegate = renderer
+        return view
     }
 }
 #endif
