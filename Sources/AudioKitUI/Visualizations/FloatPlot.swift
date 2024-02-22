@@ -5,7 +5,7 @@ import Metal
 import MetalKit
 
 // This must be in sync with the definition in shaders.metal
-public struct FragmentConstants {
+struct FragmentConstants {
     public var foregroundColor: SIMD4<Float>
     public var backgroundColor: SIMD4<Float>
     public var isFFT: Bool
@@ -17,7 +17,7 @@ public struct FragmentConstants {
     public var padding: Int = 0
 }
 
-public class FloatPlot: NSObject {
+class FloatPlot: NSObject {
     var waveformTexture: MTLTexture?
     let commandQueue: MTLCommandQueue!
     let pipelineState: MTLRenderPipelineState!
