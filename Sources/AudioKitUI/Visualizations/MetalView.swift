@@ -7,6 +7,7 @@ import UIKit
 class MetalView: UIView {
 
     var renderer: FloatPlot?
+    var displayLink: CADisplayLink?
 
     @objc static override var layerClass: AnyClass {
         CAMetalLayer.self
@@ -14,6 +15,14 @@ class MetalView: UIView {
 
     var metalLayer: CAMetalLayer {
         layer as! CAMetalLayer
+    }
+
+    func createDisplayLink() {
+        displayLink = CADisplayLink(target: self,
+                                    selector: #selector(render))
+
+        displayLink?.add(to: .current,
+                         forMode: .default)
     }
 
     override func draw(_ rect: CGRect) {
@@ -28,7 +37,7 @@ class MetalView: UIView {
         render()
     }
 
-    func render() {
+    @objc func render() {
         guard let renderer else { return }
         renderer.draw(to: metalLayer)
     }
