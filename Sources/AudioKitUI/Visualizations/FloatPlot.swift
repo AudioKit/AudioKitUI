@@ -102,7 +102,7 @@ class FloatPlot: NSObject {
         encoder.endEncoding()
     }
 
-    func draw(in layer: CAMetalLayer) {
+    func draw(to layer: CAMetalLayer) {
 
         let size = layer.drawableSize
         let w = Float(size.width)
