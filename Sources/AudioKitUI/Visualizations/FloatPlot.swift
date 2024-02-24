@@ -124,6 +124,8 @@ class FloatPlot: NSObject {
             encode(to: commandBuffer, pass: layerRenderPassDescriptor)
 
             commandBuffer.present(currentDrawable)
+        } else {
+            print("⚠️ couldn't get drawable")
         }
         commandBuffer.commit()
     }
