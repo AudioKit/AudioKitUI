@@ -38,7 +38,10 @@ class MetalView: UIView {
     }
 
     @objc func render() {
-        guard let renderer else { return }
+        guard let renderer else {
+            print("⚠️ no renderer")
+            return
+        }
         renderer.draw(to: metalLayer)
     }
 
