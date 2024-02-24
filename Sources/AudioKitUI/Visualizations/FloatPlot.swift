@@ -44,7 +44,6 @@ class FloatPlot: NSObject {
         let pipelineStateDescriptor = MTLRenderPipelineDescriptor()
         pipelineStateDescriptor.vertexFunction = vertexProgram
         pipelineStateDescriptor.fragmentFunction = fragmentProgram
-        pipelineStateDescriptor.sampleCount = 1
 
         let colorAttachment = pipelineStateDescriptor.colorAttachments[0]!
         colorAttachment.pixelFormat = .bgra8Unorm
