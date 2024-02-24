@@ -197,7 +197,7 @@ public class FloatPlotCoordinator {
         view.renderer = renderer
         view.metalLayer.pixelFormat = .bgra8Unorm
         view.metalLayer.isOpaque = false
-        // view.createDisplayLink()
+        view.createDisplayLink()
         return view
     }
 }
