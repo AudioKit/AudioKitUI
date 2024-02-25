@@ -1,9 +1,8 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/Waveform/
 
-import Foundation
+#if os(iOS) || os(visionOS)
 import UIKit
 
-#if os(iOS) || os(visionOS)
 class MetalView: UIView {
 
     var renderer: FloatPlot?
