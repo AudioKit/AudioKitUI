@@ -66,12 +66,33 @@ class FloatPlot: NSObject {
         fatalError("init(coder:) has not been implemented")
     }
 
+    func resize(width: Int) {
+
+        if width == 0 {
+            return
+        }
+
+        let desc = MTLTextureDescriptor()
+        desc.textureType = .type1D
+        desc.width = width
+        desc.pixelFormat = .r32Float
+        assert(desc.height == 1)
+        assert(desc.depth == 1)
+
+        waveformTexture = device?.makeTexture(descriptor: desc)
+        bufferSampleCount = width
+
+    }
+
     func updateWaveform(samples: [Float]) {
         if samples.count == 0 {
             return
         }
 
-        guard let waveformTexture else { return }
+        guard let waveformTexture else {
+            print("⚠️ updateWaveform: waveformTexture is nil")
+            return
+        }
 
         var resampled = [Float](repeating: 0, count: bufferSampleCount)
 
@@ -103,6 +124,8 @@ class FloatPlot: NSObject {
 
     func draw(to layer: CAMetalLayer) {
 
+        updateWaveform(samples: dataCallback())
+        
         let size = layer.drawableSize
         let w = Float(size.width)
         let h = Float(size.height)
@@ -133,21 +156,7 @@ class FloatPlot: NSObject {
 #if !os(visionOS)
 extension FloatPlot: MTKViewDelegate {
     public func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-        // We may want to resize the texture.
-
-        if view.frame.width == 0 {
-            return
-        }
-
-        let desc = MTLTextureDescriptor()
-        desc.textureType = .type1D
-        desc.width = Int(size.width)
-        desc.pixelFormat = .r32Float
-        assert(desc.height == 1)
-        assert(desc.depth == 1)
-
-        waveformTexture = device?.makeTexture(descriptor: desc)
-        bufferSampleCount = Int(size.width)
+        resize(width: Int(size.width))
     }
 
     public func draw(in view: MTKView) {

@@ -60,6 +60,7 @@ class MetalView: UIView {
         }
 
         metalLayer.drawableSize = newSize
+        renderer?.resize(width: Int(newSize.width))
 
         setNeedsDisplay()
     }
