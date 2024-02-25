@@ -69,7 +69,7 @@ public class TableView: UIView {
 
 #else
 
-import Cocoa
+import AppKit
 
 /// Displays the values in the table into a nice graph
 public class TableView: NSView {
