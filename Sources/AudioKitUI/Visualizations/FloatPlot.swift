@@ -58,7 +58,7 @@ class FloatPlot: NSObject {
         layerRenderPassDescriptor = MTLRenderPassDescriptor()
         layerRenderPassDescriptor.colorAttachments[0].loadAction = .clear
         layerRenderPassDescriptor.colorAttachments[0].storeAction = .store
-        layerRenderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(1, 1, 1, 1);
+        layerRenderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(0, 0, 0, 0);
     }
 
     @available(*, unavailable)
