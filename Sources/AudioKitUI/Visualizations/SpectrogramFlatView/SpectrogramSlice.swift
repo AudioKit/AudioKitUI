@@ -1,0 +1,247 @@
+// Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
+
+import SwiftUI
+
+/// One slice with frequencies from low frequencies at the bottom up to high frequences. 
+/// Amplitudes shown in different colors according to the submitted gradient 
+/// Resulting image has an integral size (dimensions in Int), so they are most of 
+/// the time a bit smaller than requested. This is because they are drawn in 
+/// a CGContext that doesn't have fractions of pixels to draw.  
+struct SpectrogramSlice: View, Identifiable {
+    static var counterSinceStart = 0
+    let id: Int
+    // we don't provide defaults, the caller really should know about these
+    let gradientUIColors: [UIColor]
+    let sliceWidth: CGFloat
+    let sliceHeight: CGFloat
+    let rawFftReadings: [Float]
+    let spectrogramMinFreq: CGFloat
+    let spectrogramMaxFreq: CGFloat
+    let fftMetaData: SpectrogramFFTMetaData
+    private var fftReadingsAsTupels: [CGPoint]
+    private var cachedUIImage: UIImage
+    private var allRects:[CGRect]
+    private var allColors:[Color]
+    
+    init(gradientUIColors: [UIColor], sliceWidth: CGFloat, sliceHeight: CGFloat, fftReadings: [Float], spectrogramMinFreq: CGFloat, spectrogramMaxFreq: CGFloat, fftMetaData: SpectrogramFFTMetaData) {
+        self.gradientUIColors = gradientUIColors
+        self.sliceWidth = sliceWidth
+        self.sliceHeight = sliceHeight
+        self.rawFftReadings = fftReadings
+        self.spectrogramMinFreq = spectrogramMinFreq
+        self.spectrogramMaxFreq = spectrogramMaxFreq
+        self.fftMetaData = fftMetaData
+        Self.counterSinceStart = Self.counterSinceStart &+ 1
+        id = Self.counterSinceStart
+        allRects = []
+        allColors = []
+        fftReadingsAsTupels = []
+        cachedUIImage = UIImage(systemName: "pause")!
+        
+        self.fftReadingsAsTupels = captureAmplitudeFrequencyData(fftReadings)
+        
+        createSpectrumRects()
+        cachedUIImage = createSpectrumImage()
+        
+        // release data, we don't need it anymore
+        fftReadingsAsTupels = []
+        allRects = []
+        allColors = []
+    }
+    
+    /// convenience initialiser, useful when measurements are created manually 
+    init(gradientUIColors: [UIColor], sliceWidth: CGFloat, sliceHeight: CGFloat, fftReadingsAsTupels: [CGPoint], spectrogramMinFreq: CGFloat, spectrogramMaxFreq: CGFloat, fftMetaData: SpectrogramFFTMetaData) {
+        self.gradientUIColors = gradientUIColors
+        self.sliceWidth = sliceWidth
+        self.sliceHeight = sliceHeight
+        self.fftReadingsAsTupels = fftReadingsAsTupels
+        self.spectrogramMinFreq = spectrogramMinFreq
+        self.spectrogramMaxFreq = spectrogramMaxFreq
+        self.fftMetaData = fftMetaData
+        Self.counterSinceStart = Self.counterSinceStart &+ 1
+        id = Self.counterSinceStart
+        allRects = []
+        allColors = []
+        self.rawFftReadings = []
+        cachedUIImage = UIImage(systemName: "pause")!
+
+        createSpectrumRects()
+        cachedUIImage = createSpectrumImage()
+    }
+    
+    public var body: some View {
+        return Image(uiImage: cachedUIImage).resizable()
+    }
+
+    // This code draws in the first quadrant, it's much easier to understand 
+    // when we can draw from low to high frequency
+    // will have to flip the image when using in a typical Spectrogram View
+    func createSpectrumImage()->UIImage {        
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: sliceWidth, height: sliceHeight))
+        let img = renderer.image { ctx in
+            for index in 0...allRects.count-1 {
+                UIColor(allColors[index]).setFill()
+                ctx.fill(allRects[index])
+            }
+        }
+        return img
+    }
+
+    // unused method drawing into a Canvas. Might be useful in the future 
+    // when doing more energy efficent drawing
+    func createSpectrumSlice() -> some View {
+        return Canvas { context, size in
+            for index in 0...allRects.count-1 {
+                context.fill(
+                    Path(allRects[index]), 
+                    with: .color(allColors[index])
+                )
+            }
+            // flip it back. Code is much easier to understand when we can draw from low to high frequency
+            // drawing in the first quadrant, as we did in macOS Core Animation
+        }.scaleEffect(x: 1, y: -1)
+    }
+
+    mutating func createSpectrumRects() {
+        // calc rects and color within initialiser, so the drawing will just use those
+        // fftReadings contains typically 210 tupels with frequency (x) and amplitude (y)
+        // those then are mapped to y coordinate and color
+        let mappedCells = mapFftReadingsToCells()
+        // size.height is it's height shown
+        // size.width is intensitiy between  0..1
+        var cumulativePosition = 0.0
+        var cellHeight = sliceHeight / CGFloat(fftReadingsAsTupels.count)
+        // iterating thru the array with an index (instead of enumeration)
+        // as index is used to calc height
+        for index in 0...mappedCells.count - 1 {
+            // index 0 contains highest y, meaning lowest frequency
+            cellHeight = mappedCells[index].height
+            let thisRect =  CGRect(
+                origin: CGPoint(x:0, y:cumulativePosition),
+                size: CGSize(width: sliceWidth, height: cellHeight))
+            cumulativePosition += cellHeight
+            allRects.append(thisRect)
+            allColors.append(Color(SpectrogramFlatView.gradientUIColors.intermediate(mappedCells[index].width))  )
+        }
+        if (cumulativePosition > sliceHeight) {
+            //print("Warning: all cells sum up higher than what could fit: \(cumulativePosition) should be less or equal than: \(sliceHeight) for ID: \(id)")
+        }
+
+    }
+
+    // the incoming array of fft readings should be sorted by frequency
+    func mapFftReadingsToCells() -> [CGSize] {
+        var outCells: [CGSize] = []
+        // never return an empty array
+        // the lowest delimiter in full amplitude but no height
+        outCells.append(CGSize(width: 1.0, height: 0.0))
+        // starting at line 1
+        var lastFrequencyPosition = 0.0
+        for i in 1 ..< fftReadingsAsTupels.count {
+            let amplitude = fftReadingsAsTupels[i].y.mapped(from: -200 ... 0, to: 0 ... 1.0)
+            // the frequency comes out from lowest frequency at 0 to max frequency at height
+            let frequency = fftReadingsAsTupels[i].x
+            let frequencyPosition = frequency.mappedLog10(from: spectrogramMinFreq ... spectrogramMaxFreq, to: 0 ... sliceHeight)
+
+            if frequencyPosition < 0.0 {
+                // those frequencies come from the fft but we don't show them
+                // these are the ones typcally smaller than minFreq
+                continue
+            } 
+            // calc height using the last frequency and ceil it to prevent black lines between measurements. 
+            // it may happen that a cell is less than 1.0 high: that shouldn't bother us
+            let cellHeight = ceil(frequencyPosition - lastFrequencyPosition)
+            lastFrequencyPosition += cellHeight
+            outCells.append(CGSize(width: amplitude, height: cellHeight))
+        }
+        // delimiter at top end in full Amplitude but no height
+        outCells.append(CGSize(width: 1.0, height: 0.0))
+        return outCells
+    }
+    
+    /// Returns frequency, amplitude pairs after removing unwanted data points,  there are simply too many in the high frequencies.
+    /// The resulting array has fftSize amount of readings. The incoming array is compiled to CGPoints containing
+    /// frequency and amplitude, where as x is frequency and y amplitude. 
+    /// The amount of tupels depends on minFreq and maxFreq as well as the fftSize.
+    /// To understand CGPoint x and y imagine a chart that spans from left to right for lowest to highest frequency
+    /// and on shows vertically the amplitude, as the equalizer view of an 80ies stereo system. 
+    /// The FFT-slices start at frequency 0, which is odd. 
+    /// Lowest frequency meaning amplitude of all frequencies from 0 to the first other frequency (typically 5Hz or 21.533Hz) 
+    /// 
+    /// Alternative implementation: have this array not with CGPoint of frequency and amplitude 
+    /// but only of amplitude already color coded in the gradient. The frequency axis 
+    /// would then be hardcoded as the plot distance on y-axis
+    ///
+    /// Improvement: make the filtering of high frequencies dependent of fftSize. The more data, the more filtering is needed.  
+    /// 
+    /// Make this more energy efficient by combining this function with mapFftReadingsToCells
+    
+    func captureAmplitudeFrequencyData(_ fftFloats: [Float]) -> [CGPoint] {
+        var maxSquared: Float = 0.0
+        var frequencyChosen = 0.0
+        var points: [CGPoint] = []
+        
+        for i in 1 ... (fftFloats.count / 2) {
+            // Compiler or LLVM will make these four following array access' into two 
+            var real = fftFloats[i-1].isNaN ? 0.0 : fftFloats[i-1]
+            var imaginary = fftFloats[i].isNaN ? 0.0 : fftFloats[i]
+            let frequencyForBin = fftMetaData.sampleRate * 0.5 * Double(i * 2) / Double(fftFloats.count * 2)
+            var squared = real * real + imaginary * imaginary
+            
+            // if the frequency is higher as we need: continue
+            // we don't filter low frequencies, they are all pushed to the queue
+            if frequencyForBin > Double(spectrogramMaxFreq) { continue }
+            frequencyChosen = frequencyForBin
+            
+            if frequencyForBin > 8000 {
+                // take the greatest 1 in every 16 points when > 8k Hz.
+                if squared > maxSquared { maxSquared = squared }
+                if i % 16 != 0 { continue } 
+                else {
+                    squared = maxSquared
+                    maxSquared = 0.0
+                }
+            } else if frequencyForBin > 4000 {
+                // take the greatest 1 in every 8 points when > 4k Hz.
+                if squared > maxSquared { maxSquared = squared }
+                if i % 8 != 0 { continue } 
+                else {
+                    squared = maxSquared
+                    maxSquared = 0.0
+                }
+            } else if frequencyForBin > 1000 {
+                // take the greatest 1 in every 2 points when > 1k Hz.
+                // This might be already too much data, depending on the highest frequency shown and the height of where this slice is shown. 
+                // might reduce it to show every 4th point. 
+                if squared > maxSquared { maxSquared = squared }
+                if i % 2 != 0 { continue } 
+                else {
+                    squared = maxSquared
+                    maxSquared = 0.0
+                }
+            }
+            let amplitude = Double(10 * log10(4 * squared / (Float(fftMetaData.fftSize) * Float(fftMetaData.fftSize))))
+            points.append(CGPoint(x: frequencyChosen, y: amplitude))
+        }
+        return points
+    }
+}
+
+#Preview {
+    // This shows the wrong behaviour of the slice: the lowest frequency isn't shown, the 
+    // lowest amplitude below -200 should be black but is white. 
+    SpectrogramSlice(gradientUIColors: 
+                        [(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)), (#colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1)), (#colorLiteral(red: 0.4217140079, green: 0.6851614118, blue: 0.9599093795, alpha: 1)), (#colorLiteral(red: 0.8122602105, green: 0.6033009887, blue: 0.8759307861, alpha: 1)), (#colorLiteral(red: 0.9826132655, green: 0.5594901443, blue: 0.4263145328, alpha: 1)), (#colorLiteral(red: 1, green: 0.2607713342, blue: 0.4242972136, alpha: 1))], 
+                     sliceWidth: 40, sliceHeight: 150, 
+                     fftReadingsAsTupels:[
+                        CGPoint(x: 150, y: -80),
+                        CGPoint(x: 350, y: -50),
+                        CGPoint(x: 500, y: -10),
+                        CGPoint(x: 1000, y: -160),
+                        CGPoint(x: 1500, y: -260),
+                        CGPoint(x: 2000, y: -120), 
+                        CGPoint(x: 3000, y: -80)],
+                     spectrogramMinFreq: 140, spectrogramMaxFreq: 4000, 
+                     fftMetaData: SpectrogramFFTMetaData()
+    ).scaleEffect(x: 1, y: -1)
+}
