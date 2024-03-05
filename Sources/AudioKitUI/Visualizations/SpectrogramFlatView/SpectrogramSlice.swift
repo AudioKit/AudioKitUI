@@ -7,6 +7,7 @@ import SwiftUI
 /// Resulting image has an integral size (dimensions in Int), so they are most of 
 /// the time a bit smaller than requested. This is because they are drawn in 
 /// a CGContext that doesn't have fractions of pixels to draw.  
+@available(iOS 17.0, *)
 struct SpectrogramSlice: View, Identifiable {
     static var counterSinceStart = 0
     let id: Int
@@ -227,21 +228,25 @@ struct SpectrogramSlice: View, Identifiable {
     }
 }
 
-#Preview {
-    // This shows the wrong behaviour of the slice: the lowest frequency isn't shown, the 
-    // lowest amplitude below -200 should be black but is white. 
-    SpectrogramSlice(gradientUIColors: 
-                        [(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)), (#colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1)), (#colorLiteral(red: 0.4217140079, green: 0.6851614118, blue: 0.9599093795, alpha: 1)), (#colorLiteral(red: 0.8122602105, green: 0.6033009887, blue: 0.8759307861, alpha: 1)), (#colorLiteral(red: 0.9826132655, green: 0.5594901443, blue: 0.4263145328, alpha: 1)), (#colorLiteral(red: 1, green: 0.2607713342, blue: 0.4242972136, alpha: 1))], 
-                     sliceWidth: 40, sliceHeight: 150, 
-                     fftReadingsAsTupels:[
-                        CGPoint(x: 150, y: -80),
-                        CGPoint(x: 350, y: -50),
-                        CGPoint(x: 500, y: -10),
-                        CGPoint(x: 1000, y: -160),
-                        CGPoint(x: 1500, y: -260),
-                        CGPoint(x: 2000, y: -120), 
-                        CGPoint(x: 3000, y: -80)],
-                     spectrogramMinFreq: 140, spectrogramMaxFreq: 4000, 
-                     fftMetaData: SpectrogramFFTMetaData()
-    ).scaleEffect(x: 1, y: -1)
+// MARK: Preview
+@available(iOS 17.0, *)
+struct SpectrogramSlice_Previews: PreviewProvider {
+    static var previews: some View {
+        // This shows the wrong behaviour of the slice: the lowest frequency isn't shown, the 
+        // lowest amplitude below -200 should be black but is white. 
+        return SpectrogramSlice(gradientUIColors: 
+                            [(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)), (#colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1)), (#colorLiteral(red: 0.4217140079, green: 0.6851614118, blue: 0.9599093795, alpha: 1)), (#colorLiteral(red: 0.8122602105, green: 0.6033009887, blue: 0.8759307861, alpha: 1)), (#colorLiteral(red: 0.9826132655, green: 0.5594901443, blue: 0.4263145328, alpha: 1)), (#colorLiteral(red: 1, green: 0.2607713342, blue: 0.4242972136, alpha: 1))], 
+                         sliceWidth: 40, sliceHeight: 150, 
+                         fftReadingsAsTupels:[
+                            CGPoint(x: 150, y: -80),
+                            CGPoint(x: 350, y: -50),
+                            CGPoint(x: 500, y: -10),
+                            CGPoint(x: 1000, y: -160),
+                            CGPoint(x: 1500, y: -260),
+                            CGPoint(x: 2000, y: -120), 
+                            CGPoint(x: 3000, y: -80)],
+                         spectrogramMinFreq: 140, spectrogramMaxFreq: 4000, 
+                         fftMetaData: SpectrogramFFTMetaData()
+        ).scaleEffect(x: 1, y: -1)
+    }
 }

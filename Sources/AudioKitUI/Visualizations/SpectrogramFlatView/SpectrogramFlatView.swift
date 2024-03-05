@@ -37,10 +37,12 @@ import SwiftUI
 /// a central feature in your app. Furthermore it's not scientificicly correct, when displaying
 /// white noise, it will not show a uniform distribution.
 
+// might be easy to make available in earlier versions, primarly because of .onChange(of:
+@available(iOS 17.0, *)
 public struct SpectrogramFlatView: View {
     // this static var is a shortcut: better to have this in SpectrogramModel or SpectrogramFFTMetaData
     public static var gradientUIColors: [UIColor] =  [(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 0)), (#colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 0.6275583187)), (#colorLiteral(red: 0.4217140079, green: 0.6851614118, blue: 0.9599093795, alpha: 0.8245213468)), (#colorLiteral(red: 0.8122602105, green: 0.6033009887, blue: 0.8759307861, alpha: 1)), (#colorLiteral(red: 0.9826132655, green: 0.5594901443, blue: 0.4263145328, alpha: 1)), (#colorLiteral(red: 1, green: 0.2607713342, blue: 0.4242972136, alpha: 1))]
-    @StateObject var spectrogram = SpectrogramModel()
+    @StateObject var spectrogram = SpectrogramFlatModel()
     let node: Node
     let backgroundColor: Color
 
@@ -93,7 +95,8 @@ public struct SpectrogramFlatView: View {
 
 // MARK: Preview
 
-struct SpectrogramView_Previews: PreviewProvider {
+@available(iOS 17.0, *)
+struct SpectrogramFlatView_Previews: PreviewProvider {
     static var previews: some View {
         return SpectrogramFlatView(node: Mixer())
     }

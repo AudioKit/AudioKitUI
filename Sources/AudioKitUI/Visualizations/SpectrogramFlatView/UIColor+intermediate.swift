@@ -7,7 +7,7 @@ import UIKit
 /// let color = [.green, .yellow, .red].intermediate(0.7)
 /// inspired by https://stackoverflow.com/questions/15032562/ios-find-color-at-point-between-two-colors/59996029#59996029
 extension Array where Element: UIColor {
-    func intermediate(_ percentage: CGFloat) -> UIColor {
+    public func intermediate(_ percentage: CGFloat) -> UIColor {
         let percentage = Swift.max(Swift.min(percentage, 1), 0)
         switch percentage {
         case 0: return first ?? .clear
