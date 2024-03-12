@@ -184,8 +184,8 @@ struct SpectrogramSlice: View, Identifiable {
         
         for i in 1 ... (fftFloats.count / 2) {
             // Compiler or LLVM will make these four following array access' into two 
-            var real = fftFloats[i-1].isNaN ? 0.0 : fftFloats[i-1]
-            var imaginary = fftFloats[i].isNaN ? 0.0 : fftFloats[i]
+            let real = fftFloats[i-1].isNaN ? 0.0 : fftFloats[i-1]
+            let imaginary = fftFloats[i].isNaN ? 0.0 : fftFloats[i]
             let frequencyForBin = fftMetaData.sampleRate * 0.5 * Double(i * 2) / Double(fftFloats.count * 2)
             var squared = real * real + imaginary * imaginary
             
