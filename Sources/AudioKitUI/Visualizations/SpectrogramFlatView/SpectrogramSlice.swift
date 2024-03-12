@@ -155,11 +155,14 @@ struct SpectrogramSlice: View, Identifiable {
         outCells.append(CGSize(width: 1.0, height: 0.0))
         // starting at line 1
         var lastFrequencyPosition = 0.0
-        for i in 1 ..< fftReadingsAsTupels.count {
-            let amplitude = fftReadingsAsTupels[i].y.mapped(from: -200 ... 0, to: 0 ... 1.0)
+        for index in 1 ..< fftReadingsAsTupels.count {
+            let amplitude = fftReadingsAsTupels[index].y.mapped(from: -200 ... 0, to: 0 ... 1.0)
             // the frequency comes out from lowest frequency at 0 to max frequency at height
-            let frequency = fftReadingsAsTupels[i].x
-            let frequencyPosition = frequency.mappedLog10(from: spectrogramMinFreq ... spectrogramMaxFreq, to: 0 ... sliceHeight)
+            let frequency = fftReadingsAsTupels[index].x
+            let frequencyPosition = frequency.mappedLog10(
+                from: spectrogramMinFreq ... spectrogramMaxFreq,
+                to: 0 ... sliceHeight
+            )
 
             if frequencyPosition < 0.0 {
                 // those frequencies come from the fft but we don't show them
@@ -201,12 +204,12 @@ struct SpectrogramSlice: View, Identifiable {
         var maxSquared: Float = 0.0
         var frequencyChosen = 0.0
         var points: [CGPoint] = []
-        for i in 1 ... (fftFloats.count / 2) {
 
+        for index in 1 ... (fftFloats.count / 2) {
             // Compiler or LLVM will make these four following array access' into two 
-            let real = fftFloats[i-1].isNaN ? 0.0 : fftFloats[i-1]
-            let imaginary = fftFloats[i].isNaN ? 0.0 : fftFloats[i]
-            let frequencyForBin = fftMetaData.sampleRate * 0.5 * Double(i * 2) / Double(fftFloats.count * 2)
+            let real = fftFloats[index-1].isNaN ? 0.0 : fftFloats[index-1]
+            let imaginary = fftFloats[index].isNaN ? 0.0 : fftFloats[index]
+            let frequencyForBin = fftMetaData.sampleRate * 0.5 * Double(index * 2) / Double(fftFloats.count * 2)
             var squared = real * real + imaginary * imaginary
 
             // if the frequency is higher as we need: continue
@@ -216,27 +219,28 @@ struct SpectrogramSlice: View, Identifiable {
 
             if frequencyForBin > 8000 {
                 // take the greatest 1 in every 16 points when > 8k Hz.
-                if squared > maxSquared { maxSquared = squared }
-                if i % 16 != 0 { continue } 
-                else {
+                maxSquared = squared > maxSquared ? squared : maxSquared
+                if index % 16 != 0 { continue
+                } else {
                     squared = maxSquared
                     maxSquared = 0.0
                 }
             } else if frequencyForBin > 4000 {
                 // take the greatest 1 in every 8 points when > 4k Hz.
-                if squared > maxSquared { maxSquared = squared }
-                if i % 8 != 0 { continue } 
-                else {
+                maxSquared = squared > maxSquared ? squared : maxSquared
+                if index % 8 != 0 { continue
+                } else {
                     squared = maxSquared
                     maxSquared = 0.0
                 }
             } else if frequencyForBin > 1000 {
                 // take the greatest 1 in every 2 points when > 1k Hz.
-                // This might be already too much data, depending on the highest frequency shown and the height of where this slice is shown. 
+                // This might be already too much data, depending on the highest frequency shown 
+                // and the height of where this slice is shown. 
                 // might reduce it to show every 4th point. 
-                if squared > maxSquared { maxSquared = squared }
-                if i % 2 != 0 { continue } 
-                else {
+                maxSquared = squared > maxSquared ? squared : maxSquared
+                if index % 2 != 0 { continue
+                } else {
                     squared = maxSquared
                     maxSquared = 0.0
                 }
