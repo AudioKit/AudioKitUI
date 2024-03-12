@@ -107,10 +107,10 @@ struct SpectrogramSlice: View, Identifiable {
     // unused method drawing into a Canvas. Might be useful in the future 
     // when doing more energy efficent drawing
     func createSpectrumSlice() -> some View {
-        return Canvas { context, size in
+        return Canvas { context, _ in
             for index in 0...allRects.count-1 {
                 context.fill(
-                    Path(allRects[index]), 
+                    Path(allRects[index]),
                     with: .color(allColors[index])
                 )
             }
@@ -254,10 +254,10 @@ struct SpectrogramSlice_Previews: PreviewProvider {
     static var previews: some View {
         // This shows the wrong behaviour of the slice: the lowest frequency isn't shown, the 
         // lowest amplitude below -200 should be black but is white. 
-        return SpectrogramSlice(gradientUIColors: 
-                            [(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)), (#colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1)), (#colorLiteral(red: 0.4217140079, green: 0.6851614118, blue: 0.9599093795, alpha: 1)), (#colorLiteral(red: 0.8122602105, green: 0.6033009887, blue: 0.8759307861, alpha: 1)), (#colorLiteral(red: 0.9826132655, green: 0.5594901443, blue: 0.4263145328, alpha: 1)), (#colorLiteral(red: 1, green: 0.2607713342, blue: 0.4242972136, alpha: 1))], 
-                         sliceWidth: 40, sliceHeight: 150, 
-                         fftReadingsAsTupels:[
+        return SpectrogramSlice(gradientUIColors:
+                            [(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)), (#colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1)), (#colorLiteral(red: 0.4217140079, green: 0.6851614118, blue: 0.9599093795, alpha: 1)), (#colorLiteral(red: 0.8122602105, green: 0.6033009887, blue: 0.8759307861, alpha: 1)), (#colorLiteral(red: 0.9826132655, green: 0.5594901443, blue: 0.4263145328, alpha: 1)), (#colorLiteral(red: 1, green: 0.2607713342, blue: 0.4242972136, alpha: 1))],
+                         sliceWidth: 40, sliceHeight: 150,
+                         fftReadingsAsTupels: [
                             CGPoint(x: 150, y: -80),
                             CGPoint(x: 350, y: -50),
                             CGPoint(x: 500, y: -10),

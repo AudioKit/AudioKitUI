@@ -77,9 +77,9 @@ public struct SpectrogramFlatView: View {
                     // flip it so the new slices come in right and move to the left
                     .scaleEffect(x: -1, y: 1)
                 }
-                //.border(.red, width: 5.0)
-                .frame(maxWidth: .infinity, maxHeight:.infinity, alignment: .trailing)
-            }.onChange(of: geometry.size, initial: true) { oldSize, newSize  in
+                // .border(.red, width: 5.0)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
+            }.onChange(of: geometry.size, initial: true) { _, newSize  in
                 spectrogram.sliceSize = CGSize(
                     // even when we have non-integral width for a slice, the
                     // resulting image will be integral in size but resizable
