@@ -21,9 +21,9 @@ struct SpectrogramSlice: View, Identifiable {
     let fftMetaData: SpectrogramFFTMetaData
     private var fftReadingsAsTupels: [CGPoint]
     private var cachedUIImage: UIImage
-    private var allRects:[CGRect]
-    private var allColors:[Color]
-    
+    private var allRects: [CGRect]
+    private var allColors: [Color]
+
     init(
         gradientUIColors: [UIColor],
         sliceWidth: CGFloat,
@@ -46,18 +46,18 @@ struct SpectrogramSlice: View, Identifiable {
         allColors = []
         fftReadingsAsTupels = []
         cachedUIImage = UIImage(systemName: "pause")!
-        
+
         self.fftReadingsAsTupels = captureAmplitudeFrequencyData(fftReadings)
-        
+
         createSpectrumRects()
         cachedUIImage = createSpectrumImage()
-        
+
         // release data, we don't need it anymore
         fftReadingsAsTupels = []
         allRects = []
         allColors = []
     }
-    
+
     /// convenience initialiser, useful when measurements are created manually 
     init(
         gradientUIColors: [UIColor],
@@ -85,7 +85,7 @@ struct SpectrogramSlice: View, Identifiable {
         createSpectrumRects()
         cachedUIImage = createSpectrumImage()
     }
-    
+
     public var body: some View {
         return Image(uiImage: cachedUIImage).resizable()
     }
@@ -93,7 +93,7 @@ struct SpectrogramSlice: View, Identifiable {
     // This code draws in the first quadrant, it's much easier to understand 
     // when we can draw from low to high frequency
     // will have to flip the image when using in a typical Spectrogram View
-    func createSpectrumImage()->UIImage {        
+    func createSpectrumImage() -> UIImage {
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: sliceWidth, height: sliceHeight))
         let img = renderer.image { ctx in
             for index in 0...allRects.count-1 {
@@ -134,7 +134,7 @@ struct SpectrogramSlice: View, Identifiable {
             // index 0 contains highest y, meaning lowest frequency
             cellHeight = mappedCells[index].height
             let thisRect =  CGRect(
-                origin: CGPoint(x:0, y:cumulativePosition),
+                origin: CGPoint(x: 0, y: cumulativePosition),
                 size: CGSize(width: sliceWidth, height: cellHeight))
             cumulativePosition += cellHeight
             allRects.append(thisRect)
@@ -165,7 +165,7 @@ struct SpectrogramSlice: View, Identifiable {
                 // those frequencies come from the fft but we don't show them
                 // these are the ones typcally smaller than minFreq
                 continue
-            } 
+            }
             // calc height using the last frequency and ceil it to prevent black lines between measurements. 
             // it may happen that a cell is less than 1.0 high: that shouldn't bother us
             let cellHeight = ceil(frequencyPosition - lastFrequencyPosition)
@@ -176,7 +176,7 @@ struct SpectrogramSlice: View, Identifiable {
         outCells.append(CGSize(width: 1.0, height: 0.0))
         return outCells
     }
-    
+
     /// Returns frequency, amplitude pairs after removing unwanted data points,  
     /// there are simply too many in the high frequencies.
     /// The resulting array has fftSize amount of readings. The incoming array is compiled to CGPoints containing
@@ -196,24 +196,24 @@ struct SpectrogramSlice: View, Identifiable {
     /// The more data, the more filtering is needed.  
     /// 
     /// Make this more energy efficient by combining this function with mapFftReadingsToCells
-    
+
     func captureAmplitudeFrequencyData(_ fftFloats: [Float]) -> [CGPoint] {
         var maxSquared: Float = 0.0
         var frequencyChosen = 0.0
         var points: [CGPoint] = []
-        
         for i in 1 ... (fftFloats.count / 2) {
+
             // Compiler or LLVM will make these four following array access' into two 
             let real = fftFloats[i-1].isNaN ? 0.0 : fftFloats[i-1]
             let imaginary = fftFloats[i].isNaN ? 0.0 : fftFloats[i]
             let frequencyForBin = fftMetaData.sampleRate * 0.5 * Double(i * 2) / Double(fftFloats.count * 2)
             var squared = real * real + imaginary * imaginary
-            
+
             // if the frequency is higher as we need: continue
             // we don't filter low frequencies, they are all pushed to the queue
             if frequencyForBin > Double(spectrogramMaxFreq) { continue }
             frequencyChosen = frequencyForBin
-            
+
             if frequencyForBin > 8000 {
                 // take the greatest 1 in every 16 points when > 8k Hz.
                 if squared > maxSquared { maxSquared = squared }
@@ -263,9 +263,9 @@ struct SpectrogramSlice_Previews: PreviewProvider {
                             CGPoint(x: 500, y: -10),
                             CGPoint(x: 1000, y: -160),
                             CGPoint(x: 1500, y: -260),
-                            CGPoint(x: 2000, y: -120), 
+                            CGPoint(x: 2000, y: -120),
                             CGPoint(x: 3000, y: -80)],
-                         spectrogramMinFreq: 140, spectrogramMaxFreq: 4000, 
+                         spectrogramMinFreq: 140, spectrogramMaxFreq: 4000,
                          fftMetaData: SpectrogramFFTMetaData()
         ).scaleEffect(x: 1, y: -1)
     }

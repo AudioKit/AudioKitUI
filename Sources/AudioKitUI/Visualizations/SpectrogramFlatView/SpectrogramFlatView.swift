@@ -50,7 +50,7 @@ public struct SpectrogramFlatView: View {
 
     /// put only one color into the array for a monochrome view
     public init(node: Node,
-                amplitudeColors: [Color] = [], 
+                amplitudeColors: [Color] = [],
                 backgroundColor: Color = Color.black) {
         self.node = node
         if amplitudeColors.count > 1 {
@@ -72,7 +72,7 @@ public struct SpectrogramFlatView: View {
                     ForEach(spectrogram.slices.items) { slice in
                         // flip it as the slice was drawn in the first quadrant
                         slice.scaleEffect(x: 1, y: -1)
-                        //.border(.green, width: 2.0)
+                        // .border(.green, width: 2.0)
                     }
                     // flip it so the new slices come in right and move to the left
                     .scaleEffect(x: -1, y: 1)
@@ -87,7 +87,7 @@ public struct SpectrogramFlatView: View {
                     // that's why we ceil/floor it: ceiling makes them a bit more precise. 
                     // floor makes it more energy efficient. 
                     // We did some measurements, it's hard to tell visually
-                    width:floor(newSize.width / CGFloat(spectrogram.slices.maxItems)),
+                    width: floor(newSize.width / CGFloat(spectrogram.slices.maxItems)),
                     height: newSize.height
                 )
             }

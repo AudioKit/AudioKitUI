@@ -28,7 +28,7 @@ struct SpectrogramFFTMetaData {
 struct SliceQueue {
     var maxItems: Int = 120
     var items: [SpectrogramSlice] = []
-    
+
     public mutating func pushToQueue(element: SpectrogramSlice) {
         enqueue(element: element)
         if items.count > maxItems {
@@ -75,8 +75,8 @@ class SpectrogramFlatModel: ObservableObject {
     // In case of Xcode Preview, filling of queue will be done in 
     // setSliceSize called typically from the geometry reader. 
     init() {
-        if !xcodePreview { 
-            createEmptyData() 
+        if !xcodePreview {
+            createEmptyData()
         }
     }
 
@@ -96,10 +96,10 @@ class SpectrogramFlatModel: ObservableObject {
                 sliceHeight: sliceSize.height,
                 fftReadingsAsTupels: points,
                 spectrogramMinFreq: minFreq,
-                spectrogramMaxFreq: maxFreq, 
+                spectrogramMaxFreq: maxFreq,
                 fftMetaData: nodeMetaData
             )
-            slices.pushToQueue(element:slice)
+            slices.pushToQueue(element: slice)
         }
     }
 
@@ -114,7 +114,7 @@ class SpectrogramFlatModel: ObservableObject {
                 let frequency = 48.0 + CGFloat( i * (13500 / testCellAmount ))  
                 var amplitude = CGFloat.random(in: -200 ... 0)
                 // add some silence to the test data
-                amplitude = amplitude < -80 ? amplitude : -200.0  
+                amplitude = amplitude < -80 ? amplitude : -200.0
                 points.append(CGPoint(x: frequency, y: amplitude))
             }
             let slice = SpectrogramSlice(
@@ -126,10 +126,10 @@ class SpectrogramFlatModel: ObservableObject {
                 spectrogramMaxFreq: maxFreq,
                 fftMetaData: nodeMetaData
             )
-            slices.pushToQueue(element:slice)
+            slices.pushToQueue(element: slice)
         }
     }
-    
+
     func updateNode(_ node: Node) {
         // Using a background thread to get data from FFTTap. 
         // This doesn't make it more efficient but will not bother 
@@ -160,7 +160,7 @@ class SpectrogramFlatModel: ObservableObject {
             sliceHeight: sliceSize.height,
             fftReadings: fftFloats,
             spectrogramMinFreq: minFreq,
-            spectrogramMaxFreq: maxFreq, 
+            spectrogramMaxFreq: maxFreq,
             fftMetaData: nodeMetaData
         )
         // we receive the callback typically on a background thread, where 
@@ -171,4 +171,3 @@ class SpectrogramFlatModel: ObservableObject {
     }
 
 }
-
