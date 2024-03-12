@@ -4,7 +4,8 @@
  * Each time a new slice arrives from FFTTap, the view gets a complete layout update.
  * Rendering of new slices is done on a background thread and involves too many steps
  * Frame rate is defined by how many samples come per second. This look ugly in case of less than 25 per second.
- * It somehow doesn't show the frequency range that is selected, so some cpu time is wasted for calculating stuff that isn't shown. 
+ * It somehow doesn't show the frequency range that is selected, so some cpu time 
+    is wasted for calculating stuff that isn't shown. 
  * Some arrays are iterated several times in a row whereas it could be done in one enumeration. 
  
  Following possibilities to be considered for a more energy efficient implementation:
@@ -13,7 +14,8 @@
  * Layout and draw the slices directly on a Canvas (instead of HStack) and independently move the Canvas left. 
  * Try .drawingGroup() if it helps up the performance
  * Use ImageRenderer objectwillchange to create a stream of images
- * Use Sample Code from Apple of vDSP and Accellerate (macOS) and port it to iOS: https://developer.apple.com/documentation/accelerate/visualizing_sound_as_an_audio_spectrogram
+ * Use Sample Code from Apple of vDSP and Accellerate (macOS) and port it to iOS: 
+    https://developer.apple.com/documentation/accelerate/visualizing_sound_as_an_audio_spectrogram
  * Spectrogram is actually kind of a Heatmap, so use SwiftUI.Chart
  * Use factory and emitter to emit new slice images (like in a particle system)
  * Measure performance impact when spreading on several threads or combine on main thread

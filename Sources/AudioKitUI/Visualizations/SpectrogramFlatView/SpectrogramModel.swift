@@ -7,10 +7,14 @@ import SwiftUI
 struct SpectrogramFFTMetaData {
     // fftSize defines how detailled the music is analyzed in the time domain. 
     // the lower the value, the less detail:
-    // * 1024: will receive about four analyzed frequencies between C2 and C* (65Hz to 130Hz). New data comes roughly 21.5 times per second, each 46ms.  
-    // * 2048: will receive about eight analyzed frequencies between C2 and C* (65Hz to 130Hz).  New data comes roughly 11 times per second, each 93ms. 
-    // * 4096: will receive about 16 analyzed frequencies between C2 and C* (65Hz to 130Hz). New data comes roughly  5.5 times per second, each 186ms.  
-    // Choose a higher value when you want to analyze low frequencies, choose a lower value when you want fast response and high frame rate on display
+    // * 1024: will receive about four analyzed frequencies between C2 and C* (65Hz to 130Hz). 
+    //             New data comes roughly 21.5 times per second, each 46ms.  
+    // * 2048: will receive about eight analyzed frequencies between C2 and C* (65Hz to 130Hz).  
+    //            New data comes roughly 11 times per second, each 93ms. 
+    // * 4096: will receive about 16 analyzed frequencies between C2 and C* (65Hz to 130Hz). 
+    //            New data comes roughly  5.5 times per second, each 186ms.  
+    // Choose a higher value when you want to analyze low frequencies, 
+    // choose a lower value when you want fast response and high frame rate on display.
     // Default: 2048
     var fftSize = 4096/2
 

@@ -24,7 +24,15 @@ struct SpectrogramSlice: View, Identifiable {
     private var allRects:[CGRect]
     private var allColors:[Color]
     
-    init(gradientUIColors: [UIColor], sliceWidth: CGFloat, sliceHeight: CGFloat, fftReadings: [Float], spectrogramMinFreq: CGFloat, spectrogramMaxFreq: CGFloat, fftMetaData: SpectrogramFFTMetaData) {
+    init(
+        gradientUIColors: [UIColor],
+        sliceWidth: CGFloat,
+        sliceHeight: CGFloat,
+        fftReadings: [Float],
+        spectrogramMinFreq: CGFloat,
+        spectrogramMaxFreq: CGFloat,
+        fftMetaData: SpectrogramFFTMetaData
+    ) {
         self.gradientUIColors = gradientUIColors
         self.sliceWidth = sliceWidth
         self.sliceHeight = sliceHeight
@@ -51,7 +59,15 @@ struct SpectrogramSlice: View, Identifiable {
     }
     
     /// convenience initialiser, useful when measurements are created manually 
-    init(gradientUIColors: [UIColor], sliceWidth: CGFloat, sliceHeight: CGFloat, fftReadingsAsTupels: [CGPoint], spectrogramMinFreq: CGFloat, spectrogramMaxFreq: CGFloat, fftMetaData: SpectrogramFFTMetaData) {
+    init(
+        gradientUIColors: [UIColor],
+        sliceWidth: CGFloat,
+        sliceHeight: CGFloat,
+        fftReadingsAsTupels: [CGPoint],
+        spectrogramMinFreq: CGFloat,
+        spectrogramMaxFreq: CGFloat,
+        fftMetaData: SpectrogramFFTMetaData
+    ) {
         self.gradientUIColors = gradientUIColors
         self.sliceWidth = sliceWidth
         self.sliceHeight = sliceHeight
@@ -125,7 +141,8 @@ struct SpectrogramSlice: View, Identifiable {
             allColors.append(Color(SpectrogramFlatView.gradientUIColors.intermediate(mappedCells[index].width))  )
         }
         if (cumulativePosition > sliceHeight) {
-            //print("Warning: all cells sum up higher than what could fit: \(cumulativePosition) should be less or equal than: \(sliceHeight) for ID: \(id)")
+            // print("Warning: all cells sum up higher than what could fit: " +
+            // "\(cumulativePosition) should be less or equal than: \(sliceHeight) for ID: \(id)")
         }
 
     }
@@ -160,20 +177,23 @@ struct SpectrogramSlice: View, Identifiable {
         return outCells
     }
     
-    /// Returns frequency, amplitude pairs after removing unwanted data points,  there are simply too many in the high frequencies.
+    /// Returns frequency, amplitude pairs after removing unwanted data points,  
+    /// there are simply too many in the high frequencies.
     /// The resulting array has fftSize amount of readings. The incoming array is compiled to CGPoints containing
     /// frequency and amplitude, where as x is frequency and y amplitude. 
     /// The amount of tupels depends on minFreq and maxFreq as well as the fftSize.
     /// To understand CGPoint x and y imagine a chart that spans from left to right for lowest to highest frequency
     /// and on shows vertically the amplitude, as the equalizer view of an 80ies stereo system. 
     /// The FFT-slices start at frequency 0, which is odd. 
-    /// Lowest frequency meaning amplitude of all frequencies from 0 to the first other frequency (typically 5Hz or 21.533Hz) 
+    /// Lowest frequency meaning amplitude of all frequencies 
+    /// from 0 to the first other frequency (typically 5Hz or 21.533Hz) 
     /// 
     /// Alternative implementation: have this array not with CGPoint of frequency and amplitude 
     /// but only of amplitude already color coded in the gradient. The frequency axis 
     /// would then be hardcoded as the plot distance on y-axis
     ///
-    /// Improvement: make the filtering of high frequencies dependent of fftSize. The more data, the more filtering is needed.  
+    /// Improvement: make the filtering of high frequencies dependent of fftSize. 
+    /// The more data, the more filtering is needed.  
     /// 
     /// Make this more energy efficient by combining this function with mapFftReadingsToCells
     
