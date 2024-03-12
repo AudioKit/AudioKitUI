@@ -84,8 +84,8 @@ class SpectrogramFlatModel: ObservableObject {
     private func createEmptyData() {
         for _ in 0 ... slices.maxItems - 1 {
             var points: [CGPoint] = []
-            for i in 0 ..< 10 {
-                let frequency = CGFloat(Float(i) * Float.pi)
+            for index in 0 ..< 10 {
+                let frequency = CGFloat(Float(index) * Float.pi)
                 let amplitude = CGFloat(-200.0)
                 points.append(CGPoint(x: frequency, y: amplitude))
             }
@@ -109,9 +109,9 @@ class SpectrogramFlatModel: ObservableObject {
             var points: [CGPoint] = []
             // lowest and highest frequency full amplitude to see the rendering showing full frequency spectrum
             // CGPoint x: frequency  y: Amplitude -200 ... 0 whereas 0 is full loud volume 
-            for i in 0 ... testCellAmount {
+            for index in 0 ... testCellAmount {
                 // linear frequency range from 48 to 13500 in amount of steps we generate
-                let frequency = 48.0 + CGFloat( i * (13500 / testCellAmount ))  
+                let frequency = 48.0 + CGFloat( index * (13500 / testCellAmount ))
                 var amplitude = CGFloat.random(in: -200 ... 0)
                 // add some silence to the test data
                 amplitude = amplitude < -80 ? amplitude : -200.0

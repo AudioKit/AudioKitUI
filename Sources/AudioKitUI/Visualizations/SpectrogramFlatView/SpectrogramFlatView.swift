@@ -23,6 +23,7 @@
  * Try to replace all CGPoint and CGPoint[] calculations using Accelerate or some other optimized library 
  * Measure efficiency and compare if it would make a difference to only use opaque colors in gradient
  * By all these possibilites to improve energy efficiency, don't forget the latency.
+ * might be easy to make available in earlier versions than iOS 17, primarly because of .onChange(of:
 
  */
 
@@ -39,7 +40,6 @@ import SwiftUI
 /// a central feature in your app. Furthermore it's not scientificicly correct, when displaying
 /// white noise, it will not show a uniform distribution.
 
-// might be easy to make available in earlier versions, primarly because of .onChange(of:
 @available(iOS 17.0, *)
 public struct SpectrogramFlatView: View {
     // this static var is a shortcut: better to have this in SpectrogramModel or SpectrogramFFTMetaData

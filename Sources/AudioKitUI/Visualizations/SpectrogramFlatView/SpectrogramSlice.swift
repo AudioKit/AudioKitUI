@@ -140,7 +140,7 @@ struct SpectrogramSlice: View, Identifiable {
             allRects.append(thisRect)
             allColors.append(Color(SpectrogramFlatView.gradientUIColors.intermediate(mappedCells[index].width))  )
         }
-        if (cumulativePosition > sliceHeight) {
+        if cumulativePosition > sliceHeight {
             // print("Warning: all cells sum up higher than what could fit: " +
             // "\(cumulativePosition) should be less or equal than: \(sliceHeight) for ID: \(id)")
         }
