@@ -4,6 +4,9 @@
 import AudioKit
 import SwiftUI
 
+///     Considerations for further development; depending on usage and requirements:
+///     Make this struct public so the look can be configured. Define fftSize as enum.
+///     Also add something like a gain or similar to adjust sensitivity of display. 
 struct SpectrogramFFTMetaData {
     // fftSize defines how detailled the music is analyzed in the time domain. 
     // the lower the value, the less detail:
@@ -15,13 +18,21 @@ struct SpectrogramFFTMetaData {
     //            New data comes roughly  5.5 times per second, each 186ms.  
     // Choose a higher value when you want to analyze low frequencies, 
     // choose a lower value when you want fast response and high frame rate on display.
-    // Default: 2048
-    var fftSize = 4096/2
+    let fftSize = 2048
 
+    // Lowest and highest frequencies shown. 
+    // We use 48Hz, which is a bit lower than G1. A1 would be 440Hz/8 = 55Hz.  
+    // The lowest human bass voice in choral music is reaching down to C1 (32.7 Hz). 
+    // Don't go lower than 6.0, it just doesn't make sense and the display gets terribly distorted
+    // don't use 0 as it breaks the display because log10(0) is undefined and this error not handled
+    let minFreq: CGFloat = 48.0
+    // we will not show anything above 13500 as it's not music anymore but just overtones and noise
+    let maxFreq: CGFloat = 13500.0
+    
     // how/why can the sample rate be edited? Shouldn't this come from the node/engine?
     // if the sample rate is changed, does the displayed frequency range also have to be changed?
     // took this from existing SpectrogramView, will investigate later
-    var sampleRate: double_t = 44100
+    let sampleRate: double_t = 44100
 }
 
 @available(iOS 17.0, *)
@@ -61,14 +72,6 @@ class SpectrogramFlatModel: ObservableObject {
     var nodeTap: FFTTap!
     var node: Node?
 
-    // we use 48Hz, which is a bit lower than G1. A1 would be 440Hz/8 = 55Hz.  
-    // The lowest human bass voice in choral music is reaching down to C1 (32.7 Hz). 
-    // don't go lower than 6.0, it just doesn't make sense and the display gets terribly distorted
-    // don't use 0 as it breaks the display because log10(0) is undefined and this error not handled
-    var minFreq: CGFloat = 48.0
-    // we will not show anything above 13500 as it's not music anymore but just the overtones
-    var maxFreq: CGFloat = 13500.0
-
     // create a filled Queue, always full of stuff. looks a bit better. 
     // otherwise it would be fast moving at the beginning and then  
     // pressing together until full (looks funny though :-). 
@@ -95,8 +98,6 @@ class SpectrogramFlatModel: ObservableObject {
                 sliceWidth: sliceSize.width,
                 sliceHeight: sliceSize.height,
                 fftReadingsAsTupels: points,
-                spectrogramMinFreq: minFreq,
-                spectrogramMaxFreq: maxFreq,
                 fftMetaData: nodeMetaData
             )
             slices.pushToQueue(element: slice)
@@ -122,8 +123,6 @@ class SpectrogramFlatModel: ObservableObject {
                 sliceWidth: sliceSize.width,
                 sliceHeight: sliceSize.height,
                 fftReadingsAsTupels: points,
-                spectrogramMinFreq: minFreq,
-                spectrogramMaxFreq: maxFreq,
                 fftMetaData: nodeMetaData
             )
             slices.pushToQueue(element: slice)
@@ -159,8 +158,6 @@ class SpectrogramFlatModel: ObservableObject {
             sliceWidth: sliceSize.width,
             sliceHeight: sliceSize.height,
             fftReadings: fftFloats,
-            spectrogramMinFreq: minFreq,
-            spectrogramMaxFreq: maxFreq,
             fftMetaData: nodeMetaData
         )
         // we receive the callback typically on a background thread, where 

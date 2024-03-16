@@ -16,8 +16,6 @@ struct SpectrogramSlice: View, Identifiable {
     let sliceWidth: CGFloat
     let sliceHeight: CGFloat
     let rawFftReadings: [Float]
-    let spectrogramMinFreq: CGFloat
-    let spectrogramMaxFreq: CGFloat
     let fftMetaData: SpectrogramFFTMetaData
     private var fftReadingsAsTupels: [CGPoint]
     private var cachedUIImage: UIImage
@@ -29,16 +27,12 @@ struct SpectrogramSlice: View, Identifiable {
         sliceWidth: CGFloat,
         sliceHeight: CGFloat,
         fftReadings: [Float],
-        spectrogramMinFreq: CGFloat,
-        spectrogramMaxFreq: CGFloat,
         fftMetaData: SpectrogramFFTMetaData
     ) {
         self.gradientUIColors = gradientUIColors
         self.sliceWidth = sliceWidth
         self.sliceHeight = sliceHeight
         self.rawFftReadings = fftReadings
-        self.spectrogramMinFreq = spectrogramMinFreq
-        self.spectrogramMaxFreq = spectrogramMaxFreq
         self.fftMetaData = fftMetaData
         Self.counterSinceStart = Self.counterSinceStart &+ 1
         id = Self.counterSinceStart
@@ -64,16 +58,12 @@ struct SpectrogramSlice: View, Identifiable {
         sliceWidth: CGFloat,
         sliceHeight: CGFloat,
         fftReadingsAsTupels: [CGPoint],
-        spectrogramMinFreq: CGFloat,
-        spectrogramMaxFreq: CGFloat,
         fftMetaData: SpectrogramFFTMetaData
     ) {
         self.gradientUIColors = gradientUIColors
         self.sliceWidth = sliceWidth
         self.sliceHeight = sliceHeight
         self.fftReadingsAsTupels = fftReadingsAsTupels
-        self.spectrogramMinFreq = spectrogramMinFreq
-        self.spectrogramMaxFreq = spectrogramMaxFreq
         self.fftMetaData = fftMetaData
         Self.counterSinceStart = Self.counterSinceStart &+ 1
         id = Self.counterSinceStart
@@ -160,7 +150,7 @@ struct SpectrogramSlice: View, Identifiable {
             // the frequency comes out from lowest frequency at 0 to max frequency at height
             let frequency = fftReadingsAsTupels[index].x
             let frequencyPosition = frequency.mappedLog10(
-                from: spectrogramMinFreq ... spectrogramMaxFreq,
+                from: fftMetaData.minFreq ... fftMetaData.maxFreq,
                 to: 0 ... sliceHeight
             )
 
@@ -214,7 +204,7 @@ struct SpectrogramSlice: View, Identifiable {
 
             // if the frequency is higher as we need: continue
             // we don't filter low frequencies, they are all pushed to the queue
-            if frequencyForBin > Double(spectrogramMaxFreq) { continue }
+            if frequencyForBin > Double(fftMetaData.maxFreq) { continue }
             frequencyChosen = frequencyForBin
 
             if frequencyForBin > 8000 {
@@ -268,8 +258,10 @@ struct SpectrogramSlice_Previews: PreviewProvider {
                             CGPoint(x: 1000, y: -160),
                             CGPoint(x: 1500, y: -260),
                             CGPoint(x: 2000, y: -120),
-                            CGPoint(x: 3000, y: -80)],
-                         spectrogramMinFreq: 140, spectrogramMaxFreq: 4000,
+                            CGPoint(x: 3000, y: -80),
+                            CGPoint(x: 5000, y: -30),
+                            CGPoint(x: 8800, y: -40),
+                            CGPoint(x: 8000, y: -10)],
                          fftMetaData: SpectrogramFFTMetaData()
         ).scaleEffect(x: 1, y: -1)
     }
