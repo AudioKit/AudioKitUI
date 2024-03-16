@@ -28,7 +28,7 @@ struct SpectrogramFFTMetaData {
     let minFreq: CGFloat = 48.0
     // we will not show anything above 13500 as it's not music anymore but just overtones and noise
     let maxFreq: CGFloat = 13500.0
-    
+
     // how/why can the sample rate be edited? Shouldn't this come from the node/engine?
     // if the sample rate is changed, does the displayed frequency range also have to be changed?
     // took this from existing SpectrogramView, will investigate later
