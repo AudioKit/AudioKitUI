@@ -210,6 +210,11 @@ struct SpectrogramSlice: View, Identifiable {
         var maxSquared: Float = 0.0
         var frequencyChosen = 0.0
         var points: [CGPoint] = []
+        // Frequencies are shown in a logarithmic scale (meaning octaves have same distance).
+        // Therefore frequencies above these levels are reduced.
+        let filterFrequencyHigh = 8000.0
+        let filterFrequencyMid = 4000.0
+        let filterFrequency = 1000.0
 
         for index in 1 ... (fftFloats.count / 2) {
             // Compiler or LLVM will make these four following array access' into two 
@@ -223,7 +228,7 @@ struct SpectrogramSlice: View, Identifiable {
             if frequencyForBin > Double(fftMetaData.maxFreq) { continue }
             frequencyChosen = frequencyForBin
 
-            if frequencyForBin > 8000 {
+            if frequencyForBin > filterFrequencyHigh {
                 // take the greatest 1 in every 16 points when > 8k Hz.
                 maxSquared = squared > maxSquared ? squared : maxSquared
                 if index % 16 != 0 { continue
@@ -231,7 +236,7 @@ struct SpectrogramSlice: View, Identifiable {
                     squared = maxSquared
                     maxSquared = 0.0
                 }
-            } else if frequencyForBin > 4000 {
+            } else if frequencyForBin > filterFrequencyMid {
                 // take the greatest 1 in every 8 points when > 4k Hz.
                 maxSquared = squared > maxSquared ? squared : maxSquared
                 if index % 8 != 0 { continue
@@ -239,7 +244,7 @@ struct SpectrogramSlice: View, Identifiable {
                     squared = maxSquared
                     maxSquared = 0.0
                 }
-            } else if frequencyForBin > 1000 {
+            } else if frequencyForBin > filterFrequency {
                 // take the greatest 1 in every 2 points when > 1k Hz.
                 // This might be already too much data, depending on the highest frequency shown 
                 // and the height of where this slice is shown. 
