@@ -61,7 +61,9 @@ struct SliceQueue {
 ///  Model for the SpectrogramFlatView. Makes connection to the audio node and receives FFT data
 @available(iOS 17.0, *)
 class SpectrogramFlatModel: ObservableObject {
+    /// A queue full of SpectrogramSlice
     @Published var slices = SliceQueue()
+    /// Dimensions of the slices. Set prior to rendering to get slices that fit. 
     var sliceSize = CGSize(width: 10, height: 250) {
         didSet {
             if xcodePreview { createTestData() }
