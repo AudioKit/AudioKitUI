@@ -10,7 +10,10 @@ import SwiftUI
 @available(iOS 17.0, *)
 struct SpectrogramSlice: View, Identifiable {
     static var counterSinceStart = 0
-    // id is required by Identifiable protocol
+    // static Int instead of a UUID as identifier. While debugging it's practical 
+    // to see the order and therefore time the slice was created.
+    // Furthermore for the sake of premature performance optimisation: 
+    // Incrementing an Int could be supposedly faster than creating UUID.
     // depending on the version of swiftlint, this will be marked as rule violation to be 2 characters in length
     // swiftlint:disable identifier_name
     let id: Int
