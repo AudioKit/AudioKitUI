@@ -97,7 +97,7 @@ class SpectrogramFlatModel: ObservableObject {
                 gradientUIColors: SpectrogramFlatView.gradientUIColors,
                 sliceWidth: sliceSize.width,
                 sliceHeight: sliceSize.height,
-                fftReadingsAsTupels: points,
+                fftReadingsFrequencyAmplitudePairs: points,
                 fftMetaData: nodeMetaData
             )
             slices.pushToQueue(element: slice)
@@ -122,7 +122,7 @@ class SpectrogramFlatModel: ObservableObject {
                 gradientUIColors: SpectrogramFlatView.gradientUIColors,
                 sliceWidth: sliceSize.width,
                 sliceHeight: sliceSize.height,
-                fftReadingsAsTupels: points,
+                fftReadingsFrequencyAmplitudePairs: points,
                 fftMetaData: nodeMetaData
             )
             slices.pushToQueue(element: slice)

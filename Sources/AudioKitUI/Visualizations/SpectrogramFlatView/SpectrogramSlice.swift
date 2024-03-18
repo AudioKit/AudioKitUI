@@ -24,7 +24,9 @@ struct SpectrogramSlice: View, Identifiable {
     let sliceHeight: CGFloat
     let rawFftReadings: [Float]
     let fftMetaData: SpectrogramFFTMetaData
-    private var fftReadingsAsTupels: [CGPoint]
+    // they don't contain CGPoints in the sense of graphic but in the sense of vectors.
+    // x describing the frequency axis and y the amplitude axis.
+    private var fftReadingFrequencyAmplitudePairs: [CGPoint]
     private var cachedUIImage: UIImage
     private var allRects: [CGRect]
     private var allColors: [Color]
@@ -45,16 +47,16 @@ struct SpectrogramSlice: View, Identifiable {
         id = Self.counterSinceStart
         allRects = []
         allColors = []
-        fftReadingsAsTupels = []
+        fftReadingFrequencyAmplitudePairs = []
         cachedUIImage = UIImage(systemName: "pause")!
 
-        self.fftReadingsAsTupels = captureAmplitudeFrequencyData(fftReadings)
+        self.fftReadingFrequencyAmplitudePairs = captureAmplitudeFrequencyData(fftReadings)
 
         createSpectrumRects()
         cachedUIImage = createSpectrumImage()
 
         // release data, we don't need it anymore
-        fftReadingsAsTupels = []
+        fftReadingFrequencyAmplitudePairs = []
         allRects = []
         allColors = []
     }
@@ -64,13 +66,13 @@ struct SpectrogramSlice: View, Identifiable {
         gradientUIColors: [UIColor],
         sliceWidth: CGFloat,
         sliceHeight: CGFloat,
-        fftReadingsAsTupels: [CGPoint],
+        fftReadingsFrequencyAmplitudePairs: [CGPoint],
         fftMetaData: SpectrogramFFTMetaData
     ) {
         self.gradientUIColors = gradientUIColors
         self.sliceWidth = sliceWidth
         self.sliceHeight = sliceHeight
-        self.fftReadingsAsTupels = fftReadingsAsTupels
+        self.fftReadingFrequencyAmplitudePairs = fftReadingsFrequencyAmplitudePairs
         self.fftMetaData = fftMetaData
         Self.counterSinceStart = Self.counterSinceStart &+ 1
         id = Self.counterSinceStart
@@ -120,15 +122,15 @@ struct SpectrogramSlice: View, Identifiable {
     } */
 
     mutating func createSpectrumRects() {
-        guard fftReadingsAsTupels.count > 0 else { return }
+        guard fftReadingFrequencyAmplitudePairs.count > 0 else { return }
         // calc rects and color within initialiser, so the drawing will just use those
-        // fftReadings contains typically 210 tupels with frequency (x) and amplitude (y)
+        // fftReadings contains typically 210 pairs with frequency (x) and amplitude (y)
         // those then are mapped to y coordinate and color
         let mappedCells = mapFftReadingsToCells()
         // size.height is it's height shown
         // size.width is intensitiy between  0..1
         var cumulativePosition = 0.0
-        var cellHeight = sliceHeight / CGFloat(fftReadingsAsTupels.count)
+        var cellHeight = sliceHeight / CGFloat(fftReadingFrequencyAmplitudePairs.count)
         // iterating thru the array with an index (instead of enumeration)
         // as index is used to calc height
         for index in 0...mappedCells.count - 1 {
@@ -150,17 +152,17 @@ struct SpectrogramSlice: View, Identifiable {
 
     // the incoming array of fft readings should be sorted by frequency
     func mapFftReadingsToCells() -> [CGSize] {
-        guard fftReadingsAsTupels.count > 0 else { return [] }
+        guard fftReadingFrequencyAmplitudePairs.count > 0 else { return [] }
         var outCells: [CGSize] = []
         // never return an empty array
         // the lowest delimiter in full amplitude but no height
         outCells.append(CGSize(width: 1.0, height: 0.0))
         // starting at line 1
         var lastFrequencyPosition = 0.0
-        for index in 1 ..< fftReadingsAsTupels.count {
-            let amplitude = fftReadingsAsTupels[index].y.mapped(from: -200 ... 0, to: 0 ... 1.0)
+        for index in 1 ..< fftReadingFrequencyAmplitudePairs.count {
+            let amplitude = fftReadingFrequencyAmplitudePairs[index].y.mapped(from: -200 ... 0, to: 0 ... 1.0)
             // the frequency comes out from lowest frequency at 0 to max frequency at height
-            let frequency = fftReadingsAsTupels[index].x
+            let frequency = fftReadingFrequencyAmplitudePairs[index].x
             let frequencyPosition = frequency.mappedLog10(
                 from: fftMetaData.minFreq ... fftMetaData.maxFreq,
                 to: 0 ... sliceHeight
@@ -186,7 +188,7 @@ struct SpectrogramSlice: View, Identifiable {
     /// there are simply too many in the high frequencies.
     /// The resulting array has fftSize amount of readings. The incoming array is compiled to CGPoints containing
     /// frequency and amplitude, where as x is frequency and y amplitude. 
-    /// The amount of tupels depends on minFreq and maxFreq as well as the fftSize.
+    /// The amount of pairs depends on minFreq and maxFreq as well as the fftSize.
     /// To understand CGPoint x and y imagine a chart that spans from left to right for lowest to highest frequency
     /// and on shows vertically the amplitude, as the equalizer view of an 80ies stereo system. 
     /// The FFT-slices start at frequency 0, which is odd. 
@@ -265,7 +267,7 @@ struct SpectrogramSlice_Previews: PreviewProvider {
         return SpectrogramSlice(gradientUIColors:
                             [(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)), (#colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1)), (#colorLiteral(red: 0.4217140079, green: 0.6851614118, blue: 0.9599093795, alpha: 1)), (#colorLiteral(red: 0.8122602105, green: 0.6033009887, blue: 0.8759307861, alpha: 1)), (#colorLiteral(red: 0.9826132655, green: 0.5594901443, blue: 0.4263145328, alpha: 1)), (#colorLiteral(red: 1, green: 0.2607713342, blue: 0.4242972136, alpha: 1))],
                          sliceWidth: 40, sliceHeight: 150,
-                         fftReadingsAsTupels: [
+                         fftReadingsFrequencyAmplitudePairs: [
                             CGPoint(x: 150, y: -80),
                             CGPoint(x: 350, y: -50),
                             CGPoint(x: 500, y: -10),
