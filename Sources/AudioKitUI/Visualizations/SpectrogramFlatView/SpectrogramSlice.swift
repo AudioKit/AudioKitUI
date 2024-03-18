@@ -99,8 +99,9 @@ struct SpectrogramSlice: View, Identifiable {
     }
 
     // unused method drawing into a Canvas. Might be useful in the future 
-    // when doing more energy efficent drawing
-    func createSpectrumSlice() -> some View {
+    // when doing more energy efficent drawing. 
+    // MARK: createSpectrumSlice() 
+    /* func createSpectrumSlice() -> some View {
         return Canvas { context, _ in
             for index in 0...allRects.count-1 {
                 context.fill(
@@ -111,7 +112,7 @@ struct SpectrogramSlice: View, Identifiable {
             // flip it back. Code is much easier to understand when we can draw from low to high frequency
             // drawing in the first quadrant, as we did in macOS Core Animation
         }.scaleEffect(x: 1, y: -1)
-    }
+    } */
 
     mutating func createSpectrumRects() {
         // calc rects and color within initialiser, so the drawing will just use those
