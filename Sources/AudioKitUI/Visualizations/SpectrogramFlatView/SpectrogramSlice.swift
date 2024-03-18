@@ -10,7 +10,11 @@ import SwiftUI
 @available(iOS 17.0, *)
 struct SpectrogramSlice: View, Identifiable {
     static var counterSinceStart = 0
+    // id is required by Identifiable protocol
+    // depending on the version of swiftlint, this will be marked as rule violation to be 2 characters in length
+    // swiftlint:disable identifier_name
     let id: Int
+    // swiftlint:enable identifier_name
     // we don't provide defaults, the caller really should know about these
     let gradientUIColors: [UIColor]
     let sliceWidth: CGFloat
