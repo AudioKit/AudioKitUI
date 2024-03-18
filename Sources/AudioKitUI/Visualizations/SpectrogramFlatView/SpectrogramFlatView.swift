@@ -1,5 +1,40 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 /* 
+ Dataflow overview:
+ * FFTTap analyzed the sound and creates an array of frequencies and amplitudes 
+   several times per second. As soon as the data is ready, a new slice is instantiated. 
+   On init, the slice converts the array of measurements to an image and caches it.
+   The conversion of data and creating an image takes quite some time and is 
+   done only once.
+* Drawing is done using UIGraphicsImageRenderer with context.fill primitives. 
+   These are cached as UImage and layouted onto the view. 
+ 
+ 
+Steps involved: 
+ * FFTTap calls SpectrogramFlatModel with newly analyzed sound using 
+    ``SpectrogramFlatModel/pushData(_ fftFloats: [Float])`` 
+ * The model then creates a SpectrogramSlice and puts it into the queue.
+ * Body of this view watches this queue and shows all slices in the queue.
+ * Because the body and therefore each slice is redrawn on any update of 
+    the queue, the drawing of the slice should be fast. Current implementation 
+    of SpectrogramSlice caches an image of itself after drawing.
+* The image is drawn pixel aligned on a CGContext. The image then is resized
+   to fit into this view.
+ 
+ 
+ Brief history of this class
+ * Class was created using SpectrogramView as starting point
+ * SpectrogramView looked/looks like coming from an 90ies japanese synth, 
+    in a kind of 3D surface which is cool. Most common spectrograms or sonographs 
+    have a flat look. 
+ * The flat look makes it easier to analyze music, make voice fingerprints and compare bird songs
+ * SpectrogramView had/has a major design flaw: on each update (as soon as new data arrived 
+    from the FFT), all slices were completely redrawn from raw data. All recent measurements (80)
+    are converted from an array of measurements to Paths with all the lines.
+ * Measuring with Instruments showed that this takes a lot of time, therefore
+   this implementation caches the resulting image.
+ 
+ 
  Cause of inefficiency of this implementation
  * Each time a new slice arrives from FFTTap, the view gets a complete layout update.
  * Rendering of new slices is done on a background thread and involves too many steps
@@ -12,6 +47,7 @@
  * Only calc what is shown, enumerate array only once (see comment on captureAmplitudeFrequencyData()). 
  * Make the layouting independent of sample rate, just move the slices left with a continous, builtin animation.
  * Layout and draw the slices directly on a Canvas (instead of HStack) and independently move the Canvas left. 
+ * To make it shown crisp, all images should be drawn and layouted pixel aligned (integral size and position).  
  * Try .drawingGroup() if it helps up the performance
  * Use ImageRenderer objectwillchange to create a stream of images
  * Use Sample Code from Apple of vDSP and Accellerate (macOS) and port it to iOS: 
