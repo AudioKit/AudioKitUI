@@ -88,9 +88,11 @@ struct SpectrogramSlice: View, Identifiable {
     }
 
     // This code draws in the first quadrant, it's much easier to understand 
-    // when we can draw from low to high frequency
+    // when we can draw from low to high frequency bottom to top.
     // will have to flip the image when using in a typical Spectrogram View
     func createSpectrumImage() -> UIImage {
+        // return an empty image when no data here to visualize.
+        guard allRects.count > 0 else { return UIImage() }
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: sliceWidth, height: sliceHeight))
         let img = renderer.image { ctx in
             for index in 0...allRects.count-1 {
@@ -118,6 +120,7 @@ struct SpectrogramSlice: View, Identifiable {
     } */
 
     mutating func createSpectrumRects() {
+        guard fftReadingsAsTupels.count > 0 else { return }
         // calc rects and color within initialiser, so the drawing will just use those
         // fftReadings contains typically 210 tupels with frequency (x) and amplitude (y)
         // those then are mapped to y coordinate and color
@@ -147,6 +150,7 @@ struct SpectrogramSlice: View, Identifiable {
 
     // the incoming array of fft readings should be sorted by frequency
     func mapFftReadingsToCells() -> [CGSize] {
+        guard fftReadingsAsTupels.count > 0 else { return [] }
         var outCells: [CGSize] = []
         // never return an empty array
         // the lowest delimiter in full amplitude but no height
@@ -199,6 +203,8 @@ struct SpectrogramSlice: View, Identifiable {
     /// Make this more energy efficient by combining this function with mapFftReadingsToCells
 
     func captureAmplitudeFrequencyData(_ fftFloats: [Float]) -> [CGPoint] {
+        // need at least two data points
+        guard fftFloats.count > 1 else { return [] }
         var maxSquared: Float = 0.0
         var frequencyChosen = 0.0
         var points: [CGPoint] = []
