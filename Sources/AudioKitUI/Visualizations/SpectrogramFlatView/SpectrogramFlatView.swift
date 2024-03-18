@@ -115,15 +115,15 @@ public struct SpectrogramFlatView: View {
                 // .border(.red, width: 5.0)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
             }.onAppear {
-                spectrogram.sliceSize = calcSliceSizeFromFrameSize(frameSize: geometry.size)
+                spectrogram.sliceSize = calcSliceSize(fromFrameSize: geometry.size)
             }
             .onChange(of: geometry.size) { newSize  in
-                spectrogram.sliceSize = calcSliceSizeFromFrameSize(frameSize: newSize)
+                spectrogram.sliceSize = calcSliceSize(fromFrameSize: newSize)
             }
         }
     }
 
-    func calcSliceSizeFromFrameSize(frameSize: CGSize) -> CGSize {
+    func calcSliceSize(fromFrameSize frameSize: CGSize) -> CGSize {
         let outSize = CGSize(
             // even when we have non-integral width for a slice, the
             // resulting image will be integral in size but resizable
