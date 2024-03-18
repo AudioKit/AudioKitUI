@@ -7,7 +7,6 @@ import SwiftUI
 /// Resulting image has an integral size (dimensions in Int), so they are most of 
 /// the time a bit smaller than requested. This is because they are drawn in 
 /// a CGContext that doesn't have fractions of pixels to draw.  
-@available(iOS 17.0, *)
 struct SpectrogramSlice: View, Identifiable {
     static var counterSinceStart = 0
     // static Int instead of a UUID as identifier. While debugging it's practical 

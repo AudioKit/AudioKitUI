@@ -35,7 +35,6 @@ struct SpectrogramFFTMetaData {
     let sampleRate: double_t = 44100
 }
 
-@available(iOS 17.0, *)
 struct SliceQueue {
     var maxItems: Int = 120
     var items: [SpectrogramSlice] = []
@@ -59,7 +58,6 @@ struct SliceQueue {
 }
 
 ///  Model for the SpectrogramFlatView. Makes connection to the audio node and receives FFT data
-@available(iOS 17.0, *)
 class SpectrogramFlatModel: ObservableObject {
     /// A queue full of SpectrogramSlice
     @Published var slices = SliceQueue()

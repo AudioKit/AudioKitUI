@@ -76,7 +76,6 @@ import SwiftUI
 /// a central feature in your app. Furthermore it's not scientificicly correct, when displaying
 /// white noise, it will not show a uniform distribution.
 
-@available(iOS 17.0, *)
 public struct SpectrogramFlatView: View {
     // this static var is a shortcut: better to have this in SpectrogramModel or SpectrogramFFTMetaData
     public static var gradientUIColors: [UIColor] =  [(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 0)), (#colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 0.6275583187)), (#colorLiteral(red: 0.4217140079, green: 0.6851614118, blue: 0.9599093795, alpha: 0.8245213468)), (#colorLiteral(red: 0.8122602105, green: 0.6033009887, blue: 0.8759307861, alpha: 1)), (#colorLiteral(red: 0.9826132655, green: 0.5594901443, blue: 0.4263145328, alpha: 1)), (#colorLiteral(red: 1, green: 0.2607713342, blue: 0.4242972136, alpha: 1))]
@@ -115,25 +114,32 @@ public struct SpectrogramFlatView: View {
                 }
                 // .border(.red, width: 5.0)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
-            }.onChange(of: geometry.size, initial: true) { _, newSize  in
-                spectrogram.sliceSize = CGSize(
-                    // even when we have non-integral width for a slice, the
-                    // resulting image will be integral in size but resizable
-                    // the HStack will then layout them not pixel aligned and stretched.
-                    // that's why we ceil/floor it: ceiling makes them a bit more precise. 
-                    // floor makes it more energy efficient. 
-                    // We did some measurements, it's hard to tell visually
-                    width: floor(newSize.width / CGFloat(spectrogram.slices.maxItems)),
-                    height: newSize.height
-                )
+            }.onAppear {
+                spectrogram.sliceSize = calcSliceSizeFromFrameSize(frameSize: geometry.size)
+            }
+            .onChange(of: geometry.size) { newSize  in
+                spectrogram.sliceSize = calcSliceSizeFromFrameSize(frameSize: newSize)
             }
         }
+    }
+
+    func calcSliceSizeFromFrameSize(frameSize: CGSize) -> CGSize {
+        let outSize = CGSize(
+            // even when we have non-integral width for a slice, the
+            // resulting image will be integral in size but resizable
+            // the HStack will then layout them not pixel aligned and stretched.
+            // that's why we ceil/floor it: ceiling makes them a bit more precise. 
+            // floor makes it more energy efficient. 
+            // We did some measurements, it's hard to tell visually
+            width: floor(frameSize.width / CGFloat(spectrogram.slices.maxItems)),
+            height: frameSize.height
+        )
+        return outSize
     }
 }
 
 // MARK: Preview
 
-@available(iOS 17.0, *)
 struct SpectrogramFlatView_Previews: PreviewProvider {
     static var previews: some View {
         return SpectrogramFlatView(node: Mixer())
