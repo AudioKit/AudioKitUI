@@ -1,5 +1,7 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 
+#if !os(macOS) || targetEnvironment(macCatalyst)
+
 import Foundation
 import UIKit
 
@@ -38,3 +40,5 @@ extension Array where Element: UIColor {
         }
     }
 }
+
+#endif
