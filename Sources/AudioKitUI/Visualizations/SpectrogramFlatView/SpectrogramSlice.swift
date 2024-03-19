@@ -1,5 +1,7 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/AudioKitUI/
 
+#if !os(macOS) || targetEnvironment(macCatalyst)
+
 import SwiftUI
 
 /// One slice with frequencies from low frequencies at the bottom up to high frequences. 
@@ -286,3 +288,5 @@ struct SpectrogramSlice_Previews: PreviewProvider {
         ).scaleEffect(x: 1, y: -1)
     }
 }
+
+#endif

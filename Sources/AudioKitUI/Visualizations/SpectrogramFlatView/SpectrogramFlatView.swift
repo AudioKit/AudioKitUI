@@ -66,6 +66,8 @@ Steps involved:
 import AudioKit
 import SwiftUI
 
+#if !os(macOS) || targetEnvironment(macCatalyst)
+
 /// Displays a rolling plot of the frequency spectrum. 
 ///
 /// Each slice represents a point in time with the frequencies shown from bottom to top
@@ -145,3 +147,5 @@ struct SpectrogramFlatView_Previews: PreviewProvider {
         return SpectrogramFlatView(node: Mixer())
     }
 }
+
+#endif
