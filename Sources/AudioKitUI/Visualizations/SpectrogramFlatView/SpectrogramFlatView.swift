@@ -35,6 +35,19 @@ Steps involved:
    this implementation caches the resulting image.
  
  
+ Suggested next steps on development:
+ * Layout and draw the slices directly on a Canvas (instead of HStack) and independently move the Canvas left.
+ * Make class compatible with macOS 
+    - Drawing with Canvas instead of UIGraphicsImageRenderer 
+      (caching of UIImage no longer needed if callback can draw directly on one Canvas)
+    - CrossPlatformColor from Waveform.swift or Color.Resolved instead of UIColor for gradient lookup
+ * Add some parameters that can be changed while the spectrogram is running
+    - Pause so user can have a close look at the analyzed past
+    - Gain or sensitivity
+    - Speed of the rolling plot / detail frequency by adjusting fftSize
+    - Min and max frequency shown
+ 
+ 
  Cause of inefficiency of this implementation
  * Each time a new slice arrives from FFTTap, the view gets a complete layout update.
  * Rendering of new slices is done on a background thread and involves too many steps
@@ -65,6 +78,8 @@ Steps involved:
 
 import AudioKit
 import SwiftUI
+
+#if !os(macOS) || targetEnvironment(macCatalyst)
 
 /// Displays a rolling plot of the frequency spectrum. 
 ///
@@ -145,3 +160,5 @@ struct SpectrogramFlatView_Previews: PreviewProvider {
         return SpectrogramFlatView(node: Mixer())
     }
 }
+
+#endif
