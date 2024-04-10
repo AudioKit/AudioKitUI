@@ -31,17 +31,16 @@ struct MorphableShape: Shape {
     }
 }
 
-// MARK: Path extension
-
+/// Return points at a given offset and create AnimatableVector for control points
 extension Path {
-    // return point at the curve
+    /// return point at the curve
     func point(at offset: CGFloat) -> CGPoint {
         let limitedOffset = min(max(offset, 0), 1)
         guard limitedOffset > 0 else { return cgPath.currentPoint }
         return trimmedPath(from: 0, to: limitedOffset).cgPath.currentPoint
     }
 
-    // return control points along the path
+    /// return control points along the path
     func controlPoints(count: Int) -> AnimatableVector {
         var retPoints = [Double]()
         for index in 0 ..< count {

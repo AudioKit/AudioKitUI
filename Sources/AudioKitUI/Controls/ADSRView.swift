@@ -7,6 +7,7 @@ import AVFoundation
 import UIKit
 
 /// A click and draggable view of an ADSR Envelope (Atttack, Decay, Sustain, Release)
+///
 /// All values are normalised 0->1, so scale them how you would like in your callback
 
 @IBDesignable public class ADSRView: UIView {
