@@ -1,4 +1,4 @@
-# AudioKit User Interfaces
+# ``AudioKitUI``
 
 Waveform plots and controls that can be used to jump start your AudioKit-powered app.
 
