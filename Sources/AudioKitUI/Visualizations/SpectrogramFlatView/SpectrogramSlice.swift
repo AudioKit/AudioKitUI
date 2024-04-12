@@ -88,6 +88,8 @@ struct SpectrogramSlice: View, Identifiable {
 
     public var body: some View {
         return Image(uiImage: cachedUIImage).resizable()
+            // flip it as the slice was drawn in the first quadrant
+            .scaleEffect(x: 1, y: -1)                    
     }
 
     // This code draws in the first quadrant, it's much easier to understand 
@@ -286,7 +288,7 @@ struct SpectrogramSlice_Previews: PreviewProvider {
                             CGPoint(x: 8800, y: -40),
                             CGPoint(x: 8000, y: -10)],
                          fftMetaData: SpectrogramFFTMetaData()
-        ).scaleEffect(x: 1, y: -1)
+        )
     }
 }
 
