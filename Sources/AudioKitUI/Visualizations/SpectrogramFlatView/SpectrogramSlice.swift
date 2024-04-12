@@ -89,7 +89,7 @@ struct SpectrogramSlice: View, Identifiable {
     public var body: some View {
         return Image(uiImage: cachedUIImage).resizable()
             // flip it as the slice was drawn in the first quadrant
-            .scaleEffect(x: 1, y: -1)                    
+            .scaleEffect(x: 1, y: -1)
     }
 
     // This code draws in the first quadrant, it's much easier to understand 
