@@ -222,7 +222,7 @@ struct SpectrogramSlice: View, Identifiable {
             let real = fftFloats[index-1].isNaN ? 0.0 : fftFloats[index-1]
             let imaginary = fftFloats[index].isNaN ? 0.0 : fftFloats[index]
             let frequencyForBin = fftMetaData.sampleRate * 0.5 * Double(index * 2) / Double(fftFloats.count * 2)
-            var squared = real * real + imaginary * imaginary
+            var squared: Float = real * real + imaginary * imaginary
 
             // if the frequency is higher as we need: continue
             // we don't filter low frequencies, they are all pushed to the queue
@@ -257,7 +257,8 @@ struct SpectrogramSlice: View, Identifiable {
                     maxSquared = 0.0
                 }
             }
-            let amplitude = Double(10 * log10(4 * squared / (Float(fftMetaData.fftSize) * Float(fftMetaData.fftSize))))
+            let fftBins = CGFloat(fftMetaData.fftSize)
+            let amplitude = Double(10 * log10(4 * CGFloat(squared) / fftBins * fftBins))
             points.append(CGPoint(x: frequencyChosen, y: amplitude))
         }
         return points
