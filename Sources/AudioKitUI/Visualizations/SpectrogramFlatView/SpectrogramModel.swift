@@ -20,7 +20,7 @@ struct SpectrogramFFTMetaData {
     //            New data comes roughly  5.5 times per second, each 186ms.  
     // Choose a higher value when you want to analyze low frequencies, 
     // choose a lower value when you want fast response and high frame rate on display.
-    let fftSize = 2048
+    let fftSize: UInt32 = 2048
 
     // Lowest and highest frequencies shown. 
     // We use 48Hz, which is a bit lower than G1. A1 would be 440Hz/8 = 55Hz.  
@@ -137,7 +137,7 @@ class SpectrogramFlatModel: ObservableObject {
         // main thread and user while doing the work
         if node !== self.node {
             self.node = node
-            nodeTap = FFTTap(node, bufferSize: UInt32(nodeMetaData.fftSize * 2), callbackQueue: .global()) { fftData in
+            nodeTap = FFTTap(node, bufferSize: nodeMetaData.fftSize * 2, callbackQueue: .global()) { fftData in
                 self.pushData(fftData)
             }
             // normalization would mean that on each slice, the loudest would have 

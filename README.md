@@ -32,10 +32,12 @@ Just like AudioKit, the example project for AudioKitUI is the [AudioKit Cookbook
 
 ## More!
 
-Because some user interfaces are quite complex, and don't really have AudioKit as a dependency, we will be putting them in other repositories under the AudioKit umbrella. 
+Because some user interfaces are quite complex, and don't really have AudioKit as a dependency, they are in other repositories under the AudioKit umbrella:
 
-### Piano Roll 
-
-[https://github.com/AudioKit/PianoRoll](https://github.com/AudioKit/PianoRoll)
-
-<img src="https://raw.githubusercontent.com/AudioKit/PianoRoll/main/Sources/PianoRoll/PianoRoll.docc/Resources/screenshot.png" alt="piano roll screenshot" style="width:75%;">
+* Controls: SwiftUI Knobs, Sliders, X-Y Pads, and more [github.com/AudioKit/Controls](https://github.com/AudioKit/Controls)
+* Flow: Generic node graph editor [github.com/AudioKit/Flow](https://github.com/AudioKit/Flow) 
+* Keyboard: SwiftUI music keyboard [github.com/AudioKit/Keyboard](https://github.com/AudioKit/Keyboard)
+* Piano Roll: Touch oriented piano roll [github.com/AudioKit/PianoRoll](https://github.com/AudioKit/PianoRoll)
+* PianoRollEditor: Logic Pro like piano roll editor [github.com/AudioKit/PianoRollEditor](https://github.com/AudioKit/PianoRollEditor)
+* MIDITrackView: View representing a MIDI Track [github.com/AudioKit/MIDITrackView](https://github.com/AudioKit/MIDITrackView)
+* Waveform: GPU accelerated waveform view [github.com/AudioKit/Waveform](https://github.com/AudioKit/Waveform)

@@ -120,14 +120,11 @@ public struct SpectrogramFlatView: View {
                     }
                 HStack(spacing: 0.0) {
                     ForEach(spectrogram.slices.items) { slice in
-                        // flip it as the slice was drawn in the first quadrant
-                        slice.scaleEffect(x: 1, y: -1)
-                        // .border(.green, width: 2.0)
+                        slice
                     }
                     // flip it so the new slices come in right and move to the left
                     .scaleEffect(x: -1, y: 1)
                 }
-                // .border(.red, width: 5.0)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
             }.onAppear {
                 spectrogram.sliceSize = calcSliceSize(fromFrameSize: geometry.size)

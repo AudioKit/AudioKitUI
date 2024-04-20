@@ -5,11 +5,15 @@
 import Foundation
 import UIKit
 
-/// usage You can use it to get an intermediate color between two or more colors:
-/// let color = [.green, .yellow, .red].intermediate(0.7)
-/// inspired by 
-/// https://stackoverflow.com/questions/15032562/ios-find-color-at-point-between-two-colors/59996029#59996029
+/// Get an intermediate color between two or more colors
+/// 
+/// Example: `let color = [.green, .yellow, .red].intermediate(0.7)`
+///
+/// inspired by [stackoverflow 15032562 answer Nikaaner](https://stackoverflow.com/questions/15032562/ios-find-color-at-point-between-two-colors/59996029#59996029)
 extension Array where Element: UIColor {
+    /// Get an intermediate color between two or more colors
+    /// 
+    /// Example: `let color = [.green, .yellow, .red].intermediate(0.7)`
     public func intermediate(_ percentage: CGFloat) -> UIColor {
         let percentage = Swift.max(Swift.min(percentage, 1), 0)
         switch percentage {
