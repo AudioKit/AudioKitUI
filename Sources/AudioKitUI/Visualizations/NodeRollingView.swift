@@ -4,6 +4,7 @@ import Accelerate
 import AudioKit
 import AVFoundation
 import SwiftUI
+import MetalKit
 
 public class RollingViewData {
     let bufferSampleCount: UInt
@@ -60,20 +61,22 @@ public struct NodeRollingView: ViewRepresentable {
         rollingData = RollingViewData(bufferSize: bufferSize)
     }
 
-    var plot: FloatPlot {
+    public func makeCoordinator() -> FloatPlotCoordinator {
         nodeTap.start()
 
-        return FloatPlot(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024), constants: constants) {
+        let plot = FloatPlot(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024), constants: constants) {
             rollingData.calculate(nodeTap)
         }
+
+        return .init(renderer: plot)
     }
 
     #if os(macOS)
-    public func makeNSView(context: Context) -> FloatPlot { return plot }
-    public func updateNSView(_ nsView: FloatPlot, context: Context) {}
+    public func makeNSView(context: Context) -> NSView { return context.coordinator.view }
+    public func updateNSView(_ nsView: NSView, context: Context) {}
     #else
-    public func makeUIView(context: Context) -> FloatPlot { return plot }
-    public func updateUIView(_ uiView: FloatPlot, context: Context) {}
+    public func makeUIView(context: Context) -> UIView { return context.coordinator.view }
+    public func updateUIView(_ uiView: UIView, context: Context) {}
     #endif
 }
 
