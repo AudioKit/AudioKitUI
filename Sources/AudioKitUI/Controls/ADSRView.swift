@@ -502,7 +502,7 @@ extension CGPoint {
 #else
 
 import AVFoundation
-import Cocoa
+import AppKit
 
 /// Call back for values for attack, decay, sustain, and release parameters
 public typealias ADSRCallback = (AUValue, AUValue, AUValue, AUValue) -> Void

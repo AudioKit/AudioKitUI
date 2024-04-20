@@ -4,6 +4,7 @@ import Accelerate
 import AudioKit
 import AVFoundation
 import SwiftUI
+import MetalKit
 
 public struct NodeOutputView: ViewRepresentable {
     private var nodeTap: RawDataTap
@@ -18,19 +19,21 @@ public struct NodeOutputView: ViewRepresentable {
         nodeTap = RawDataTap(node, bufferSize: UInt32(bufferSize), callbackQueue: .main)
     }
 
-    var plot: FloatPlot {
+    public func makeCoordinator() -> FloatPlotCoordinator {
         nodeTap.start()
 
-        return FloatPlot(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024), constants: constants) {
-            return nodeTap.data
+        let plot = FloatPlot(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024), constants: constants) {
+            nodeTap.data
         }
+
+        return .init(renderer: plot)
     }
 
     #if os(macOS)
-    public func makeNSView(context: Context) -> FloatPlot { return plot }
-    public func updateNSView(_ nsView: FloatPlot, context: Context) {}
+    public func makeNSView(context: Context) -> NSView { return context.coordinator.view }
+    public func updateNSView(_ nsView: NSView, context: Context) {}
     #else
-    public func makeUIView(context: Context) -> FloatPlot { return plot }
-    public func updateUIView(_ uiView: FloatPlot, context: Context) {}
+    public func makeUIView(context: Context) -> UIView { return context.coordinator.view }
+    public func updateUIView(_ uiView: UIView, context: Context) {}
     #endif
 }

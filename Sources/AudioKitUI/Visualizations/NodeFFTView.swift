@@ -4,6 +4,7 @@ import Accelerate
 import AudioKit
 import AVFoundation
 import SwiftUI
+import MetalKit
 
 public struct NodeFFTView: ViewRepresentable {
     var nodeTap: FFTTap
@@ -13,7 +14,7 @@ public struct NodeFFTView: ViewRepresentable {
         nodeTap = FFTTap(node, bufferSize: UInt32(bufferSampleCount), callbackQueue: .main) { _ in }
     }
 
-    internal var plot: FloatPlot {
+    public func makeCoordinator() -> FloatPlotCoordinator {
         nodeTap.start()
 
         let constants = FragmentConstants(foregroundColor: Color.yellow.simd,
@@ -26,14 +27,14 @@ public struct NodeFFTView: ViewRepresentable {
             nodeTap.fftData
         }
 
-        return plot
+        return .init(renderer: plot)
     }
 
     #if os(macOS)
-    public func makeNSView(context: Context) -> FloatPlot { return plot }
-    public func updateNSView(_ nsView: FloatPlot, context: Context) {}
+    public func makeNSView(context: Context) -> NSView { return context.coordinator.view }
+    public func updateNSView(_ nsView: NSView, context: Context) {}
     #else
-    public func makeUIView(context: Context) -> FloatPlot { return plot }
-    public func updateUIView(_ uiView: FloatPlot, context: Context) {}
+    public func makeUIView(context: Context) -> UIView { return context.coordinator.view }
+    public func updateUIView(_ uiView: UIView, context: Context) {}
     #endif
 }
