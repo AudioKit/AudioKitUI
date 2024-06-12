@@ -35,7 +35,7 @@ public struct AudioFileWaveform: View {
     }
 
     public var body: some View {
-        Group {
+        let group = Group {
             if viewModel.rmsValues.count > 2 {
                 AudioWaveform(rmsVals: viewModel.rmsValues)
                     .fill(color)
@@ -43,8 +43,18 @@ public struct AudioFileWaveform: View {
                 AudioWaveform(rmsVals: viewModel.rmsValues)
                     .stroke(color)
             }
-        }.onAppear {
-            viewModel.update(url: url, rmsSamplesPerWindow: rmsSamplesPerWindow)
+        }
+        if #available(iOS 17.0, *) {
+            group.onChange(of:url) { 
+                viewModel.update(url: url, rmsSamplesPerWindow: rmsSamplesPerWindow)
+            }
+            .onAppear {
+                viewModel.update(url: url, rmsSamplesPerWindow: rmsSamplesPerWindow)
+            }
+        } else {
+            group.onAppear {
+                viewModel.update(url: url, rmsSamplesPerWindow: rmsSamplesPerWindow)
+            }
         }
     }
 }
