@@ -45,7 +45,7 @@ public struct AudioFileWaveform: View {
             }
         }
         if #available(iOS 17.0, *) {
-            group.onChange(of:url) { 
+            group.onChange(of: url) { 
                 viewModel.update(url: url, rmsSamplesPerWindow: rmsSamplesPerWindow)
             }
             .onAppear {
