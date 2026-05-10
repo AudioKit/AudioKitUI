@@ -5,7 +5,7 @@ import Metal
 import MetalKit
 
 // This must be in sync with the definition in shaders.metal
-struct FragmentConstants {
+public struct FragmentConstants {
     public var foregroundColor: SIMD4<Float>
     public var backgroundColor: SIMD4<Float>
     public var isFFT: Bool
@@ -15,9 +15,25 @@ struct FragmentConstants {
     // Padding is required because swift doesn't pad to alignment
     // like MSL does.
     public var padding: Int = 0
+
+    public init(
+        foregroundColor: SIMD4<Float>,
+        backgroundColor: SIMD4<Float>,
+        isFFT: Bool,
+        isCentered: Bool,
+        isFilled: Bool,
+        padding: Int = 0
+    ) {
+        self.foregroundColor = foregroundColor
+        self.backgroundColor = backgroundColor
+        self.isFFT = isFFT
+        self.isCentered = isCentered
+        self.isFilled = isFilled
+        self.padding = padding
+    }
 }
 
-class FloatPlot: NSObject {
+public class FloatPlot: NSObject {
     var waveformTexture: MTLTexture?
     let commandQueue: MTLCommandQueue!
     let pipelineState: MTLRenderPipelineState!
